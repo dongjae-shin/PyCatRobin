@@ -5,11 +5,84 @@ import os
 from typing import List, Tuple
 from glob import glob
 
+class DataForGP:
+    """"""
+    def __init__(self, path):
+        self.path = path
+        self.path_found = None
+        self.path_filtered = None
+        self.path_removed = None
+        self.df_us = None
+
+    def find_excel_files(self):
+        extension = '*.xlsx'  # the matched but starting with 'P' is excluded to remove example file
+        self.path_found = glob(pathname=os.path.join(self.path, extension))
+        print(f'{len(self.path_found)} excel files were found:')
+
+    def filter_excel_files(self, exclude_keywords):
+        """
+        filters out excel files that satisfy any of `exclude_keywords`.
+        Args:
+            exclude_keywords:
+
+        Returns:
+
+        """
+        self.path_filtered = []
+        self.path_removed = []
+        for path in self.path_found:
+            if any(keyword in path for keyword in exclude_keywords):
+                self.path_removed.append(path)  # store removed elements
+            else:
+                self.path_filtered.append(path)  # store filtered elements
+
+    def construct_dataframe(self, extensive:bool=False):
+        if extensive:
+            self.df_us = pd.DataFrame(
+                {'reaction_temp': [],
+                 'Rh_weight_loading': [],
+                 'Rh_total_mass': [],
+                 'synth_method': [],
+                 'filename': [],
+                 'experiment_date': [],
+                 'diluent_mass': [],
+                 'bed_length': [],
+                 'inner_diameter': [],
+                 'pretreat_ramp_rate': [],
+                 'pretreat_gas_composition': [],
+                 'diluent': [], }
+            )
+        else:
+            self.df_us = pd.DataFrame(
+                {'reaction_temp': [],
+                 'Rh_weight_loading': [],
+                 'Rh_total_mass': [],
+                 'synth_method': [],
+                 'filename': [],
+                 'experiment_date': []}
+            )
+        for i in range(len(self.path_filtered)):
+            self.df_us.loc[i] = get_input_vector(
+                self.path_filtered[i],
+                extensive=extensive
+            )  # adding a row
+            # self.df_us.index = self.df_us.index + 1  # shifting index
+            # self.df_us = self.df_us.sort_index()  # sorting by index
 
 # Extract input vector for each excel file (241115)
 def get_input_vector(excel_path: str = None,
                      extensive: bool = False,
                      mute: bool = True) -> List:
+    """
+
+    Args:
+        excel_path: placeholder
+        extensive: placeholder
+        mute: placeholder
+
+    Returns:
+
+    """
     if excel_path == None:
         print('excel_path should be give.')
         return
