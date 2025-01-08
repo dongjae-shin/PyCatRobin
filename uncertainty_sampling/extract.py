@@ -1,9 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import os
 from typing import List, Tuple
 from glob import glob
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from datetime import timedelta
+from IPython.display import display
+
 
 class DataForGP:
     """"""
@@ -15,7 +19,7 @@ class DataForGP:
         self.df_us = None
 
     def find_excel_files(self):
-        extension = '*.xlsx'  # the matched but starting with 'P' is excluded to remove example file
+        extension = '*.xlsx'
         self.path_found = glob(pathname=os.path.join(self.path, extension))
         print(f'{len(self.path_found)} excel files were found:')
 
@@ -69,12 +73,80 @@ class DataForGP:
             # self.df_us.index = self.df_us.index + 1  # shifting index
             # self.df_us = self.df_us.sort_index()  # sorting by index
 
-# Extract input vector for each excel file (241115)
+        # convert 'experiment_date' column into datetime format
+        self.df_us['experiment_date'] = pd.to_datetime(self.df_us['experiment_date'], format='%Y%m%d')
+
+    def convert_measured_to_nominal(self,
+                                    allowed_values: np.array = None,
+                                    which_column: str = 'Rh_total_mass',
+                                    ):
+        """
+        convert measured values in the column that are not allowed by `allowed_values` into closest values
+        to the allowed ones.
+        Args:
+            allowed_values: 
+            which_column: 
+
+        Returns:
+
+        """
+        if not allowed_values:
+            # allowed grid values for m_rh
+            m_rh_max = 0.02
+            m_rh_min = 0.005
+            m_rh_step = 0.0025
+            n_m_rh_grid = int((m_rh_max - m_rh_min) / m_rh_step + 1)
+            m_rh = np.linspace(m_rh_min, m_rh_max, n_m_rh_grid)
+
+            # allowed grid values + out-of-range nominal value in training data (0.04)
+            allowed_values = np.concatenate((m_rh, [0.04]))
+        for i in np.argwhere(_is_not_nominal_value_vectorized(self.df_us[which_column], allowed_values)).reshape(-1):
+            i_min = np.argmin(np.abs(allowed_values - self.df_us.loc[i, which_column]))
+            print('data indexed', i, 'is not nominal: ', self.df_us.loc[i, which_column], '->', allowed_values[i_min])
+            self.df_us.loc[i, which_column] = allowed_values[i_min]
+    
+    def check_most_recent(self, buffer_recent: int = 1):
+        # get the most recent date in the column
+        most_recent_date = self.df_us['experiment_date'].max()
+
+        # find the row with the most recent date with buffer 
+        most_recent_rows = self.df_us[(most_recent_date - self.df_us['experiment_date']) <= timedelta(buffer_recent)]
+
+        # obtain the row numbers
+        row_numbers = most_recent_rows.index.to_list()
+
+        print("Most Recent Date:", most_recent_date)
+        print("Most Recent Row Numbers:", row_numbers)
+        print("Most Recent Row Data:")
+        display(self.df_us.iloc[row_numbers, :])
+
+        # plot recent data
+        for i, row_number in enumerate(row_numbers):
+            print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
+            plot_tos_data(
+                self.path_filtered[row_number], keyword_to_plot='CO2 Conversion', x_max_plot=None, y_max_plot=60
+            )
+            print(
+                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(
+                    self.path_filtered[row_number], percent=False, mute=False
+                ):5.3f}")
+
+    def apply_group_id_duplicate_data(self):
+        pass
+
+def _is_not_nominal_value_vectorized(to_be_tested: pd.Series,
+                                    allowed_values: np.array) -> pd.Series:
+    """
+    True if the element of a given DataFrame column is not allowed/
+    In other words, True if the elements are not close ot any of allowed values
+    """
+    return to_be_tested.apply(lambda x: not np.any(np.abs(allowed_values - x) == 0))
+
 def get_input_vector(excel_path: str = None,
                      extensive: bool = False,
                      mute: bool = True) -> List:
     """
-
+    Extract input vector for each excel file (241115)
     Args:
         excel_path: placeholder
         extensive: placeholder
