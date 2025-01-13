@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="added some classes and functions in extract.py">
-      <change afterPath="$PROJECT_DIR$/extract_from_gc_data.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uncertainty_sampling/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="modified extract.py, and two python files added.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_from_gc_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uncertainty_sampling/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/uncertainty_sampling/extract.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +53,8 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "settings.editor.selected.configurable": "preferences.sourceCode"
+    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -125,7 +125,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736291547139</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="modified extract.py, and two python files added.">
+      <option name="closed" value="true" />
+      <created>1736297028581</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1736297028581</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -142,20 +150,16 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="cloned into other local directory, synced with Dropbox" />
     <MESSAGE value="added some classes and functions in extract.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="added some classes and functions in extract.py" />
+    <MESSAGE value="modified extract.py, and two python files added." />
+    <option name="LAST_COMMIT_MESSAGE" value="modified extract.py, and two python files added." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/extract_from_gc_data.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/extract_from_gc_data.py</url>
-          <line>23</line>
-          <option name="timeStamp" value="16" />
+          <line>29</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

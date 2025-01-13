@@ -5,6 +5,8 @@ from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import datetime
+import warnings
 from datetime import timedelta
 from IPython.display import display
 
@@ -17,6 +19,7 @@ class DataForGP:
         self.path_filtered = None
         self.path_removed = None
         self.df_us = None
+        self.co2_convs = []
 
     def find_excel_files(self):
         extension = '*.xlsx'
@@ -84,8 +87,8 @@ class DataForGP:
         convert measured values in the column that are not allowed by `allowed_values` into closest values
         to the allowed ones.
         Args:
-            allowed_values: 
-            which_column: 
+            allowed_values: numpy array of allowed values specified by `which_column`
+            which_column: column of which values are converted into the closest allowed values
 
         Returns:
 
@@ -127,12 +130,73 @@ class DataForGP:
                 self.path_filtered[row_number], keyword_to_plot='CO2 Conversion', x_max_plot=None, y_max_plot=60
             )
             print(
-                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(
+                f"delta_CO2_conversion (%): {_calculate_delta_co2_conv(
                     self.path_filtered[row_number], percent=False, mute=False
                 ):5.3f}")
 
-    def apply_group_id_duplicate_data(self):
-        pass
+    def apply_duplicate_groupid(self):
+        self.df_us = self.df_us.drop(labels=['filename', 'experiment_date'], axis=1)
+        self.df_us["GroupID"] = (self.df_us.loc[self.df_us.duplicated(keep=False)]
+                                    .groupby(self.df_us.columns.tolist())
+                                    .ngroup() + 1)
+        # set non-duplicate rows as GroupID=0
+        self.df_us["GroupID"] = self.df_us["GroupID"].fillna(0).astype(int)
+        print("\nDataFrame with Group IDs:")
+        print(self.df_us)
+        # show by group
+        groups = [group for _, group in self.df_us.groupby("GroupID") if _]
+        print("\nDuplicate Groups:")
+        for i, group in enumerate(groups, start=1):
+            print(f"Group {i}:")
+            print(group)
+
+    def calculate_delta_co2_conv(self, percent=False, mute=True):
+        for i in range(len(self.path_filtered)):
+            self.co2_convs.append(
+                _calculate_delta_co2_conv(self.path_filtered[i], percent=percent, mute=mute)
+            )
+        self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
+
+    def export_sheet(self,
+                     unique:bool=True,
+                     which_target:str='delta_CO2_conv',
+                     mute:bool=True):
+        # export unique data set made by averaging targets and integrating
+        if unique:
+            # calculate each group's average target value
+            df_unique = self.df_us[self.df_us["GroupID"] == 0]
+            # ignore warning: A value is trying to be set on a copy of a slice from a DataFrame
+            with warnings.catch_warnings(action="ignore"):
+                for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
+                    # display(df_group)
+                    mean = df_group[which_target].mean()
+                    if not mute:
+                        print(f'Group {i}: ')
+                        print(f'mean: {mean:5.2f}')
+                    df_integrated = df_group.iloc[0, :] # use the first row in the group
+                    df_integrated.loc[which_target] = mean
+                    df_integrated.loc['filename'] = f'group {i} integrated'
+                    df_unique.loc[-1] = df_integrated # append an integrated row
+                    df_unique.index = df_unique.index + 1
+                    df_unique = df_unique.sort_index()
+            df_unique = df_unique.sort_index(ascending=False)
+            df_unique = df_unique.reset_index(drop=True)
+
+            # export excel file
+            dates = str(datetime.date.today()).rsplit('-')
+            df_unique.to_excel(
+                f'./{dates[0] + dates[1] + dates[2]}_sheet_for_ML_unique.xlsx',
+                index=False
+            )
+            return df_unique
+        # export data set with duplicate data
+        else:
+            dates = str(datetime.date.today()).rsplit('-')
+            self.df_us.to_excel(
+                f'./{dates[0] + dates[1] + dates[2]}_sheet_for_ML_duplicate.xlsx',
+                index=False
+            )
+            return self.df_us
 
 def _is_not_nominal_value_vectorized(to_be_tested: pd.Series,
                                     allowed_values: np.array) -> pd.Series:
@@ -256,7 +320,7 @@ def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
     plt.show()
 
 
-def calculate_delta_co2_conv(path, percent=True, mute=False):
+def _calculate_delta_co2_conv(path, percent=True, mute=False):
     df = pd.read_excel(path, sheet_name='Data')
     df = df.fillna(value=0)  # some data set includes nan at the end of a column.
 
