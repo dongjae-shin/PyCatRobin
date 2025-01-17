@@ -1,6 +1,8 @@
 import uncertainty_sampling.extract as ex
+import os
 
-path = "/Users/djayshin/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data"
+home_dir = os.path.expanduser("~")
+path = home_dir + "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data"
 # path = "/Users/dongjae/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data"
 
 # keywords to exclude

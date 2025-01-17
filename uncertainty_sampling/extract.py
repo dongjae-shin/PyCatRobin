@@ -157,6 +157,9 @@ class DataForGP:
             )
         self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
 
+    def calculate_init_slope(self):
+        pass
+
     def export_sheet(self,
                      unique:bool=True,
                      which_target:str='delta_CO2_conv',
