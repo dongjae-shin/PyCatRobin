@@ -10,7 +10,6 @@ import warnings
 from datetime import timedelta
 from IPython.display import display
 
-
 class DataForGP:
     """"""
     def __init__(self, path):
@@ -393,6 +392,7 @@ def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False
 def calculate_target(
         path: str, column: str, method:str, mute: bool = False,
         adjacency: float = 0.1,
+        duration: float = 10,
         plot_slope: bool = False
 )->float:
     """
@@ -434,19 +434,24 @@ def calculate_target(
     # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
     initial_index = \
         np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-                    (0 <= tos) &          # 2: 0<=t
-                    (np.argwhere(col_val > -999).reshape(-1) >= vertex_index)
+                    (0 <= tos) #&          # 2: 0<=t
+                    # (np.argwhere(col_val > -999).reshape(-1) >= vertex_index)
                                           # 3:index >= vertex index, among all indices
                     ).reshape(-1)[0]
-
+    print(vertex_index)
+    print(initial_index)
     # final_index: initial_index + ~10 hrs
-    final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
+    final_index = np.argwhere(tos >= tos[initial_index] + duration).reshape(-1)[0]
 
     # selected_index: to be used for highlighting range in plot
     selected_index = np.argwhere(
         (tos >= tos[initial_index]) &
         (tos <= tos[final_index])
          ).reshape(-1)
+
+
+    print(final_index)
+    # print(selected_index)
 
     # calculate target value according to `method` argument
     methods = ['delta', 'initial value', 'final value', 'initial slope', 'final slope',
