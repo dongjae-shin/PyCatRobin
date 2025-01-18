@@ -292,31 +292,30 @@ def plot_tos_data(
     delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
     delta_temp = delta_temp.abs()
 
-    # defining t_final = t_vertex + 10 hrs
-    tos_ind_vertex = np.argmax(prop[:100])
-    try:
-        tos_ind_10hrs = np.argwhere(tos >= tos[tos_ind_vertex] + 10).reshape(-1)[0]
-    except Exception as e:
-        print(e, f'has occurred while calculating `tos_ind_10hrs`.')
-
-    # # select tos range within const temperature region
-    # tos_ind_selected = \
-    #     np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-    #                 (tos <= tos[tos_ind_10hrs]) & (0 <= tos) &  # 2: 0<=t<=t_vert+10 hrs
-    #                 (np.argwhere(col_val > -999).reshape(-1) \
-    #                  >= np.argmax(col_val[:100]))
-    #                 # 3: after point with strongest negative change of slope
-    #                 # slicing (:100) when argmin to exclude spurious outlier
-    #                 ).reshape(-1)
+    # # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
+    # vertex_index = np.argmax(prop[:100])
     #
-    # # locating the max & min points
-    # initial_index = tos_ind_selected[0]
-    # final_index = tos_ind_selected[-1]
+    # # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
+    # initial_index = \
+    #     np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
+    #                 (0 <= tos) &  # 2: 0<=t
+    #                 (np.argwhere(prop > -999).reshape(-1) >= vertex_index)
+    #                 # 3:index >= vertex index, among all indices
+    #                 ).reshape(-1)[0]
+    #
+    # # final_index: initial_index + ~10 hrs
+    # final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
+    #
+    # # selected_index: to be used for highlighting range in plot
+    # selected_index = np.argwhere(
+    #     (tos >= tos[initial_index]) &
+    #     (tos <= tos[final_index])
+    # ).reshape(-1)
 
     # Plot
     l1 = plt.scatter(tos, prop,
                      color=[0.5, 1.0, 0.5, 1.0], s=5, label=df.columns[ind_match_prop])  # whole profile
-    # l2 = plt.scatter(tos[tos_ind_selected], prop[tos_ind_selected],
+    # l2 = plt.scatter(tos[selected_index], prop[selected_index],
     #                  color='g', s=5, label='selected')
     plt.xlabel('Time on stream (hrs)')
     plt.ylabel(df.columns[ind_match_prop], c='g')
@@ -359,27 +358,25 @@ def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False
     delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
     delta_temp = delta_temp.abs()
 
-    # defining t_final = t_vertex + 10 hrs
-    tos_ind_vertex = np.argmax(conv[:100])
-    try:
-        tos_ind_10hrs = np.argwhere(tos >= tos[tos_ind_vertex] + 10).reshape(-1)[0]
-    except Exception as e:
-        print(e, f'has occurred while calculating `tos_ind_10hrs`.')
-        # continue
+    # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
+    vertex_index = np.argmax(conv[:100])
 
-    # select tos range:
-    tos_ind_selected = \
+    # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
+    initial_index = \
         np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-                    (tos <= tos[tos_ind_10hrs]) & (0 <= tos) &  # 2: 0<=t<=t_vert+10 hrs
-                    (np.argwhere(conv > -999).reshape(-1) \
-                     >= np.argmax(conv[:100]))
-                    # 3: after point with strongest negative change of slope
-                    # slicing (:100) when argmin to exclude spurious outlier
-                    ).reshape(-1)
+                    (0 <= tos) &  # 2: 0<=t
+                    (np.argwhere(conv > -999).reshape(-1) >= vertex_index)
+                    # 3:index >= vertex index, among all indices
+                    ).reshape(-1)[0]
 
-    # locating the max & min points
-    initial_index = tos_ind_selected[0]
-    final_index = tos_ind_selected[-1]
+    # final_index: initial_index + ~10 hrs
+    final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
+
+    # selected_index: to be used for highlighting range in plot
+    selected_index = np.argwhere(
+        (tos >= tos[initial_index]) &
+        (tos <= tos[final_index])
+    ).reshape(-1)
 
     if percent:
         d_co2_conv = (conv[final_index] - conv[initial_index]) / conv[initial_index] * 100
@@ -431,31 +428,25 @@ def calculate_target(
     delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
     delta_temp = delta_temp.abs()
 
-    # defining t_final = t_vertex + 10 hrs
-    tos_ind_vertex = np.argmax(col_val[:100])
-    print('tos_ind_vertex: ', tos_ind_vertex)
-    try:
-        tos_ind_10hrs = np.argwhere(tos >= tos[tos_ind_vertex] + 10).reshape(-1)[0]
-        print('tos_ind_10hrs: ', tos_ind_10hrs)
-    except Exception as e:
-        print(e, f'has occurred while calculating `tos_ind_10hrs`.')
+    # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
+    vertex_index = np.argmax(col_val[:100])
 
-    # select tos range within const temperature region
-    tos_ind_selected = \
+    # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
+    initial_index = \
         np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-                    (tos <= tos[tos_ind_10hrs]) & (0 <= tos) &  # 2: 0<=t<=t_vert+10 hrs
-                    (np.argwhere(col_val > -999).reshape(-1) \
-                     >= np.argmax(col_val[:100]))
-                    # 3: after point with strongest negative change of slope
-                    # slicing (:100) when argmin to exclude spurious outlier
-                    ).reshape(-1)
+                    (0 <= tos) &          # 2: 0<=t
+                    (np.argwhere(col_val > -999).reshape(-1) >= vertex_index)
+                                          # 3:index >= vertex index, among all indices
+                    ).reshape(-1)[0]
 
-    # locating the max & min points
-    initial_index = tos_ind_selected[0]
-    final_index = tos_ind_selected[-1]
+    # final_index: initial_index + ~10 hrs
+    final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
 
-    print('initial_index: ', initial_index)
-    print('final_index: ', final_index )
+    # selected_index: to be used for highlighting range in plot
+    selected_index = np.argwhere(
+        (tos >= tos[initial_index]) &
+        (tos <= tos[final_index])
+         ).reshape(-1)
 
     # calculate target value according to `method` argument
     methods = ['delta', 'initial value', 'final value', 'initial slope', 'final slope',
