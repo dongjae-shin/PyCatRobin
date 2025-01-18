@@ -127,12 +127,10 @@ class DataForGP:
         for i, row_number in enumerate(row_numbers):
             print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
             plot_tos_data(
-                self.path_filtered[row_number], keyword_to_plot='CO2 Conversion', x_max_plot=None, y_max_plot=60
+                self.path_filtered[row_number], column='CO2 Conversion', x_max_plot=None, y_max_plot=60
             )
             print(
-                f"delta_CO2_conversion (%): {_calculate_delta_co2_conv(
-                    self.path_filtered[row_number], percent=False, mute=False
-                ):5.3f}")
+                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(self.path_filtered[row_number], percent=False, mute=False) :5.3f}")
 
     def apply_duplicate_groupid(self):
         self.df_us = self.df_us.drop(labels=['filename', 'experiment_date'], axis=1)
@@ -153,7 +151,7 @@ class DataForGP:
     def calculate_delta_co2_conv(self, percent=False, mute=True):
         for i in range(len(self.path_filtered)):
             self.co2_convs.append(
-                _calculate_delta_co2_conv(self.path_filtered[i], percent=percent, mute=mute)
+                calculate_delta_co2_conv(self.path_filtered[i], percent=percent, mute=mute)
             )
         self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
 
@@ -271,18 +269,21 @@ def get_input_vector(excel_path: str = None,
     else:
         return [temp, w_rh, m_rh, synth_method, filename, expt_date]
 
-def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
+def plot_tos_data(
+        path: str,
+        column: str = None, x_max_plot: float = None, y_max_plot: float = None,
+        show: bool = True
+):
     df = pd.read_excel(path, sheet_name='Data')
-    print("?")
-    if keyword_to_plot not in df.columns:
-        raise ValueError(f"Keyword '{keyword_to_plot}' is not included in df.columns")
+    if column not in df.columns:
+        raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
     # getting columns dealing with heterogeneous column names between expt groups
     ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
     tos = df[df.columns[ind_match]]
     ind_match = np.argwhere(np.char.find(list(df.columns), 'Temperature') + 1)[0][0]
     temp = df[df.columns[ind_match]]
-    ind_match_prop = np.argwhere(np.char.find(list(df.columns), keyword_to_plot) + 1)[0][0]
+    ind_match_prop = np.argwhere(np.char.find(list(df.columns), column) + 1)[0][0]
     prop = df[df.columns[ind_match_prop]]
 
     # defining const-temp region: delta temp
@@ -297,7 +298,20 @@ def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
         tos_ind_10hrs = np.argwhere(tos >= tos[tos_ind_vertex] + 10).reshape(-1)[0]
     except Exception as e:
         print(e, f'has occurred while calculating `tos_ind_10hrs`.')
-        # continue
+
+    # # select tos range within const temperature region
+    # tos_ind_selected = \
+    #     np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
+    #                 (tos <= tos[tos_ind_10hrs]) & (0 <= tos) &  # 2: 0<=t<=t_vert+10 hrs
+    #                 (np.argwhere(col_val > -999).reshape(-1) \
+    #                  >= np.argmax(col_val[:100]))
+    #                 # 3: after point with strongest negative change of slope
+    #                 # slicing (:100) when argmin to exclude spurious outlier
+    #                 ).reshape(-1)
+    #
+    # # locating the max & min points
+    # initial_index = tos_ind_selected[0]
+    # final_index = tos_ind_selected[-1]
 
     # Plot
     l1 = plt.scatter(tos, prop,
@@ -306,7 +320,8 @@ def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
     #                  color='g', s=5, label='selected')
     plt.xlabel('Time on stream (hrs)')
     plt.ylabel(df.columns[ind_match_prop], c='g')
-    plt.ylim(0, y_max_plot)
+    if y_max_plot:
+        plt.ylim(0, y_max_plot)
     if x_max_plot:
         plt.xlim(0, x_max_plot)
 
@@ -322,10 +337,11 @@ def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
     # plt.legend(ls, labs)#, loc=(0.55,0.73))
 
     # plt.savefig(path_imgs+"/{}_fig_{}.png".format(prefix, num))
-    plt.show()
+    if show:
+        plt.show()
 
-
-def _calculate_delta_co2_conv(path, percent=True, mute=False):
+# deprecated
+def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False)->float:
     df = pd.read_excel(path, sheet_name='Data')
     df = df.fillna(value=0)  # some data set includes nan at the end of a column.
 
@@ -375,3 +391,140 @@ def _calculate_delta_co2_conv(path, percent=True, mute=False):
             print("delta conv (%): {:.2f}".format(d_co2_conv))
 
     return d_co2_conv
+
+# maybe the implementation for each `method` should be different depending on `column` ...
+def calculate_target(
+        path: str, column: str, method:str, mute: bool = False,
+        adjacency: float = 0.1,
+        plot_slope: bool = False
+)->float:
+    """
+    General version of target value calculator
+    Args:
+        path: path to individual GC excel file
+        column:
+        method: 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', #'decaying rate'
+        mute:
+        adjacency: used to treat fluctuation of measured y values. It indicates how close two points will be for initial and final slopes, not used for other methods.
+        plot_slope: works with plot_tos_data()
+
+    Returns:
+
+    """
+    df = pd.read_excel(path, sheet_name='Data')
+    df = df.fillna(value=0)  # some data set includes nan at the end of a column.
+    
+    if column not in df.columns:
+        raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
+
+    # to deal with heterogeneous column names between expt groups
+    ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
+    tos = df[df.columns[ind_match]]
+    ind_match = np.argwhere(np.char.find(list(df.columns), 'Temperature') + 1)[0][0]
+    temp = df[df.columns[ind_match]]
+    ind_match = np.argwhere(np.char.find(list(df.columns), column) + 1)[0][0]
+    col_val = df[df.columns[ind_match]]
+
+    # defining constant temperature region: delta temp
+    temp_plus = np.roll(temp, -1)
+    temp_plus[-1] = 0
+    delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
+    delta_temp = delta_temp.abs()
+
+    # defining t_final = t_vertex + 10 hrs
+    tos_ind_vertex = np.argmax(col_val[:100])
+    print('tos_ind_vertex: ', tos_ind_vertex)
+    try:
+        tos_ind_10hrs = np.argwhere(tos >= tos[tos_ind_vertex] + 10).reshape(-1)[0]
+        print('tos_ind_10hrs: ', tos_ind_10hrs)
+    except Exception as e:
+        print(e, f'has occurred while calculating `tos_ind_10hrs`.')
+
+    # select tos range within const temperature region
+    tos_ind_selected = \
+        np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
+                    (tos <= tos[tos_ind_10hrs]) & (0 <= tos) &  # 2: 0<=t<=t_vert+10 hrs
+                    (np.argwhere(col_val > -999).reshape(-1) \
+                     >= np.argmax(col_val[:100]))
+                    # 3: after point with strongest negative change of slope
+                    # slicing (:100) when argmin to exclude spurious outlier
+                    ).reshape(-1)
+
+    # locating the max & min points
+    initial_index = tos_ind_selected[0]
+    final_index = tos_ind_selected[-1]
+
+    print('initial_index: ', initial_index)
+    print('final_index: ', final_index )
+
+    # calculate target value according to `method` argument
+    methods = ['delta', 'initial value', 'final value', 'initial slope', 'final slope',
+               'overall slope',] # 'decaying rate']
+    if method not in methods:
+        raise ValueError(f"Keyword '{method}' is not included in {methods}")
+
+    if   method == 'delta':
+        target = col_val[final_index] - col_val[initial_index]
+    elif method == 'initial value':
+        target = col_val[initial_index]
+    elif method == 'final value':
+        target = col_val[final_index]
+    elif method == 'initial slope':
+        # use the same initial_index
+        try:
+            # choosing final index which is close, in tos, to initial index
+            final_index = np.argwhere(tos >= tos[initial_index] + adjacency).reshape(-1)[0]
+        except Exception as e:
+            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+        target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+    elif method == 'final slope':
+        # use the same final_index
+        try:
+            # choosing initial index which is close, in tos, to final index
+            initial_index = np.argwhere(tos <= tos[final_index] - adjacency).reshape(-1)[-1]
+        except Exception as e:
+            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+        target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+    elif method == 'overall slope':
+        target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+    # elif method == 'decaying rate':
+    #     print('not implemented yet')
+    #     return
+
+    # plot linear line for slope
+    if method in ['initial slope', 'final slope', 'overall slope'] and plot_slope:
+        _plot_linear_line(
+            tos[initial_index], tos[final_index], col_val[initial_index], col_val[final_index],
+            show=False
+        )
+        plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
+
+    if not mute:
+        print(f"{column}->{method}: {target:.2f}")
+    return target
+
+def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False):
+    """ plot linear line connecting two points"""
+    def linear_func(x, x1, x2, y1, y2):
+        a = (y2 - y1) / (x2 - x1)
+        b = y2 - a * x2
+        return a * x + b, a
+
+    x_plot = np.linspace(t_init-1, t_final+1, 100) # plot buffer of 1
+    y_plot, slope = linear_func(x_plot, t_init,
+                                t_final,
+                                y_init,
+                                y_final)
+
+    plt.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
+    plt.scatter([t_init, t_final],
+                [y_init, y_final],
+                color='red', edgecolors='gray'
+                )
+    plt.text(
+        (t_init + t_final) / 2,
+        (y_init + y_final) / 2,
+        f'slope={slope:.2f}'
+    )
+    if show:
+        plt.show()
