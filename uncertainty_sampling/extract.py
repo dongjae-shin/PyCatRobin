@@ -107,7 +107,7 @@ class DataForGP:
             i_min = np.argmin(np.abs(allowed_values - self.df_us.loc[i, which_column]))
             print('data indexed', i, 'is not nominal: ', self.df_us.loc[i, which_column], '->', allowed_values[i_min])
             self.df_us.loc[i, which_column] = allowed_values[i_min]
-    
+
     def check_most_recent(self, buffer_recent: int = 1):
         # get the most recent date in the column
         most_recent_date = self.df_us['experiment_date'].max()
@@ -271,9 +271,11 @@ def get_input_vector(excel_path: str = None,
     else:
         return [temp, w_rh, m_rh, synth_method, filename, expt_date]
 
-
 def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
     df = pd.read_excel(path, sheet_name='Data')
+
+    if keyword_to_plot not in df.columns:
+        raise ValueError(f"Keyword '{keyword_to_plot}' is not included in df.columns")
 
     # getting columns dealing with heterogeneous column names between expt groups
     ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
