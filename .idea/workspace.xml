@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods.">
-      <change beforePath="$PROJECT_DIR$/.idea/LongTermCat.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/LongTermCat.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="Update extract.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_from_gc_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uncertainty_sampling/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/uncertainty_sampling/extract.py" afterDir="false" />
@@ -32,12 +30,12 @@
     &quot;assignee&quot;: &quot;dongjae-shin&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
-    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dongjae-shin/LongTermCat.git",
+    "accountId": "b7b883db-0900-4ee5-9035-1c12d8894bc8"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -47,18 +45,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.extract.executor": "Run",
-    "Python.extract_from_gc_data.executor": "Run",
-    "Python.test.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.extract.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/us_samp" />
@@ -143,7 +141,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736811022096</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Update extract.py and extract_from_gc_data.py">
+      <option name="closed" value="true" />
+      <created>1737092332129</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1737092332129</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Update extract.py">
+      <option name="closed" value="true" />
+      <created>1737161981894</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737161981894</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -162,14 +176,16 @@
     <MESSAGE value="added some classes and functions in extract.py" />
     <MESSAGE value="modified extract.py, and two python files added." />
     <MESSAGE value="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods." />
-    <option name="LAST_COMMIT_MESSAGE" value="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods." />
+    <MESSAGE value="Update extract.py and extract_from_gc_data.py" />
+    <MESSAGE value="Update extract.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update extract.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/extract_from_gc_data.py</url>
-          <line>31</line>
+          <line>30</line>
           <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>

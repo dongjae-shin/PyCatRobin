@@ -273,7 +273,7 @@ def get_input_vector(excel_path: str = None,
 
 def plot_tos_data(path, keyword_to_plot=None, x_max_plot=None, y_max_plot=100):
     df = pd.read_excel(path, sheet_name='Data')
-
+    print("?")
     if keyword_to_plot not in df.columns:
         raise ValueError(f"Keyword '{keyword_to_plot}' is not included in df.columns")
 
