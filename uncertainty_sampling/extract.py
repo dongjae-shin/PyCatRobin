@@ -271,7 +271,9 @@ def get_input_vector(excel_path: str = None,
 def plot_tos_data(
         path: str,
         column: str = None, x_max_plot: float = None, y_max_plot: float = None,
-        show: bool = True
+        show: bool = True,
+        savefig: str = None,
+        plt = plt
 ):
     df = pd.read_excel(path, sheet_name='Data')
     if column not in df.columns:
@@ -334,9 +336,13 @@ def plot_tos_data(
     # labs = [l.get_label() for l in ls]
     # plt.legend(ls, labs)#, loc=(0.55,0.73))
 
+    if savefig:
+        # plt.tight_layout()
+        plt.savefig(savefig, bbox_inches='tight')
     # plt.savefig(path_imgs+"/{}_fig_{}.png".format(prefix, num))
     if show:
         plt.show()
+
 
 # deprecated
 def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False)->float:
@@ -393,7 +399,8 @@ def calculate_target(
         path: str, column: str, method:str, mute: bool = False,
         adjacency: float = 0.1,
         duration: float = 10,
-        plot_slope: bool = False
+        plot_slope: bool = False,
+        plt = plt
 )->float:
     """
     General version of target value calculator
@@ -491,15 +498,15 @@ def calculate_target(
     if method in ['initial slope', 'final slope', 'overall slope'] and plot_slope:
         _plot_linear_line(
             tos[initial_index], tos[final_index], col_val[initial_index], col_val[final_index],
-            show=False
+            show=False, plt=plt
         )
-        plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
+        # plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
 
     if not mute:
         print(f"{column}->{method}: {target:.2f}")
     return target
 
-def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False):
+def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False, plt=plt):
     """ plot linear line connecting two points"""
     def linear_func(x, x1, x2, y1, y2):
         a = (y2 - y1) / (x2 - x1)
