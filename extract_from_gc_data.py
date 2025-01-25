@@ -1,31 +1,57 @@
 import uncertainty_sampling.extract as ex
 import os
 
+# Define the home directory and path to data
 home_dir = os.path.expanduser("~")
 path = home_dir + "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data"
 
-# keywords to exclude
+# Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
-    "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location" # example excel file
+    "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location" # example Excel file
 ]
 
+# Create an instance of DataForGP
 dataset = ex.DataForGP(path=path)
+
+# Find and filter Excel files
 dataset.find_excel_files()
-dataset.filter_excel_files(exclude_keywords=exclude_keywords)
-dataset.construct_dataframe(extensive=False)
-dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
-# dataset.check_most_recent(buffer_recent=1)
-
-dataset.apply_duplicate_groupid()
-dataset.calculate_delta_co2_conv(mute=False)
-
-print(
-    dataset.export_sheet(
-        unique=True,
-        which_target='delta_CO2_conv',
-        mute=True
-    )
+dataset.filter_excel_files(
+    exclude_keywords=exclude_keywords,
+    verbose=True
 )
-print()
+
+# Construct the DataFrame
+dataset.construct_dataframe(extensive=False)
+
+# Convert measured values to nominal values
+dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
+#
+# # Apply duplicate group IDs
+# dataset.apply_duplicate_groupid(verbose=False)
+#
+# # Calculate delta CO2 conversion
+# # dataset.assign_delta_co2_conv()
+# dataset.assign_target_values(['delta','initial value'], column='CO2 Conversion (%)')
+# dataset.assign_target_values(['delta','initial value'], column='CO Forward Production Rate (mol/molRh/s)')
+
+# for i in range(5):
+ex.plot_tos_data(
+    dataset.path_filtered[2],
+    'CO2 Conversion (%)',
+    temp_threshold=5.0,
+    plot_selected=True, show=True
+)
+
+# # Export the processed data
+# print(
+#     dataset.export_sheet(
+#         unique=True,
+#         # which_target='delta_CO2_conv',
+#         which_target='CO2 Conversion (%)_delta',
+#         mute=True
+#     )
+# )
+
+print(dataset.df_us.columns[0])

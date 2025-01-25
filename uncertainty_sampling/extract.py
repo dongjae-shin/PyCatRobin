@@ -25,22 +25,29 @@ class DataForGP:
         self.path_found = glob(pathname=os.path.join(self.path, extension))
         print(f'{len(self.path_found)} excel files were found:')
 
-    def filter_excel_files(self, exclude_keywords):
-        """
-        filters out excel files that satisfy any of `exclude_keywords`.
-        Args:
-            exclude_keywords:
+    def filter_excel_files(self, exclude_keywords, verbose=False):
+                    """
+                    Filters out excel files that satisfy any of `exclude_keywords`.
 
-        Returns:
+                    Args:
+                        exclude_keywords (list): List of keywords to exclude files.
+                        verbose (bool): If True, print the number and names of filtered files.
 
-        """
-        self.path_filtered = []
-        self.path_removed = []
-        for path in self.path_found:
-            if any(keyword in path for keyword in exclude_keywords):
-                self.path_removed.append(path)  # store removed elements
-            else:
-                self.path_filtered.append(path)  # store filtered elements
+                    Returns:
+                        None
+                    """
+                    self.path_filtered = []
+                    self.path_removed = []
+                    for path in self.path_found:
+                        if any(keyword in path for keyword in exclude_keywords):
+                            self.path_removed.append(path)  # store removed elements
+                        else:
+                            self.path_filtered.append(path)  # store filtered elements
+
+                    if verbose:
+                        print(f'{len(self.path_removed)} files were filtered out:')
+                        for path in self.path_removed:
+                            print(path)
 
     def construct_dataframe(self, extensive:bool=False):
         if extensive:
@@ -129,30 +136,65 @@ class DataForGP:
                 self.path_filtered[row_number], column='CO2 Conversion', x_max_plot=None, y_max_plot=60
             )
             print(
-                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(self.path_filtered[row_number], percent=False, mute=False) :5.3f}")
+                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(self.path_filtered[row_number], percent=False, verbose=False) :5.3f}")
 
-    def apply_duplicate_groupid(self):
+    def apply_duplicate_groupid(self, verbose=False):
+        """
+        Apply group IDs to duplicate entries in the DataFrame.
+
+        Args:
+            verbose (bool): If True, print the DataFrame with Group IDs and duplicate groups.
+
+        Returns:
+            None
+        """
+        # Drop the 'filename' and 'experiment_date' columns from the DataFrame
         self.df_us = self.df_us.drop(labels=['filename', 'experiment_date'], axis=1)
+
+        # Create a new column 'GroupID' to identify duplicate rows
+        # Group duplicate rows and assign a unique group number to each group
         self.df_us["GroupID"] = (self.df_us.loc[self.df_us.duplicated(keep=False)]
                                     .groupby(self.df_us.columns.tolist())
                                     .ngroup() + 1)
         # set non-duplicate rows as GroupID=0
         self.df_us["GroupID"] = self.df_us["GroupID"].fillna(0).astype(int)
-        print("\nDataFrame with Group IDs:")
-        print(self.df_us)
-        # show by group
-        groups = [group for _, group in self.df_us.groupby("GroupID") if _]
-        print("\nDuplicate Groups:")
-        for i, group in enumerate(groups, start=1):
-            print(f"Group {i}:")
-            print(group)
 
-    def calculate_delta_co2_conv(self, percent=False, mute=True):
+        if verbose:
+            print("\nDataFrame with Group IDs:")
+            print(self.df_us)
+            # show by group
+            groups = [group for _, group in self.df_us.groupby("GroupID") if _]
+            print("\nDuplicate Groups:")
+            for i, group in enumerate(groups, start=1):
+                print(f"Group {i}:")
+                print(group)
+
+    def assign_delta_co2_conv(self, percent=False, verbose=False):
         for i in range(len(self.path_filtered)):
             self.co2_convs.append(
-                calculate_delta_co2_conv(self.path_filtered[i], percent=percent, mute=mute)
+                calculate_delta_co2_conv(self.path_filtered[i], percent=percent, verbose=verbose)
             )
         self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
+
+    def assign_target_values(self, methods: List[str], column: str, verbose: bool = False):
+        """
+        Assign target values to the DataFrame based on the specified methods.
+
+        Args:
+            methods (List[str]): List of target methods to calculate and include in the DataFrame.
+            column (str): The column to calculate the target values for.
+            verbose (bool): If True, print the calculated target values.
+
+        Returns:
+            None
+        """
+
+        for target in methods:
+            target_values = []
+            for path in self.path_filtered:
+                target_value = calculate_target(path, column, target, verbose=verbose)
+                target_values.append(target_value)
+            self.df_us[f'{column}_{target}'] = target_values
 
     def calculate_init_slope(self):
         pass
@@ -271,81 +313,77 @@ def get_input_vector(excel_path: str = None,
 def plot_tos_data(
         path: str,
         column: str = None, x_max_plot: float = None, y_max_plot: float = None,
+        temp_threshold: float = 3.5,
+        plot_selected: bool = False,
+        temp_max: float = False,
         show: bool = True,
         savefig: str = None,
+        duration: float = 10.0,
         plt = plt
 ):
-    df = pd.read_excel(path, sheet_name='Data')
-    if column not in df.columns:
-        raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
+    """
+        Plot Time-on-Stream (TOS) data with specific target and temperature.
 
-    # getting columns dealing with heterogeneous column names between expt groups
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
-    tos = df[df.columns[ind_match]]
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Temperature') + 1)[0][0]
-    temp = df[df.columns[ind_match]]
-    ind_match_prop = np.argwhere(np.char.find(list(df.columns), column) + 1)[0][0]
-    prop = df[df.columns[ind_match_prop]]
+        Args:
+            path (str): Path to the Excel file containing the data.
+            column (str, optional): Column name to plot. Defaults to None.
+            x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
+            y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
+            plot_selected (bool, optional): Whether to plot the selected region. Defaults to False.
+            show (bool, optional): Whether to display the plot. Defaults to True.
+            savefig (str, optional): Path to save the figure. Defaults to None.
+            duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
+            plt (module, optional): Matplotlib pyplot module. Defaults to plt.
 
-    # defining const-temp region: delta temp
-    temp_plus = np.roll(temp, -1)
-    temp_plus[-1] = 0
-    delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
-    delta_temp = delta_temp.abs()
-
-    # # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
-    # vertex_index = np.argmax(prop[:100])
-    #
-    # # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
-    # initial_index = \
-    #     np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-    #                 (0 <= tos) &  # 2: 0<=t
-    #                 (np.argwhere(prop > -999).reshape(-1) >= vertex_index)
-    #                 # 3:index >= vertex index, among all indices
-    #                 ).reshape(-1)[0]
-    #
-    # # final_index: initial_index + ~10 hrs
-    # final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
-    #
-    # # selected_index: to be used for highlighting range in plot
-    # selected_index = np.argwhere(
-    #     (tos >= tos[initial_index]) &
-    #     (tos <= tos[final_index])
-    # ).reshape(-1)
+        Returns:
+            None
+        """
+    tos, temp, col_val, vertex_index, initial_index, final_index, selected_index = \
+        extract_indices_target(path, column, duration, temp_threshold=temp_threshold)
 
     # Plot
-    l1 = plt.scatter(tos, prop,
-                     color=[0.5, 1.0, 0.5, 1.0], s=5, label=df.columns[ind_match_prop])  # whole profile
-    # l2 = plt.scatter(tos[selected_index], prop[selected_index],
-    #                  color='g', s=5, label='selected')
+    l1 = plt.scatter(tos, col_val,
+                     color=[0.5, 1.0, 0.5, 1.0], s=5, label=column)  # whole profile
+    if plot_selected:
+        l2 = plt.scatter(tos[selected_index], col_val[selected_index],
+                         color='g', s=5, label='selected')  # selected region
+        plt.scatter(
+            [tos[initial_index], tos[final_index]],
+            [col_val[initial_index], col_val[final_index]],
+            edgecolors='g', color='y', s=18
+        )
+        plt.axvline(x=tos[initial_index], color='g', linestyle='--')
+
     plt.xlabel('Time on stream (hrs)')
-    plt.ylabel(df.columns[ind_match_prop], c='g')
+    plt.ylabel(column, c='g')
     if y_max_plot:
         plt.ylim(0, y_max_plot)
     if x_max_plot:
         plt.xlim(0, x_max_plot)
 
-    # secondary axis
+    # secondary axis for temperature
     axs_2nd = plt.twinx()
-    l3 = axs_2nd.scatter(tos, temp, s=5, color='r')
+    l3 = axs_2nd.scatter(tos, temp, s=5, color='r', alpha=0.5)
     axs_2nd.set_ylabel('Temperature (C)', color='r')
-    axs_2nd.set_ylim(0, 520)
+    if temp_max:
+        axs_2nd.set_ylim(0, temp_max)
 
-    # # legends & title
-    # ls = [l1, l3] #l2
-    # labs = [l.get_label() for l in ls]
-    # plt.legend(ls, labs)#, loc=(0.55,0.73))
+    # legends & title
+    if plot_selected:
+        ls = [l1, l2, l3]
+    else:
+        ls = [l1, l3]
+    labs = [l.get_label() for l in ls]
+    plt.legend(ls, labs)#, loc=(0.55,0.73))
 
     if savefig:
         # plt.tight_layout()
         plt.savefig(savefig, bbox_inches='tight')
-    # plt.savefig(path_imgs+"/{}_fig_{}.png".format(prefix, num))
     if show:
         plt.show()
 
-
 # deprecated
-def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False)->float:
+def calculate_delta_co2_conv(path: str, percent: bool = True, verbose: bool = False)->float:
     df = pd.read_excel(path, sheet_name='Data')
     df = df.fillna(value=0)  # some data set includes nan at the end of a column.
 
@@ -385,18 +423,18 @@ def calculate_delta_co2_conv(path: str, percent: bool = True, mute: bool = False
 
     if percent:
         d_co2_conv = (conv[final_index] - conv[initial_index]) / conv[initial_index] * 100
-        if not mute:
+        if verbose:
             print("percent delta conv (%): {:.2f}".format(d_co2_conv))
     else:
         d_co2_conv = conv[final_index] - conv[initial_index]
-        if not mute:
+        if verbose:
             print("delta conv (%): {:.2f}".format(d_co2_conv))
 
     return d_co2_conv
 
 # maybe the implementation for each `method` should be different depending on `column` ...
 def calculate_target(
-        path: str, column: str, method:str, mute: bool = False,
+        path: str, column: str, method:str, verbose: bool = False,
         adjacency: float = 0.1,
         duration: float = 10,
         plot_slope: bool = False,
@@ -408,7 +446,7 @@ def calculate_target(
         path: path to individual GC excel file
         column:
         method: 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', #'decaying rate'
-        mute:
+        verbose:
         adjacency: used to treat fluctuation of measured y values. It indicates how close two points will be for initial and final slopes, not used for other methods.
         plot_slope: works with plot_tos_data()
 
@@ -421,43 +459,10 @@ def calculate_target(
     if column not in df.columns:
         raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
-    # to deal with heterogeneous column names between expt groups
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
-    tos = df[df.columns[ind_match]]
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Temperature') + 1)[0][0]
-    temp = df[df.columns[ind_match]]
-    ind_match = np.argwhere(np.char.find(list(df.columns), column) + 1)[0][0]
-    col_val = df[df.columns[ind_match]]
+    tos, temp, col_val, vertex_index, initial_index, final_index, selected_index =\
+        extract_indices_target(path, column, duration)
 
-    # defining constant temperature region: delta temp
-    temp_plus = np.roll(temp, -1)
-    temp_plus[-1] = 0
-    delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
-    delta_temp = delta_temp.abs()
-
-    # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
-    vertex_index = np.argmax(col_val[:100])
-
-    # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
-    initial_index = \
-        np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-                    (0 <= tos) #&          # 2: 0<=t
-                    # (np.argwhere(col_val > -999).reshape(-1) >= vertex_index)
-                                          # 3:index >= vertex index, among all indices
-                    ).reshape(-1)[0]
-    print(vertex_index)
-    print(initial_index)
-    # final_index: initial_index + ~10 hrs
-    final_index = np.argwhere(tos >= tos[initial_index] + duration).reshape(-1)[0]
-
-    # selected_index: to be used for highlighting range in plot
-    selected_index = np.argwhere(
-        (tos >= tos[initial_index]) &
-        (tos <= tos[final_index])
-         ).reshape(-1)
-
-
-    print(final_index)
+    # print(final_index)
     # print(selected_index)
 
     # calculate target value according to `method` argument
@@ -502,9 +507,75 @@ def calculate_target(
         )
         # plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
 
-    if not mute:
+    if verbose:
         print(f"{column}->{method}: {target:.2f}")
     return target
+
+
+def extract_indices_target(path: str, column: str, duration: float = 10.0, temp_threshold: float = 3.5) -> Tuple[
+    pd.Series, pd.Series, pd.Series, int, int, int, np.ndarray]:
+    """
+    Processes a DataFrame to extract specific columns and calculate indices.
+
+    Args:
+        path (str): The path to the Excel file.
+        column (str): The column name to be processed.
+        duration (float): The duration to calculate the final index.
+
+    Returns:
+        Tuple[pd.Series, pd.Series, pd.Series, int, int, int, np.ndarray]:
+            - Time on stream (tos) series.
+            - Temperature series.
+            - Column values series.
+            - Vertex index.
+            - Initial index.
+            - Final index.
+            - Selected index array.
+    """
+    # Read the Excel file and extract the reference temperature
+    df = pd.read_excel(
+        path,
+        sheet_name='Constants'
+    )
+    temp_ref = float(df[df['Variable'] == 'Reaction Temperature']['Value'].values[0])
+
+    # Read the Excel file and fill NaN values with 0
+    df = pd.read_excel(path, sheet_name='Data').fillna(0)
+
+    # Check if the specified column exists in the DataFrame
+    if column not in df.columns:
+        raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
+
+    # Extract the 'Time', 'Temperature', and specified column values
+    tos = df.filter(like='Time').iloc[:, 0]
+    temp = df.filter(like='Temperature').iloc[:, 0]
+    col_val = df.filter(like=column).iloc[:, 0]
+
+    # Detect and remove duplicates based on 'tos' and 'temp'; sometimes identical pair of data points are included.
+    df_unique = pd.DataFrame({'Time': tos, 'Temperature': temp, column: col_val}).drop_duplicates(subset=['Time', 'Temperature'])
+    tos = df_unique['Time']
+    temp = df_unique['Temperature']
+    col_val = df_unique[column]
+
+    # Calculate the absolute difference in temperature
+    delta_temp = np.abs(np.roll(temp, -1) - temp)
+    delta_temp[-1] = 0
+
+    # Find the index of the maximum value in the specified column (first 100 rows)
+    vertex_index = np.argmax(col_val[:100])
+
+    # Find the initial index where the temperature is close to the reference temperature and time is non-negative
+    assert (temp_threshold > 0), "temp_threshold should be positive."
+    initial_index = np.argwhere((np.abs(temp-temp_ref) <= temp_threshold) & (tos >= 0)).reshape(-1)[0]
+    test_val = np.abs(temp-temp_ref)
+    test_val2 = (np.abs(temp-temp_ref) <= temp_threshold)
+    # Find the final index based on the duration from the initial index
+    final_index = np.argwhere(tos >= tos[initial_index] + duration).reshape(-1)[0]
+
+    # Find the selected indices within the initial and final index range
+    selected_index = np.arange(initial_index, final_index + 1)
+
+    return tos, temp, col_val, vertex_index, initial_index, final_index, selected_index
 
 def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False, plt=plt):
     """ plot linear line connecting two points"""

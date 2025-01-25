@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update extract.py">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods.">
+      <change beforePath="$PROJECT_DIR$/.idea/LongTermCat.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/LongTermCat.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_from_gc_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uncertainty_sampling/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/uncertainty_sampling/extract.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,7 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="different-10hrs_2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,14 +45,14 @@
         &quot;id&quot;: &quot;PR_kwDONnIFEc6IOtGd&quot;,
         &quot;number&quot;: 1
       },
-      &quot;lastSeen&quot;: 1737188175952
+      &quot;lastSeen&quot;: 1737746567054
     }
   ]
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
-    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
+    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
   },
   &quot;recentNewPullRequestHead&quot;: {
     &quot;server&quot;: {
@@ -60,7 +63,8 @@
     },
     &quot;owner&quot;: &quot;dongjae-shin&quot;,
     &quot;repository&quot;: &quot;LongTermCat&quot;
-  }
+  },
+  &quot;editorReviewEnabled&quot;: false
 }</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -71,18 +75,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.extract.executor&quot;: &quot;Run&quot;,
-    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;different-10hrs__2&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.extract.executor": "Debug",
+    "Python.extract_from_gc_data.executor": "Run",
+    "Python.test.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "different-10hrs__2",
+    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat",
+    "settings.editor.selected.configurable": "configurable.group.tools"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/us_samp" />
@@ -259,8 +263,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/extract_from_gc_data.py</url>
-          <line>29</line>
-          <option name="timeStamp" value="20" />
+          <line>56</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/uncertainty_sampling/extract.py</url>
+          <line>577</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
