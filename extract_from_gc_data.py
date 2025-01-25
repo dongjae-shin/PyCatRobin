@@ -27,22 +27,23 @@ dataset.construct_dataframe(extensive=False)
 
 # Convert measured values to nominal values
 dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
-#
-# # Apply duplicate group IDs
-# dataset.apply_duplicate_groupid(verbose=False)
-#
-# # Calculate delta CO2 conversion
-# # dataset.assign_delta_co2_conv()
-# dataset.assign_target_values(['delta','initial value'], column='CO2 Conversion (%)')
-# dataset.assign_target_values(['delta','initial value'], column='CO Forward Production Rate (mol/molRh/s)')
 
-# for i in range(5):
-ex.plot_tos_data(
-    dataset.path_filtered[2],
-    'CO2 Conversion (%)',
-    temp_threshold=5.0,
-    plot_selected=True, show=True
-)
+# Apply duplicate group IDs
+dataset.apply_duplicate_groupid(verbose=False)
+
+# Calculate delta CO2 conversion
+# dataset.assign_delta_co2_conv()
+dataset.assign_target_values(['delta','initial slope'], column='CO2 Conversion (%)', plot_slope=True)
+dataset.assign_target_values(['delta','initial value'], column='CO Forward Production Rate (mol/molRh/s)', plot_slope=True)
+
+for i in range(len(dataset.path_filtered)):
+    ex.plot_tos_data(
+        dataset.path_filtered[i],
+        'CO2 Conversion (%)',
+        temp_threshold=2.0,
+        init_tos_buffer=0.5,
+        plot_selected=True, show=True
+    )
 
 # # Export the processed data
 # print(

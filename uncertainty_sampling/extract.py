@@ -9,6 +9,8 @@ import datetime
 import warnings
 from datetime import timedelta
 from IPython.display import display
+from numba.core.entrypoints import init_all
+
 
 class DataForGP:
     """"""
@@ -176,7 +178,9 @@ class DataForGP:
             )
         self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
 
-    def assign_target_values(self, methods: List[str], column: str, verbose: bool = False):
+    def assign_target_values(
+            self, methods: List[str], column: str, plot_slope: bool = False, verbose: bool = False
+    ):
         """
         Assign target values to the DataFrame based on the specified methods.
 
@@ -192,7 +196,7 @@ class DataForGP:
         for target in methods:
             target_values = []
             for path in self.path_filtered:
-                target_value = calculate_target(path, column, target, verbose=verbose)
+                target_value = calculate_target(path, column, target, plot_slope=plot_slope, verbose=verbose)
                 target_values.append(target_value)
             self.df_us[f'{column}_{target}'] = target_values
 
@@ -314,6 +318,7 @@ def plot_tos_data(
         path: str,
         column: str = None, x_max_plot: float = None, y_max_plot: float = None,
         temp_threshold: float = 3.5,
+        init_tos_buffer: float = 1.0,
         plot_selected: bool = False,
         temp_max: float = False,
         show: bool = True,
@@ -338,8 +343,10 @@ def plot_tos_data(
         Returns:
             None
         """
-    tos, temp, col_val, vertex_index, initial_index, final_index, selected_index = \
-        extract_indices_target(path, column, duration, temp_threshold=temp_threshold)
+    tos, temp, col_val, initial_index, final_index, selected_index = \
+        extract_indices_target(
+            path, column, duration, init_tos_buffer=init_tos_buffer, temp_threshold=temp_threshold
+        )
 
     # Plot
     l1 = plt.scatter(tos, col_val,
@@ -375,6 +382,7 @@ def plot_tos_data(
         ls = [l1, l3]
     labs = [l.get_label() for l in ls]
     plt.legend(ls, labs)#, loc=(0.55,0.73))
+    plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
 
     if savefig:
         # plt.tight_layout()
@@ -459,7 +467,7 @@ def calculate_target(
     if column not in df.columns:
         raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
-    tos, temp, col_val, vertex_index, initial_index, final_index, selected_index =\
+    tos, temp, col_val, initial_index, final_index, selected_index =\
         extract_indices_target(path, column, duration)
 
     # print(final_index)
@@ -512,7 +520,9 @@ def calculate_target(
     return target
 
 
-def extract_indices_target(path: str, column: str, duration: float = 10.0, temp_threshold: float = 3.5) -> Tuple[
+def extract_indices_target(
+        path: str, column: str, duration: float = 10.0, temp_threshold: float = 3.5, init_tos_buffer: float = 1.0
+) -> Tuple[
     pd.Series, pd.Series, pd.Series, int, int, int, np.ndarray]:
     """
     Processes a DataFrame to extract specific columns and calculate indices.
@@ -546,36 +556,38 @@ def extract_indices_target(path: str, column: str, duration: float = 10.0, temp_
     if column not in df.columns:
         raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
-    # Extract the 'Time', 'Temperature', and specified column values
-    tos = df.filter(like='Time').iloc[:, 0]
-    temp = df.filter(like='Temperature').iloc[:, 0]
-    col_val = df.filter(like=column).iloc[:, 0]
+    # Extract the 'Time', 'Temperature', and specified column values, and sort by 'Time'
+    df_sorted = df.sort_values(by=df.filter(like='Time').columns[0])
+    tos = df_sorted.filter(like='Time').iloc[:, 0]
+    temp = df_sorted.filter(like='Temperature').iloc[:, 0]
+    col_val = df_sorted.filter(like=column).iloc[:, 0]
 
     # Detect and remove duplicates based on 'tos' and 'temp'; sometimes identical pair of data points are included.
-    df_unique = pd.DataFrame({'Time': tos, 'Temperature': temp, column: col_val}).drop_duplicates(subset=['Time', 'Temperature'])
+    df_unique = pd.DataFrame({
+            'Time': tos,
+            'Temperature': temp,
+            column: col_val
+        }).drop_duplicates(subset=['Time', 'Temperature']).reset_index(drop=True)
     tos = df_unique['Time']
     temp = df_unique['Temperature']
     col_val = df_unique[column]
 
-    # Calculate the absolute difference in temperature
-    delta_temp = np.abs(np.roll(temp, -1) - temp)
-    delta_temp[-1] = 0
-
-    # Find the index of the maximum value in the specified column (first 100 rows)
-    vertex_index = np.argmax(col_val[:100])
-
     # Find the initial index where the temperature is close to the reference temperature and time is non-negative
     assert (temp_threshold > 0), "temp_threshold should be positive."
-    initial_index = np.argwhere((np.abs(temp-temp_ref) <= temp_threshold) & (tos >= 0)).reshape(-1)[0]
-    test_val = np.abs(temp-temp_ref)
-    test_val2 = (np.abs(temp-temp_ref) <= temp_threshold)
+    condition1 = np.abs(temp - temp_ref) <= temp_threshold
+    condition2 = tos >= 0
+    initial_index = np.argwhere(condition1 & condition2).reshape(-1)[0]
+
+    # Adjust the initial index to account for the initial TOS buffer
+    initial_index = np.argwhere(tos >= tos[initial_index] + init_tos_buffer).reshape(-1)[0]
+
     # Find the final index based on the duration from the initial index
     final_index = np.argwhere(tos >= tos[initial_index] + duration).reshape(-1)[0]
 
     # Find the selected indices within the initial and final index range
     selected_index = np.arange(initial_index, final_index + 1)
 
-    return tos, temp, col_val, vertex_index, initial_index, final_index, selected_index
+    return tos, temp, col_val, initial_index, final_index, selected_index
 
 def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False, plt=plt):
     """ plot linear line connecting two points"""
