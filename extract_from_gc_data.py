@@ -53,7 +53,6 @@ for i in range(5):
                      plot_selected=True, plot_slope=True,
                      show=True)
 
-
 # # Export the processed data
 # print(
 #     dataset.export_sheet(
