@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment=".">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="merged different-10hrs_2 branch into main branch">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/extract_from_gc_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uncertainty_sampling/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/uncertainty_sampling/extract.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,11 +79,11 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Python.extract.executor&quot;: &quot;Run&quot;,
-    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
     &quot;Python.test.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;different-10hrs__2&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/LongTermCat&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
@@ -118,6 +120,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.extract" />
+        <item itemvalue="Python.extract" />
         <item itemvalue="Python.extract" />
         <item itemvalue="Python.extract" />
         <item itemvalue="Python.extract" />
@@ -282,8 +286,9 @@
     <MESSAGE value="updated extract.py" />
     <MESSAGE value="1. updated extract_indices_target() in extract.py. &#10;2. plot_slope argument of assign_target_values() to be put into plot_tos_data()" />
     <MESSAGE value="renamed branches" />
-    <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="merged different-10hrs_2 branch into main." />
+    <MESSAGE value="merged different-10hrs_2 branch into main." />
+    <option name="LAST_COMMIT_MESSAGE" value="merged different-10hrs_2 branch into main." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

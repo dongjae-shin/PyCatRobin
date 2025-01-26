@@ -45,7 +45,7 @@ for column in ['CO2 Conversion (%)',]: # 'CH4 Net Production Rate (mol/molRh/s)'
 for i in range(5):
     print(i, end=' ')
     ex.plot_tos_data(dataset.path_filtered[i], x_max_plot=20,
-                     methods_slope=['initial slope', 'final slope', 'overall slope'],
+                     # methods_slope=['delta', 'initial slope', 'final slope', 'overall slope'],
                      column='CO2 Conversion (%)',
                      temp_threshold=3.5,
                      init_tos_buffer=0.5,

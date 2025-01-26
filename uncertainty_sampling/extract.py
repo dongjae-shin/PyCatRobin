@@ -11,7 +11,42 @@ from datetime import timedelta
 from IPython.display import display
 
 class DataForGP:
-    """"""
+    """
+    A class to handle and process experimental data for Gaussian Process (GP) modeling.
+
+    Attributes:
+        path (str): Path to the directory containing the data files.
+        path_found (list): List of paths to the found Excel files.
+        path_filtered (list): List of paths to the filtered Excel files.
+        path_removed (list): List of paths to the removed Excel files.
+        df_us (pd.DataFrame): DataFrame containing the processed data.
+        co2_convs (list): List to store CO2 conversion data.
+
+    Methods:
+        find_excel_files():
+            Finds all Excel files in the specified directory.
+
+        filter_excel_files(exclude_keywords, verbose=False):
+            Filters out Excel files based on the provided keywords.
+
+        construct_dataframe(extensive=False):
+            Constructs a DataFrame from the filtered Excel files.
+
+        convert_measured_to_nominal(allowed_values=None, which_column='Rh_total_mass'):
+            Converts measured values in the specified column to the closest nominal values.
+
+        check_most_recent(buffer_recent=1, column='CO2 Conversion (%)', method='delta', ...):
+            Checks and plots the most recent data based on the specified column and method.
+
+        apply_duplicate_groupid(verbose=False):
+            Applies group IDs to duplicate entries in the DataFrame.
+
+        assign_target_values(methods, column, verbose=False, ...):
+            Assigns target values to the DataFrame based on the specified methods.
+
+        export_sheet(unique=True, which_target='delta_CO2_conv', mute=True):
+            Exports the processed data to an Excel sheet.
+    """
     def __init__(self, path):
         self.path = path
         self.path_found = None
