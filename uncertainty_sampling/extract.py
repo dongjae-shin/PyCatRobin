@@ -9,8 +9,6 @@ import datetime
 import warnings
 from datetime import timedelta
 from IPython.display import display
-from numba.core.entrypoints import init_all
-
 
 class DataForGP:
     """"""
@@ -116,7 +114,20 @@ class DataForGP:
             print('data indexed', i, 'is not nominal: ', self.df_us.loc[i, which_column], '->', allowed_values[i_min])
             self.df_us.loc[i, which_column] = allowed_values[i_min]
 
-    def check_most_recent(self, buffer_recent: int = 1):
+    def check_most_recent(
+            self, buffer_recent: int = 1, column: str = 'CO2 Conversion (%)', method: str = 'delta',
+            x_max_plot: float | None = None,
+            y_max_plot: float | None = None,
+            temp_threshold: float = 3.5,
+            init_tos_buffer: float = 1.0,
+            plot_selected: bool = False,
+            plot_slope: bool = False,
+            temp_max: float = False,
+            adjacency_slope: float = 0.1,
+            window: int = 0,
+            duration: float = 10,
+            verbose: bool = False
+    ):
         # get the most recent date in the column
         most_recent_date = self.df_us['experiment_date'].max()
 
@@ -134,11 +145,14 @@ class DataForGP:
         # plot recent data
         for i, row_number in enumerate(row_numbers):
             print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
-            plot_tos_data(
-                self.path_filtered[row_number], column='CO2 Conversion', x_max_plot=None, y_max_plot=60
-            )
+            plot_tos_data(self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
+                          init_tos_buffer, plot_selected, plot_slope, temp_max)
             print(
-                f"delta_CO2_conversion (%): {calculate_delta_co2_conv(self.path_filtered[row_number], percent=False, verbose=False) :5.3f}")
+                f"{column}_{method}: {_calculate_target(
+                    self.path_filtered[row_number], column, method, verbose, 
+                    adjacency_slope, window, duration, temp_threshold, init_tos_buffer
+                ) :5.3f}"
+            )
 
     def apply_duplicate_groupid(self, verbose=False):
         """
@@ -171,37 +185,38 @@ class DataForGP:
                 print(f"Group {i}:")
                 print(group)
 
-    def assign_delta_co2_conv(self, percent=False, verbose=False):
-        for i in range(len(self.path_filtered)):
-            self.co2_convs.append(
-                calculate_delta_co2_conv(self.path_filtered[i], percent=percent, verbose=verbose)
-            )
-        self.df_us = self.df_us.assign(delta_CO2_conv=self.co2_convs)
-
     def assign_target_values(
-            self, methods: List[str], column: str, plot_slope: bool = False, verbose: bool = False
+            self, methods: List[str], column: str, verbose: bool = False,
+            adjacency_slope: float = 0.1,
+            window: int = 0,
+            duration: float = 10,
+            temp_threshold: float = 3.5,
+            init_tos_buffer: float = 1.0
     ):
         """
         Assign target values to the DataFrame based on the specified methods.
 
         Args:
+            window:
             methods (List[str]): List of target methods to calculate and include in the DataFrame.
             column (str): The column to calculate the target values for.
             verbose (bool): If True, print the calculated target values.
+            adjacency_slope (float): Slope threshold for initial and final slope calculations.
+            duration (float): Duration to calculate the final index.
+            temp_threshold (float): Temperature threshold for initial index calculation.
+            init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
 
         Returns:
             None
         """
 
-        for target in methods:
+        for method in methods:
             target_values = []
             for path in self.path_filtered:
-                target_value = calculate_target(path, column, target, plot_slope=plot_slope, verbose=verbose)
+                target_value = _calculate_target(path, column, method, verbose, adjacency_slope,
+                                                 window, duration, temp_threshold, init_tos_buffer)
                 target_values.append(target_value)
-            self.df_us[f'{column}_{target}'] = target_values
-
-    def calculate_init_slope(self):
-        pass
+            self.df_us[f'{column}_{method}'] = target_values
 
     def export_sheet(self,
                      unique:bool=True,
@@ -320,33 +335,43 @@ def plot_tos_data(
         temp_threshold: float = 3.5,
         init_tos_buffer: float = 1.0,
         plot_selected: bool = False,
+        plot_slope: bool = False,
+        methods_slope=None,
         temp_max: float = False,
         show: bool = True,
         savefig: str = None,
         duration: float = 10.0,
-        plt = plt
+        adjacency_slope: float = 0.1,
+        window: int = 0
 ):
     """
-        Plot Time-on-Stream (TOS) data with specific target and temperature.
+    Plot Time-on-Stream (TOS) data with specific target and temperature.
 
-        Args:
-            path (str): Path to the Excel file containing the data.
-            column (str, optional): Column name to plot. Defaults to None.
-            x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
-            y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
-            plot_selected (bool, optional): Whether to plot the selected region. Defaults to False.
-            show (bool, optional): Whether to display the plot. Defaults to True.
-            savefig (str, optional): Path to save the figure. Defaults to None.
-            duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
-            plt (module, optional): Matplotlib pyplot module. Defaults to plt.
+    Args:
+        path (str): Path to the Excel file containing the data.
+        column (str, optional): Column name to plot. Defaults to None.
+        x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
+        y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
+        temp_threshold (float, optional): Temperature threshold for initial index calculation. Defaults to 3.5.
+        init_tos_buffer (float, optional): Initial time-on-stream buffer for index calculation. Defaults to 1.0.
+        plot_selected (bool, optional): Whether to plot the selected region. Defaults to False.
+        plot_slope (bool, optional): Whether to plot the slope of the target values. Defaults to False.
+        methods_slope (list, optional): List of methods to calculate the slope. Defaults to ['delta'].
+        temp_max (float, optional): Maximum value for the temperature axis. Defaults to False.
+        show (bool, optional): Whether to display the plot. Defaults to True.
+        savefig (str, optional): Path to save the figure. Defaults to None.
+        duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
+        adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
+        window (int, optional): Number of points around the initial index to use for fitting. Defaults to 0.
 
-        Returns:
-            None
-        """
+    Returns:
+        None
+    """
+    if methods_slope is None:
+        methods_slope = ['delta']
+
     tos, temp, col_val, initial_index, final_index, selected_index = \
-        extract_indices_target(
-            path, column, duration, init_tos_buffer=init_tos_buffer, temp_threshold=temp_threshold
-        )
+        _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer)
 
     # Plot
     l1 = plt.scatter(tos, col_val,
@@ -368,7 +393,24 @@ def plot_tos_data(
     if x_max_plot:
         plt.xlim(0, x_max_plot)
 
-    # secondary axis for temperature
+    plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
+
+    # plot linear line for slopes
+    if plot_slope:
+        for method in methods_slope:
+            # Get proper indices and values according to 'method'
+            _, _, _, initial_index, final_index, _ = \
+                _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer, method,
+                                        adjacency_slope)
+            # Plot using the extracted indices
+            if method in ['overall slope']:
+                _plot_linear_line_two_points(tos[initial_index], tos[final_index], col_val[initial_index],
+                                             col_val[final_index], show=False)
+            if method in ['initial slope', 'final slope']:
+                _plot_linear_line_fitting(tos[initial_index], tos[final_index], col_val[initial_index],
+                                          col_val[final_index], tos, col_val, window, show=False)
+
+    # Plot temperature: secondary axis for temperature
     axs_2nd = plt.twinx()
     l3 = axs_2nd.scatter(tos, temp, s=5, color='r', alpha=0.5)
     axs_2nd.set_ylabel('Temperature (C)', color='r')
@@ -381,8 +423,8 @@ def plot_tos_data(
     else:
         ls = [l1, l3]
     labs = [l.get_label() for l in ls]
-    plt.legend(ls, labs)#, loc=(0.55,0.73))
-    plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
+    # plt.legend(ls, labs)#, loc=(0.55,0.73))
+    plt.legend(ls, labs, loc='lower left', bbox_to_anchor=(0.58, 0))
 
     if savefig:
         # plt.tight_layout()
@@ -390,76 +432,31 @@ def plot_tos_data(
     if show:
         plt.show()
 
-# deprecated
-def calculate_delta_co2_conv(path: str, percent: bool = True, verbose: bool = False)->float:
-    df = pd.read_excel(path, sheet_name='Data')
-    df = df.fillna(value=0)  # some data set includes nan at the end of a column.
-
-    # to deal with heterogeneous column names between expt groups
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Time') + 1)[0][0]
-    tos = df[df.columns[ind_match]]
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Temperature') + 1)[0][0]
-    temp = df[df.columns[ind_match]]
-    ind_match = np.argwhere(np.char.find(list(df.columns), 'Conversion') + 1)[0][0]
-    conv = df[df.columns[ind_match]]
-
-    # defining const-temp region: delta temp
-    temp_plus = np.roll(temp, -1)
-    temp_plus[-1] = 0
-    delta_temp = temp_plus - temp  # np.diff(temp, axis=0, prepend=0)
-    delta_temp = delta_temp.abs()
-
-    # vertex_index: `maximizer` + `slicing` (:100): to exclude spurious outlier when applying argmin
-    vertex_index = np.argmax(conv[:100])
-
-    # initial_index: `constant temp.` and `t>=0` and `t>=t_vertex`
-    initial_index = \
-        np.argwhere((delta_temp < 3.5) &  # 1: constant-temperature
-                    (0 <= tos) &  # 2: 0<=t
-                    (np.argwhere(conv > -999).reshape(-1) >= vertex_index)
-                    # 3:index >= vertex index, among all indices
-                    ).reshape(-1)[0]
-
-    # final_index: initial_index + ~10 hrs
-    final_index = np.argwhere(tos >= tos[initial_index] + 10).reshape(-1)[0]
-
-    # selected_index: to be used for highlighting range in plot
-    selected_index = np.argwhere(
-        (tos >= tos[initial_index]) &
-        (tos <= tos[final_index])
-    ).reshape(-1)
-
-    if percent:
-        d_co2_conv = (conv[final_index] - conv[initial_index]) / conv[initial_index] * 100
-        if verbose:
-            print("percent delta conv (%): {:.2f}".format(d_co2_conv))
-    else:
-        d_co2_conv = conv[final_index] - conv[initial_index]
-        if verbose:
-            print("delta conv (%): {:.2f}".format(d_co2_conv))
-
-    return d_co2_conv
-
 # maybe the implementation for each `method` should be different depending on `column` ...
-def calculate_target(
+def _calculate_target(
         path: str, column: str, method:str, verbose: bool = False,
-        adjacency: float = 0.1,
+        adjacency_slope: float = 0.1,
+        window: int = 0,
         duration: float = 10,
-        plot_slope: bool = False,
-        plt = plt
+        temp_threshold: float = 3.5,
+        init_tos_buffer: float = 1.0
 )->float:
     """
-    General version of target value calculator
+    General version of target value calculator.
+
     Args:
-        path: path to individual GC excel file
-        column:
-        method: 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', #'decaying rate'
-        verbose:
-        adjacency: used to treat fluctuation of measured y values. It indicates how close two points will be for initial and final slopes, not used for other methods.
-        plot_slope: works with plot_tos_data()
+        path (str): Path to individual GC Excel file.
+        column (str): Column name to calculate the target values for.
+        method (str): Method to calculate the target value. Options are 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope'.
+        verbose (bool): If True, print the calculated target values.
+        adjacency_slope (float): Slope threshold for initial and final slope calculations.
+
+        duration (float): Duration to calculate the final index.
+        temp_threshold (float): Temperature threshold for initial index calculation.
+        init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
 
     Returns:
-
+        float: Calculated target value.
     """
     df = pd.read_excel(path, sheet_name='Data')
     df = df.fillna(value=0)  # some data set includes nan at the end of a column.
@@ -467,17 +464,9 @@ def calculate_target(
     if column not in df.columns:
         raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
-    tos, temp, col_val, initial_index, final_index, selected_index =\
-        extract_indices_target(path, column, duration)
-
-    # print(final_index)
-    # print(selected_index)
-
-    # calculate target value according to `method` argument
-    methods = ['delta', 'initial value', 'final value', 'initial slope', 'final slope',
-               'overall slope',] # 'decaying rate']
-    if method not in methods:
-        raise ValueError(f"Keyword '{method}' is not included in {methods}")
+    # Get proper indices and values according to 'method'
+    tos, temp, col_val, initial_index, final_index, selected_index = \
+        _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer, method, adjacency_slope)
 
     if   method == 'delta':
         target = col_val[final_index] - col_val[initial_index]
@@ -486,44 +475,34 @@ def calculate_target(
     elif method == 'final value':
         target = col_val[final_index]
     elif method == 'initial slope':
-        # use the same initial_index
-        try:
-            # choosing final index which is close, in tos, to initial index
-            final_index = np.argwhere(tos >= tos[initial_index] + adjacency).reshape(-1)[0]
-        except Exception as e:
-            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
-        target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+        # calculate slope using linear fitting
+        target = _plot_linear_line_fitting(
+            tos[initial_index], tos[final_index], col_val[initial_index],
+            col_val[final_index], tos, col_val, window, plot=False, show=False
+        )
     elif method == 'final slope':
-        # use the same final_index
-        try:
-            # choosing initial index which is close, in tos, to final index
-            initial_index = np.argwhere(tos <= tos[final_index] - adjacency).reshape(-1)[-1]
-        except Exception as e:
-            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
-        target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+        # calculate slope using linear fitting
+        target = _plot_linear_line_fitting(
+            tos[initial_index], tos[final_index], col_val[initial_index],
+            col_val[final_index], tos, col_val, window, plot=False, show=False
+        )
     elif method == 'overall slope':
         target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
     # elif method == 'decaying rate':
     #     print('not implemented yet')
     #     return
 
-    # plot linear line for slope
-    if method in ['initial slope', 'final slope', 'overall slope'] and plot_slope:
-        _plot_linear_line(
-            tos[initial_index], tos[final_index], col_val[initial_index], col_val[final_index],
-            show=False, plt=plt
-        )
-        # plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
-
     if verbose:
         print(f"{column}->{method}: {target:.2f}")
-    return target
+
+    else:
+        return target
 
 
-def extract_indices_target(
-        path: str, column: str, duration: float = 10.0, temp_threshold: float = 3.5, init_tos_buffer: float = 1.0
-) -> Tuple[
-    pd.Series, pd.Series, pd.Series, int, int, int, np.ndarray]:
+def _extract_indices_target(
+        path: str, column: str, duration: float = 10.0, temp_threshold: float = 3.5, init_tos_buffer: float = 1.0,
+        method: str = 'delta', adjacency_slope: float = 0.1
+) -> Tuple[pd.Series, pd.Series, pd.Series, int, int, np.ndarray]:
     """
     Processes a DataFrame to extract specific columns and calculate indices.
 
@@ -531,13 +510,16 @@ def extract_indices_target(
         path (str): The path to the Excel file.
         column (str): The column name to be processed.
         duration (float): The duration to calculate the final index.
+        temp_threshold (float): Temperature threshold for initial index calculation.
+        init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
+        method (str): Method to calculate the target value.
+        adjacency_slope (float): Slope threshold for initial and final slope calculations.
 
     Returns:
-        Tuple[pd.Series, pd.Series, pd.Series, int, int, int, np.ndarray]:
+        Tuple[pd.Series, pd.Series, pd.Series, int, int, np.ndarray]:
             - Time on stream (tos) series.
             - Temperature series.
             - Column values series.
-            - Vertex index.
             - Initial index.
             - Final index.
             - Selected index array.
@@ -575,6 +557,7 @@ def extract_indices_target(
     # Find the initial index where the temperature is close to the reference temperature and time is non-negative
     assert (temp_threshold > 0), "temp_threshold should be positive."
     condition1 = np.abs(temp - temp_ref) <= temp_threshold
+    test_val = np.abs(temp - temp_ref)
     condition2 = tos >= 0
     initial_index = np.argwhere(condition1 & condition2).reshape(-1)[0]
 
@@ -587,30 +570,113 @@ def extract_indices_target(
     # Find the selected indices within the initial and final index range
     selected_index = np.arange(initial_index, final_index + 1)
 
+    # Modify indices according to the given `method` argument for 'plot_slope'
+    if method == 'initial slope':
+        # use the same initial_index
+        try:
+            # choosing final index which is close, in tos, to initial index
+            final_index = np.argwhere(tos >= tos[initial_index] + adjacency_slope).reshape(-1)[0]
+        except Exception as e:
+            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+    elif method == 'final slope':
+        # use the same final_index
+        try:
+            # choosing initial index which is close, in tos, to final index
+            initial_index = np.argwhere(tos <= tos[final_index] - adjacency_slope).reshape(-1)[-1]
+        except Exception as e:
+            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+
     return tos, temp, col_val, initial_index, final_index, selected_index
 
-def _plot_linear_line(t_init: float, t_final: float, y_init: float, y_final: float, show: bool = False, plt=plt):
-    """ plot linear line connecting two points"""
+def _plot_linear_line_two_points(
+        t_init: float, t_final: float, y_init: float, y_final: float, plot: bool = True, show: bool = False
+) -> float:
+    """ plot linear line connecting two points
+
+    Args:
+        t_init (float): Initial time.
+        t_final (float): Final time.
+        y_init (float): Initial value.
+        y_final (float): Final value.
+        plot (bool): Whether to plot the fitted line.
+        show (bool): Whether to display the plot.
+
+    Returns:
+        float: Slope of the fitted line
+    """
     def linear_func(x, x1, x2, y1, y2):
         a = (y2 - y1) / (x2 - x1)
         b = y2 - a * x2
         return a * x + b, a
 
     x_plot = np.linspace(t_init-1, t_final+1, 100) # plot buffer of 1
-    y_plot, slope = linear_func(x_plot, t_init,
+    y_plot, slope = linear_func(x_plot,
+                                t_init,
                                 t_final,
                                 y_init,
                                 y_final)
 
-    plt.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
-    plt.scatter([t_init, t_final],
-                [y_init, y_final],
-                color='red', edgecolors='gray'
-                )
-    plt.text(
-        (t_init + t_final) / 2,
-        (y_init + y_final) / 2,
-        f'slope={slope:.2f}'
-    )
+    if plot:
+        plt.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
+        plt.scatter([t_init, t_final],
+                    [y_init, y_final],
+                    color='red', edgecolors='gray'
+                    )
+        plt.text(
+            (t_init + t_final) / 2,
+            (y_init + y_final) / 2,
+            f'slope={slope:.2f}'
+        )
     if show:
         plt.show()
+    return slope
+
+def _plot_linear_line_fitting(
+        t_init, t_final, y_init, y_final, tos, col_val, window=1, plot: bool=True, show: bool=False
+) -> float:
+    """
+    Plot linear line fitting data points around t_init.
+
+    Args:
+        plot:
+        t_init (float): Initial time.
+        t_final (float): Final time.
+        y_init (float): Initial value.
+        y_final (float): Final value.
+        tos (pd.Series): Time on stream series.
+        col_val (pd.Series): Column values series.
+        window (int): Number of points around the range defined by initial index (t_init) and final index (t_final) to use for fitting.
+        plot (bool): Whether to plot the fitted line.
+        show (bool): Whether to display the plot.
+
+    Returns:
+        float: Slope of the fitted line
+    """
+    # Find the index of t_init
+    t_init_index = np.argmin(np.abs(tos - t_init))
+    t_final_index = np.argmin(np.abs(tos - t_final))
+
+    # Select data points around t_init for fitting
+    start_index = max(0, t_init_index - window)
+    end_index = min(len(tos), t_final_index + window + 1)
+    t_fit = tos[start_index:end_index]
+    y_fit = col_val[start_index:end_index]
+
+    # Perform linear fitting
+    coeffs = np.polyfit(t_fit, y_fit, 1)
+    linear_func = np.poly1d(coeffs)
+
+    if plot:
+        # Generate points for plotting the fitted line
+        x_plot = np.linspace(t_init - 1, t_final + 1, 100)
+        y_plot = linear_func(x_plot)
+
+        # Plot the fitted line
+        plt.plot(x_plot, y_plot, c='b', alpha=0.5, label='linear fit')
+        plt.scatter([t_init, t_final], [y_init, y_final], color='red', edgecolors='gray')
+        plt.scatter(t_fit, y_fit, color=[1,0,0,0], edgecolors='blue')
+        plt.text(t_final + 0.5, y_final - 1.0, f'slope={coeffs[0]:.2f}')
+
+    if show:
+        plt.show()
+    return coeffs[0]

@@ -31,19 +31,22 @@ dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
 # Apply duplicate group IDs
 dataset.apply_duplicate_groupid(verbose=False)
 
-# Calculate delta CO2 conversion
-# dataset.assign_delta_co2_conv()
-dataset.assign_target_values(['delta','initial slope'], column='CO2 Conversion (%)', plot_slope=True)
-dataset.assign_target_values(['delta','initial value'], column='CO Forward Production Rate (mol/molRh/s)', plot_slope=True)
+# Calculate and add target values into the DataFrame
+for column in ['CO2 Conversion (%)',]: # 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)', 'CO Forward Production Rate (mol/molRh/s)', 'Selectivity to CO (%)']:
+    dataset.assign_target_values(methods=['initial slope', 'final slope', 'overall slope'], column=column,
+                                 adjacency_slope=0.5, temp_threshold=3.5, init_tos_buffer=0.5)
 
-for i in range(len(dataset.path_filtered)):
-    ex.plot_tos_data(
-        dataset.path_filtered[i],
-        'CO2 Conversion (%)',
-        temp_threshold=2.0,
-        init_tos_buffer=0.5,
-        plot_selected=True, show=True
-    )
+# Plot the data and the corresponding slopes
+for i in range(5):
+    print(i, end=' ')
+    ex.plot_tos_data(dataset.path_filtered[i], x_max_plot=20,
+                     methods_slope=['initial slope', 'final slope', 'overall slope'],
+                     column='CO2 Conversion (%)',
+                     temp_threshold=3.5,
+                     init_tos_buffer=0.5,
+                     adjacency_slope=0.5,
+                     plot_selected=True, plot_slope=True,
+                     show=True)
 
 # # Export the processed data
 # print(
