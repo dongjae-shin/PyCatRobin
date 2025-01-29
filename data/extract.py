@@ -257,6 +257,17 @@ class DataForGP:
                      unique:bool=True,
                      which_target:str='delta_CO2_conv',
                      mute:bool=True):
+        """
+        Export the processed data to an Excel sheet.
+
+        Args:
+            unique (bool): If True, export a unique dataset by averaging targets and integrating.
+            which_target (str): The target column to be exported.
+            mute (bool): If True, suppress print statements.
+
+        Returns:
+            pd.DataFrame: The exported DataFrame.
+        """
         # export unique data set made by averaging targets and integrating
         if unique:
             # calculate each group's average target value
@@ -419,7 +430,7 @@ def plot_tos_data(
             [col_val[initial_index], col_val[final_index]],
             edgecolors='g', color='y', s=18
         )
-        plt.axvline(x=tos[initial_index], color='g', linestyle='--')
+        plt.axvline(x=tos[initial_index], color='gray', linestyle='--')
 
     plt.xlabel('Time on stream (hrs)')
     plt.ylabel(column, c='g')

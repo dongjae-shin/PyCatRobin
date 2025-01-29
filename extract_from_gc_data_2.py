@@ -42,27 +42,3 @@ for column in ['CO2 Conversion (%)', 'CH4 Net Production Rate (mol/molRh/s)', 'C
         init_tos_buffer=0.5,
         adjacency_slope=0.5,
     )
-
-# Plot the data and the corresponding slopes
-for i in range(5):
-    print(i, end=' ')
-    ex.plot_tos_data(dataset.path_filtered[i], x_max_plot=20,
-                     # methods_slope=['delta', 'initial slope', 'final slope', 'overall slope'],
-                     column='CO2 Conversion (%)',
-                     temp_threshold=3.5,
-                     init_tos_buffer=0.5,
-                     adjacency_slope=0.5,
-                     plot_selected=True, plot_slope=True,
-                     show=True)
-
-# # Export the processed data
-# print(
-#     dataset.export_sheet(
-#         unique=True,
-#         # which_target='delta_CO2_conv',
-#         which_target='CO2 Conversion (%)_delta',
-#         mute=True
-#     )
-# )
-
-print(dataset.df_us.columns[0])
