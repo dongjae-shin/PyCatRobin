@@ -20,7 +20,9 @@ class DataForGP:
         path_filtered (list): List of paths to the filtered Excel files.
         path_removed (list): List of paths to the removed Excel files.
         df_us (pd.DataFrame): DataFrame containing the processed data.
-        co2_convs (list): List to store CO2 conversion data.
+        df_us_unique (pd.DataFrame): DataFrame containing the unique processed data.
+        df_stat (pd.DataFrame): DataFrame containing statistical data of duplicate groups.
+        targets (list): List to store target values.
 
     Methods:
         find_excel_files():
@@ -44,7 +46,13 @@ class DataForGP:
         assign_target_values(methods, column, verbose=False, ...):
             Assigns target values to the DataFrame based on the specified methods.
 
-        export_sheet(unique=True, which_target='delta_CO2_conv', mute=True):
+        construct_unique_dataframe(verbose=False):
+            Constructs a unique DataFrame by averaging targets and integrating duplicate groups.
+
+        calculate_statistics_duplicate_group():
+            Calculates statistics for duplicate groups.
+
+        export_sheet(unique=True):
             Exports the processed data to an Excel sheet.
     """
     def __init__(self, path):
@@ -53,7 +61,9 @@ class DataForGP:
         self.path_filtered = None
         self.path_removed = None
         self.df_us = None
-        self.co2_convs = []
+        self.df_us_unique = None
+        self.df_stat = None
+        self.targets = []
 
     def find_excel_files(self):
         extension = '*.xlsx'
@@ -180,8 +190,8 @@ class DataForGP:
         # plot recent data
         for i, row_number in enumerate(row_numbers):
             print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
-            plot_tos_data(self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
-                          init_tos_buffer, plot_selected, plot_slope, temp_max)
+            _plot_tos_data(self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
+                           init_tos_buffer, plot_selected, plot_slope, temp_max)
             print(
                 f"{column}_{method}: {_calculate_target(
                     self.path_filtered[row_number], column, method, verbose, 
@@ -199,14 +209,13 @@ class DataForGP:
         Returns:
             None
         """
-        # Drop the 'filename' and 'experiment_date' columns from the DataFrame
-        self.df_us = self.df_us.drop(labels=['filename', 'experiment_date'], axis=1)
-
         # Create a new column 'GroupID' to identify duplicate rows
         # Group duplicate rows and assign a unique group number to each group
-        self.df_us["GroupID"] = (self.df_us.loc[self.df_us.duplicated(keep=False)]
-                                    .groupby(self.df_us.columns.tolist())
-                                    .ngroup() + 1)
+        subset_columns = [col for col in self.df_us.columns if col not in ['filename', 'experiment_date']]
+        self.df_us["GroupID"] = (self.df_us.loc[self.df_us.duplicated(subset=subset_columns, keep=False)]
+                                 .groupby(subset_columns)
+                                 .ngroup() + 1)
+
         # set non-duplicate rows as GroupID=0
         self.df_us["GroupID"] = self.df_us["GroupID"].fillna(0).astype(int)
 
@@ -252,58 +261,155 @@ class DataForGP:
                                                  window, duration, temp_threshold, init_tos_buffer)
                 target_values.append(target_value)
             self.df_us[f'{column}_{method}'] = target_values
+            self.targets.append(f'{column}_{method}')
+            
+    def construct_unique_dataframe(self, verbose: bool = False):
+        if 'GroupID' not in self.df_us.columns:
+            raise ValueError("self.df_us does not have 'GroupID' column. Please run apply_duplicate_groupid() first.")
 
-    def export_sheet(self,
-                     unique:bool=True,
-                     which_target:str='delta_CO2_conv',
-                     mute:bool=True):
+        if len(self.targets) == 0:
+            raise ValueError("self.targets is not constructed yet. Please run assign_target_values() first.")
+
+        # calculate each group's average target value
+        self.df_us_unique = self.df_us[self.df_us["GroupID"] == 0]
+        # ignoring warning
+        with warnings.catch_warnings(action="ignore"):
+            # convert datetime column, self.df_us_unique['experiment_date'], to string
+            self.df_us_unique['experiment_date'] = self.df_us_unique['experiment_date'].dt.strftime('%Y%m%d')
+            # for each duplicate group integrate columns such as filename, experiment_date, and targets
+            for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
+                if verbose:
+                    print(f'Group {i}: ')
+                df_integrated = df_group.iloc[0, :]  # use the first row in the group
+                # calculate mean and std. dev. of each target for each duplicate group
+                for target in self.targets:
+                    mean = df_group[target].mean()
+                    if verbose:
+                        print(f'mean of {target}: {mean:5.2f}')
+                    df_integrated.loc[target] = mean
+                df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
+                df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
+                                                                 .dt.strftime('%Y%m%d').to_list())
+
+                # append an integrated row
+                self.df_us_unique.loc[-1] = df_integrated
+                self.df_us_unique.index = self.df_us_unique.index + 1
+                self.df_us_unique = self.df_us_unique.sort_index()
+        self.df_us_unique = self.df_us_unique.sort_index(ascending=False)
+        self.df_us_unique = self.df_us_unique.reset_index(drop=True)
+
+    def calculate_statistics_duplicate_group(self, verbose: bool = False):
+        if 'GroupID' not in self.df_us.columns:
+            raise ValueError("self.df_us does not have 'GroupID' column. Please run apply_duplicate_groupid() first.")
+
+        if len(self.targets) == 0:
+            raise ValueError("self.targets is not constructed yet. Please run assign_target_values() first.")
+
+        # use fist row and remove columns of self.df_stat corresponding to target values
+        self.df_stat = self.df_us.iloc[0?? No..., :].drop(self.targets)
+
+        for target in self.targets:
+            self.df_stat.loc[f'{target}_mean'] = []
+            self.df_stat.loc[f'{target}_std'] = []
+
+        # ignoring warning
+        with warnings.catch_warnings(action="ignore"):
+
+            # for each duplicate group integrate columns such as filename, experiment_date, and targets
+            for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
+                if verbose:
+                    print(f'Group {i}: ')
+                df_integrated = df_group.iloc[0, :].drop(self.targets) # use the first row in the group
+                # calculate mean and std. dev. of each target for each duplicate group
+                for target in self.targets:
+                    mean = df_group[target].mean()
+                    std = df_group[target].std()
+                    if verbose:
+                        print(f'mean of {target}: {mean:5.2f}')
+                        print(f'std. dev. of {target}: {std:5.2f}')
+                    df_integrated.loc[f'{target}_mean'] = mean
+                    df_integrated.loc[f'{target}_std'] = std
+                df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
+                df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
+                                                                 .dt.strftime('%Y%m%d').to_list())
+                # append an integrated row
+                self.df_stat.loc[i] = df_integrated
+                # self.df_us_unique.index = self.df_us_unique.index + 1
+        #         self.df_us_unique = self.df_us_unique.sort_index()
+        # self.df_us_unique = self.df_us_unique.sort_index(ascending=False)
+        # self.df_us_unique = self.df_us_unique.reset_index(drop=True)
+        return df_integrated
+
+    def export_sheet(self, unique: bool = True):
         """
         Export the processed data to an Excel sheet.
 
         Args:
             unique (bool): If True, export a unique dataset by averaging targets and integrating.
-            which_target (str): The target column to be exported.
-            mute (bool): If True, suppress print statements.
 
         Returns:
             pd.DataFrame: The exported DataFrame.
         """
+
+        if self.df_us_unique is None:
+            raise ValueError("self.df_us_unique is not constructed yet. Please run construct_unique_dataframe() first.")
+
+        dates = str(datetime.date.today()).rsplit('-')
+
         # export unique data set made by averaging targets and integrating
         if unique:
-            # calculate each group's average target value
-            df_unique = self.df_us[self.df_us["GroupID"] == 0]
-            # ignore warning: A value is trying to be set on a copy of a slice from a DataFrame
-            with warnings.catch_warnings(action="ignore"):
-                for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
-                    # display(df_group)
-                    mean = df_group[which_target].mean()
-                    if not mute:
-                        print(f'Group {i}: ')
-                        print(f'mean: {mean:5.2f}')
-                    df_integrated = df_group.iloc[0, :] # use the first row in the group
-                    df_integrated.loc[which_target] = mean
-                    df_integrated.loc['filename'] = f'group {i} integrated'
-                    df_unique.loc[-1] = df_integrated # append an integrated row
-                    df_unique.index = df_unique.index + 1
-                    df_unique = df_unique.sort_index()
-            df_unique = df_unique.sort_index(ascending=False)
-            df_unique = df_unique.reset_index(drop=True)
-
-            # export excel file
-            dates = str(datetime.date.today()).rsplit('-')
-            df_unique.to_excel(
+            self.df_us_unique.to_excel(
                 f'./{dates[0] + dates[1] + dates[2]}_sheet_for_ML_unique.xlsx',
                 index=False
             )
-            return df_unique
+            return self.df_us_unique
         # export data set with duplicate data
         else:
-            dates = str(datetime.date.today()).rsplit('-')
             self.df_us.to_excel(
                 f'./{dates[0] + dates[1] + dates[2]}_sheet_for_ML_duplicate.xlsx',
                 index=False
             )
             return self.df_us
+
+    def plot_tos_data(
+        self,
+        column: str = 'CO2 Conversion (%)',
+        x_max_plot: float = None, y_max_plot: float = None,
+        temp_threshold: float = 3.5, init_tos_buffer: float = 1.0,
+        plot_selected: bool = False, plot_slope: bool = False, methods_slope=None,
+        temp_max: float = False, show: bool = True, savefig: str = None,
+        duration: float = 10.0, adjacency_slope: float = 0.1, window: int = 0
+        ):
+        """
+        Plot Time-on-Stream (TOS) data with specific target and temperature.
+
+        Args:
+            column (str): Column name to plot. Defaults to 'CO2 Conversion (%)'.
+            x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
+            y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
+            temp_threshold (float, optional): Temperature threshold for initial index calculation. Defaults to 3.5.
+            init_tos_buffer (float, optional): Initial time-on-stream buffer for index calculation. Defaults to 1.0.
+            plot_selected (bool, optional): Whether to plot the selected region. Defaults to False.
+            plot_slope (bool, optional): Whether to plot the slope of the target values. Defaults to False.
+            methods_slope (list, optional): List of methods to calculate the slope. Defaults to None.
+            temp_max (float, optional): Maximum value for the temperature axis. Defaults to False.
+            show (bool, optional): Whether to display the plot. Defaults to True.
+            savefig (str, optional): Path to save the figure. Defaults to None.
+            duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
+            adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
+            window (int, optional): Number of points around the initial index to use for fitting. Defaults to 0.
+
+        Returns:
+            None
+        """
+        # Iterate over each filtered path and plot the TOS data
+        for i, path in enumerate(self.path_filtered):
+            _plot_tos_data(
+                path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer,
+                plot_selected, plot_slope, methods_slope, temp_max, show, savefig, duration,
+                adjacency_slope, window,
+                filename=f'({i+1}/{len(self.path_filtered)}) '+path.rsplit('/')[-1]
+            )
 
 def _is_not_nominal_value_vectorized(to_be_tested: pd.Series,
                                     allowed_values: np.array) -> pd.Series:
@@ -375,9 +481,9 @@ def get_input_vector(excel_path: str = None,
     else:
         return [temp, w_rh, m_rh, synth_method, filename, expt_date]
 
-def plot_tos_data(
-        path: str,
-        column: str = None, x_max_plot: float = None, y_max_plot: float = None,
+def _plot_tos_data(
+        path: str, column: str = None,
+        x_max_plot: float = None, y_max_plot: float = None,
         temp_threshold: float = 3.5,
         init_tos_buffer: float = 1.0,
         plot_selected: bool = False,
@@ -388,7 +494,8 @@ def plot_tos_data(
         savefig: str = None,
         duration: float = 10.0,
         adjacency_slope: float = 0.1,
-        window: int = 0
+        window: int = 0,
+        filename: str = None
 ):
     """
     Plot Time-on-Stream (TOS) data with specific target and temperature.
@@ -439,7 +546,12 @@ def plot_tos_data(
     if x_max_plot:
         plt.xlim(0, x_max_plot)
 
-    plt.title(f'duration: {tos[final_index] - tos[initial_index]:.2f}')
+    if filename:
+        plt.title(
+            f'duration: {tos[final_index] - tos[initial_index]:.2f}\n{filename}')
+    else:
+        plt.title(
+            f'duration: {tos[final_index] - tos[initial_index]:.2f}')
 
     # plot linear line for slopes
     if plot_slope:
@@ -721,7 +833,7 @@ def _plot_linear_line_fitting(
         plt.plot(x_plot, y_plot, c='b', alpha=0.5, label='linear fit')
         plt.scatter([t_init, t_final], [y_init, y_final], color='red', edgecolors='gray')
         plt.scatter(t_fit, y_fit, color=[1,0,0,0], edgecolors='blue')
-        plt.text(t_final + 0.5, y_final - 1.0, f'slope={coeffs[0]:.2f}')
+        plt.text(t_final, y_final, f'slope={coeffs[0]:.2f}')
 
     if show:
         plt.show()

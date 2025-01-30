@@ -5,7 +5,6 @@ import os
 home_dir = os.path.expanduser("~")
 path = (home_dir +
         "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
-
 # Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -15,26 +14,19 @@ exclude_keywords = [
 
 # Create an instance of DataForGP
 dataset = ex.DataForGP(path=path)
-
 # Find and filter Excel files
 dataset.find_excel_files()
-dataset.filter_excel_files(
-    exclude_keywords=exclude_keywords,
-    verbose=True
-)
-
+dataset.filter_excel_files(exclude_keywords=exclude_keywords, verbose=True)
 # Construct the DataFrame
 dataset.construct_dataframe(extensive=False)
-
 # Convert measured values to nominal values
 dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
-
 # Apply duplicate group IDs
 dataset.apply_duplicate_groupid(verbose=False)
 
 # Calculate and add target values into the DataFrame
-for column in ['CO2 Conversion (%)', 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
-               'CO Forward Production Rate (mol/molRh/s)', 'Selectivity to CO (%)']:
+for column in ['CO2 Conversion (%)']:#, 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
+               # 'CO Forward Production Rate (mol/molRh/s)', 'Selectivity to CO (%)']:
     dataset.assign_target_values(
         methods=['initial slope', 'final slope', 'overall slope'],
         column=column,
@@ -43,26 +35,20 @@ for column in ['CO2 Conversion (%)', 'CH4 Net Production Rate (mol/molRh/s)', 'C
         adjacency_slope=0.5,
     )
 
-# Plot the data and the corresponding slopes
-for i in range(5):
-    print(i, end=' ')
-    ex.plot_tos_data(dataset.path_filtered[i], x_max_plot=20,
-                     # methods_slope=['delta', 'initial slope', 'final slope', 'overall slope'],
-                     column='CO2 Conversion (%)',
-                     temp_threshold=3.5,
-                     init_tos_buffer=0.5,
-                     adjacency_slope=0.5,
-                     plot_selected=True, plot_slope=True,
-                     show=True)
+# Construct unique DataFrame using group IDs
+dataset.construct_unique_dataframe(verbose=True)
+# Export the processed data
+print(
+    dataset.export_sheet(unique=True)
+)
+# # Plot the data and the corresponding slopes
+# dataset.plot_tos_data(x_max_plot=20,
+#                       column='CH4 Net Production Rate (mol/molRh/s)',
+#                       temp_threshold=3.5,
+#                       init_tos_buffer=0.5,
+#                       adjacency_slope=0.5,
+#                       methods_slope=['initial slope', 'final slope', 'overall slope'],
+#                       plot_selected=True, plot_slope=True, show=True)
 
-# # Export the processed data
-# print(
-#     dataset.export_sheet(
-#         unique=True,
-#         # which_target='delta_CO2_conv',
-#         which_target='CO2 Conversion (%)_delta',
-#         mute=True
-#     )
-# )
-
+df_stat = dataset.calculate_statistics_duplicate_group()
 print(dataset.df_us.columns[0])

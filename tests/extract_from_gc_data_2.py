@@ -33,12 +33,29 @@ dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
 dataset.apply_duplicate_groupid(verbose=False)
 
 # Calculate and add target values into the DataFrame
-for column in ['CO2 Conversion (%)', 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
-               'CO Forward Production Rate (mol/molRh/s)', 'Selectivity to CO (%)']:
+for column in ['CO2 Conversion (%)', 'CH4 Net Production Rate (mol/molRh/s)',]: #'CO Net Production Rate (mol/molRh/s)',
+               # 'CO Forward Production Rate (mol/molRh/s)', 'Selectivity to CO (%)']:
     dataset.assign_target_values(
-        methods=['initial slope', 'final slope', 'overall slope'],
+        methods=['overall slope', 'initial slope', 'final slope', 'delta'],
         column=column,
         temp_threshold=3.5,
         init_tos_buffer=0.5,
         adjacency_slope=0.5,
     )
+
+# # Plot the data and the corresponding slopes
+# for i in range(5):
+#     print(i, end=' ')
+#     ex._plot_tos_data(dataset.path_filtered[i], x_max_plot=20,
+#                       column='CO2 Conversion (%)',
+#                       temp_threshold=3.5,
+#                       init_tos_buffer=0.5,
+#                       adjacency_slope=0.5,
+#                       plot_selected=True, plot_slope=True, show=True)
+
+# Export the processed data
+print(
+    dataset.export_sheet(unique=True, verbose=True)
+)
+
+print()
