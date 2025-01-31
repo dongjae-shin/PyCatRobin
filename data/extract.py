@@ -607,8 +607,10 @@ def _plot_tos_data(
                                           col_val[final_index], tos, col_val, savgol, show=False)
 
     # Plot temperature: secondary axis for temperature
+    plt.subplot(111)
     axs_2nd = plt.twinx()
-    l3 = axs_2nd.scatter(tos, temp, s=5, color='r', alpha=0.5)
+
+    l3 = axs_2nd.scatter(tos, temp, s=5, color='r', alpha=0.5, zorder=0)
     axs_2nd.set_ylabel('Temperature (C)', color='r')
     if temp_max:
         axs_2nd.set_ylim(0, temp_max)
