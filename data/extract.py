@@ -71,28 +71,28 @@ class DataForGP:
         print(f'{len(self.path_found)} excel files were found:')
 
     def filter_excel_files(self, exclude_keywords, verbose=False):
-                    """
-                    Filters out excel files that satisfy any of `exclude_keywords`.
+        """
+        Filters out Excel files that satisfy any of `exclude_keywords`.
 
-                    Args:
-                        exclude_keywords (list): List of keywords to exclude files.
-                        verbose (bool): If True, print the number and names of filtered files.
+        Args:
+            exclude_keywords (list): List of keywords to exclude files.
+            verbose (bool): If True, print the number and names of filtered files.
 
-                    Returns:
-                        None
-                    """
-                    self.path_filtered = []
-                    self.path_removed = []
-                    for path in self.path_found:
-                        if any(keyword in path for keyword in exclude_keywords):
-                            self.path_removed.append(path)  # store removed elements
-                        else:
-                            self.path_filtered.append(path)  # store filtered elements
+        Returns:
+            None
+        """
+        self.path_filtered = []
+        self.path_removed = []
+        for path in self.path_found:
+            if any(keyword in path for keyword in exclude_keywords):
+                self.path_removed.append(path)  # store removed elements
+            else:
+                self.path_filtered.append(path)  # store filtered elements
 
-                    if verbose:
-                        print(f'{len(self.path_removed)} files were filtered out:')
-                        for path in self.path_removed:
-                            print(path)
+        if verbose:
+            print(f'{len(self.path_removed)} files were filtered out:')
+            for path in self.path_removed:
+                print(path)
 
     def construct_dataframe(self, extensive:bool=False):
         if extensive:
