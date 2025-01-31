@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated submodule structure and project name">
-      <change afterPath="$PROJECT_DIR$/data/preprocess.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/extract_from_gc_data-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/extract_from_gc_data-checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/20250110_sheet_for_ML_duplicate.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/tests/20250110_sheet_for_ML_duplicate.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/20250110_sheet_for_ML_unique.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/tests/20250110_sheet_for_ML_unique.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/extract_from_gc_data_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data_2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/us_code.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/us_code.py" afterDir="false" />
-    </list>
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated submodule structure and project name" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,7 +46,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
-    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
+    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
   },
   &quot;recentNewPullRequestHead&quot;: {
     &quot;server&quot;: {
@@ -82,20 +72,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.extract.executor": "Debug",
-    "Python.extract_from_gc_data.executor": "Debug",
-    "Python.extract_from_gc_data_2.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.us_code.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/djayshin/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.extract.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.extract_from_gc_data_2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.us_code.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />

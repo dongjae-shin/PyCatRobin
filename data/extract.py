@@ -167,12 +167,34 @@ class DataForGP:
             init_tos_buffer: float = 1.0,
             plot_selected: bool = False,
             plot_slope: bool = False,
+            savgol: bool = True,
             temp_max: float = False,
             adjacency_slope: float = 0.1,
-            window: int = 0,
             duration: float = 10,
             verbose: bool = False
     ):
+        """
+        Check and plot the most recent data based on the specified column and method.
+
+        Args:
+            buffer_recent (int): Buffer in days to consider for recent data.
+            column (str): Column to check and plot.
+            method (str): Method to calculate the target value.
+            x_max_plot (float | None): Maximum value for the x-axis.
+            y_max_plot (float | None): Maximum value for the y-axis.
+            temp_threshold (float): Temperature threshold for initial index calculation.
+            init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
+            plot_selected (bool): Whether to plot the selected region.
+            plot_slope (bool): Whether to plot the slope of the target values.
+            savgol (bool): Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
+            temp_max (float): Maximum value for the temperature axis.
+            adjacency_slope (float): Slope threshold for initial and final slope calculations.
+            duration (float): Duration to calculate the final index.
+            verbose (bool): If True, print additional information.
+
+        Returns:
+            None
+        """
         # get the most recent date in the column
         most_recent_date = self.df_us['experiment_date'].max()
 
@@ -190,12 +212,14 @@ class DataForGP:
         # plot recent data
         for i, row_number in enumerate(row_numbers):
             print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
-            _plot_tos_data(self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
-                           init_tos_buffer, plot_selected, plot_slope, temp_max)
+            _plot_tos_data(
+                self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
+                init_tos_buffer, plot_selected, plot_slope, temp_max=temp_max, savgol=savgol
+            )
             print(
                 f"{column}_{method}: {_calculate_target(
-                    self.path_filtered[row_number], column, method, verbose, 
-                    adjacency_slope, window, duration, temp_threshold, init_tos_buffer
+                    self.path_filtered[row_number], column, method, verbose, adjacency_slope, duration, temp_threshold, 
+                    init_tos_buffer, savgol
                 ) :5.3f}"
             )
 
@@ -232,16 +256,15 @@ class DataForGP:
     def assign_target_values(
             self, methods: List[str], column: str, verbose: bool = False,
             adjacency_slope: float = 0.1,
-            window: int = 0,
             duration: float = 10,
             temp_threshold: float = 3.5,
-            init_tos_buffer: float = 1.0
+            init_tos_buffer: float = 1.0,
+            savgol: bool = True
     ):
         """
         Assign target values to the DataFrame based on the specified methods.
 
         Args:
-            window:
             methods (List[str]): List of target methods to calculate and include in the DataFrame.
             column (str): The column to calculate the target values for.
             verbose (bool): If True, print the calculated target values.
@@ -249,6 +272,7 @@ class DataForGP:
             duration (float): Duration to calculate the final index.
             temp_threshold (float): Temperature threshold for initial index calculation.
             init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
+            savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
 
         Returns:
             None
@@ -257,8 +281,8 @@ class DataForGP:
         for method in methods:
             target_values = []
             for path in self.path_filtered:
-                target_value = _calculate_target(path, column, method, verbose, adjacency_slope,
-                                                 window, duration, temp_threshold, init_tos_buffer)
+                target_value = _calculate_target(path, column, method, verbose, adjacency_slope, duration,
+                                                 temp_threshold, init_tos_buffer, savgol)
                 target_values.append(target_value)
             self.df_us[f'{column}_{method}'] = target_values
             self.targets.append(f'{column}_{method}')
@@ -299,46 +323,62 @@ class DataForGP:
         self.df_us_unique = self.df_us_unique.reset_index(drop=True)
 
     def calculate_statistics_duplicate_group(self, verbose: bool = False):
+        """
+        Calculate statistics for duplicate groups. The statistics include the mean, standard deviation of each target, and
+        the total standard deviation of each target in the unique dataset. The calculated statistics are stored in the
+        DataFrame `self.df_stat`. The DataFrame `self.df_stat` is constructed by integrating the columns of the first
+        row in each duplicate group. The columns of the DataFrame `self.df_stat` are the same as the columns of the
+        DataFrame `self.df_us` except for the target values.
+
+        Args:
+            verbose (bool): If True, print the calculated statistics.
+
+        Returns:
+            None
+        """
         if 'GroupID' not in self.df_us.columns:
             raise ValueError("self.df_us does not have 'GroupID' column. Please run apply_duplicate_groupid() first.")
+
+        if self.df_us_unique is None:
+            raise ValueError("self.df_us_unique is not constructed yet. Please run construct_unique_dataframe() first.")
 
         if len(self.targets) == 0:
             raise ValueError("self.targets is not constructed yet. Please run assign_target_values() first.")
 
-        # use fist row and remove columns of self.df_stat corresponding to target values
-        self.df_stat = self.df_us.iloc[0?? No..., :].drop(self.targets)
+        # use fist row as a dummy, and remove columns of self.df_stat corresponding to target values
+        self.df_stat = self.df_us.iloc[0, :] #
+        self.df_stat = self.df_stat.to_frame().T
+        self.df_stat = self.df_stat.drop(self.targets, axis=1)
 
+        # add columns for statistics of target values
         for target in self.targets:
-            self.df_stat.loc[f'{target}_mean'] = []
-            self.df_stat.loc[f'{target}_std'] = []
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_std_total', None)
 
         # ignoring warning
         with warnings.catch_warnings(action="ignore"):
-
             # for each duplicate group integrate columns such as filename, experiment_date, and targets
             for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
                 if verbose:
                     print(f'Group {i}: ')
                 df_integrated = df_group.iloc[0, :].drop(self.targets) # use the first row in the group
-                # calculate mean and std. dev. of each target for each duplicate group
+                # calculate statistics of each target for each duplicate group
                 for target in self.targets:
                     mean = df_group[target].mean()
                     std = df_group[target].std()
+                    std_total = self.df_us_unique[target].std()
                     if verbose:
                         print(f'mean of {target}: {mean:5.2f}')
                         print(f'std. dev. of {target}: {std:5.2f}')
                     df_integrated.loc[f'{target}_mean'] = mean
                     df_integrated.loc[f'{target}_std'] = std
+                    df_integrated.loc[f'{target}_std_total'] = std_total
                 df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
                 df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
                                                                  .dt.strftime('%Y%m%d').to_list())
                 # append an integrated row
-                self.df_stat.loc[i] = df_integrated
-                # self.df_us_unique.index = self.df_us_unique.index + 1
-        #         self.df_us_unique = self.df_us_unique.sort_index()
-        # self.df_us_unique = self.df_us_unique.sort_index(ascending=False)
-        # self.df_us_unique = self.df_us_unique.reset_index(drop=True)
-        return df_integrated
+                self.df_stat.loc[i-1] = df_integrated
 
     def export_sheet(self, unique: bool = True):
         """
@@ -378,7 +418,7 @@ class DataForGP:
         temp_threshold: float = 3.5, init_tos_buffer: float = 1.0,
         plot_selected: bool = False, plot_slope: bool = False, methods_slope=None,
         temp_max: float = False, show: bool = True, savefig: str = None,
-        duration: float = 10.0, adjacency_slope: float = 0.1, window: int = 0
+        duration: float = 10.0, adjacency_slope: float = 0.1, savgol: bool = True
         ):
         """
         Plot Time-on-Stream (TOS) data with specific target and temperature.
@@ -397,19 +437,16 @@ class DataForGP:
             savefig (str, optional): Path to save the figure. Defaults to None.
             duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
             adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
-            window (int, optional): Number of points around the initial index to use for fitting. Defaults to 0.
+            savgol(bool, optional): Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
 
         Returns:
             None
         """
         # Iterate over each filtered path and plot the TOS data
         for i, path in enumerate(self.path_filtered):
-            _plot_tos_data(
-                path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer,
-                plot_selected, plot_slope, methods_slope, temp_max, show, savefig, duration,
-                adjacency_slope, window,
-                filename=f'({i+1}/{len(self.path_filtered)}) '+path.rsplit('/')[-1]
-            )
+            _plot_tos_data(path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer, plot_selected,
+                           plot_slope, methods_slope, temp_max, show, savefig, duration, adjacency_slope, savgol,
+                           filename=f'({i + 1}/{len(self.path_filtered)}) ' + path.rsplit('/')[-1])
 
 def _is_not_nominal_value_vectorized(to_be_tested: pd.Series,
                                     allowed_values: np.array) -> pd.Series:
@@ -494,7 +531,7 @@ def _plot_tos_data(
         savefig: str = None,
         duration: float = 10.0,
         adjacency_slope: float = 0.1,
-        window: int = 0,
+        savgol: bool = True,
         filename: str = None
 ):
     """
@@ -515,7 +552,8 @@ def _plot_tos_data(
         savefig (str, optional): Path to save the figure. Defaults to None.
         duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
         adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
-        window (int, optional): Number of points around the initial index to use for fitting. Defaults to 0.
+        savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
+        filename (str, optional): Filename to display on the plot. Defaults to None.
 
     Returns:
         None
@@ -566,7 +604,7 @@ def _plot_tos_data(
                                              col_val[final_index], show=False)
             if method in ['initial slope', 'final slope']:
                 _plot_linear_line_fitting(tos[initial_index], tos[final_index], col_val[initial_index],
-                                          col_val[final_index], tos, col_val, window, show=False)
+                                          col_val[final_index], tos, col_val, savgol, show=False)
 
     # Plot temperature: secondary axis for temperature
     axs_2nd = plt.twinx()
@@ -594,10 +632,10 @@ def _plot_tos_data(
 def _calculate_target(
         path: str, column: str, method:str, verbose: bool = False,
         adjacency_slope: float = 0.1,
-        window: int = 0,
         duration: float = 10,
         temp_threshold: float = 3.5,
-        init_tos_buffer: float = 1.0
+        init_tos_buffer: float = 1.0,
+        savgol: bool = True
 )->float:
     """
     General version of target value calculator.
@@ -608,10 +646,10 @@ def _calculate_target(
         method (str): Method to calculate the target value. Options are 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope'.
         verbose (bool): If True, print the calculated target values.
         adjacency_slope (float): Slope threshold for initial and final slope calculations.
-
         duration (float): Duration to calculate the final index.
         temp_threshold (float): Temperature threshold for initial index calculation.
         init_tos_buffer (float): Initial time-on-stream buffer for index calculation.
+        savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
 
     Returns:
         float: Calculated target value.
@@ -634,16 +672,12 @@ def _calculate_target(
         target = col_val[final_index]
     elif method == 'initial slope':
         # calculate slope using linear fitting
-        target = _plot_linear_line_fitting(
-            tos[initial_index], tos[final_index], col_val[initial_index],
-            col_val[final_index], tos, col_val, window, plot=False, show=False
-        )
+        target = _plot_linear_line_fitting(tos[initial_index], tos[final_index], col_val[initial_index],
+                                           col_val[final_index], tos, col_val, savgol, plot=False, show=False)
     elif method == 'final slope':
         # calculate slope using linear fitting
-        target = _plot_linear_line_fitting(
-            tos[initial_index], tos[final_index], col_val[initial_index],
-            col_val[final_index], tos, col_val, window, plot=False, show=False
-        )
+        target = _plot_linear_line_fitting(tos[initial_index], tos[final_index], col_val[initial_index],
+                                           col_val[final_index], tos, col_val, savgol, plot=False, show=False)
     elif method == 'overall slope':
         target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
     # elif method == 'decaying rate':
@@ -735,14 +769,14 @@ def _extract_indices_target(
             # choosing final index which is close, in tos, to initial index
             final_index = np.argwhere(tos >= tos[initial_index] + adjacency_slope).reshape(-1)[0]
         except Exception as e:
-            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+            print(e, f'has occurred while calculating `final_index` for {method}.')
     elif method == 'final slope':
         # use the same final_index
         try:
             # choosing initial index which is close, in tos, to final index
             initial_index = np.argwhere(tos <= tos[final_index] - adjacency_slope).reshape(-1)[-1]
         except Exception as e:
-            print(e, f'has occurred while calculating `tos_ind_final` for {method}.')
+            print(e, f'has occurred while calculating `initial_index` for {method}.')
 
     return tos, temp, col_val, initial_index, final_index, selected_index
 
@@ -778,7 +812,7 @@ def _plot_linear_line_two_points(
         plt.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
         plt.scatter([t_init, t_final],
                     [y_init, y_final],
-                    color='red', edgecolors='gray'
+                    color='orange', edgecolors='gray'
                     )
         plt.text(
             (t_init + t_final) / 2,
@@ -790,20 +824,19 @@ def _plot_linear_line_two_points(
     return slope
 
 def _plot_linear_line_fitting(
-        t_init, t_final, y_init, y_final, tos, col_val, window=1, plot: bool=True, show: bool=False
+        t_init, t_final, y_init, y_final, tos, col_val, savgol: bool = True, plot: bool=True, show: bool=False
 ) -> float:
     """
     Plot linear line fitting data points around t_init.
 
     Args:
-        plot:
         t_init (float): Initial time.
         t_final (float): Final time.
         y_init (float): Initial value.
         y_final (float): Final value.
         tos (pd.Series): Time on stream series.
         col_val (pd.Series): Column values series.
-        window (int): Number of points around the range defined by initial index (t_init) and final index (t_final) to use for fitting.
+        savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
         plot (bool): Whether to plot the fitted line.
         show (bool): Whether to display the plot.
 
@@ -815,10 +848,18 @@ def _plot_linear_line_fitting(
     t_final_index = np.argmin(np.abs(tos - t_final))
 
     # Select data points around t_init for fitting
-    start_index = max(0, t_init_index - window)
-    end_index = min(len(tos), t_final_index + window + 1)
+    start_index = max(0, t_init_index)
+    end_index = min(len(tos), t_final_index + 1)
     t_fit = tos[start_index:end_index]
     y_fit = col_val[start_index:end_index]
+
+    if savgol:
+        # Apply Savitzky-Golay filter to smooth the data
+        from scipy.signal import savgol_filter
+        y_fit = savgol_filter(y_fit, window_length=min(len(y_fit),10), polyorder=1)
+    if plot and savgol:
+        # Plot Savitzky-Golay-filtered data points used for fitting
+        plt.scatter(t_fit, y_fit, c='blue', s=5, label='savgol')
 
     # Perform linear fitting
     coeffs = np.polyfit(t_fit, y_fit, 1)
@@ -831,8 +872,9 @@ def _plot_linear_line_fitting(
 
         # Plot the fitted line
         plt.plot(x_plot, y_plot, c='b', alpha=0.5, label='linear fit')
-        plt.scatter([t_init, t_final], [y_init, y_final], color='red', edgecolors='gray')
-        plt.scatter(t_fit, y_fit, color=[1,0,0,0], edgecolors='blue')
+        # Plot the initial and final points that define data range for fitting
+        plt.scatter([t_init, t_final], [y_init, y_final], color='orange', edgecolors='gray')
+        # Annotate the slope value
         plt.text(t_final, y_final, f'slope={coeffs[0]:.2f}')
 
     if show:
