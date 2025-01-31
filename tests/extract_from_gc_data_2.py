@@ -25,14 +25,15 @@ dataset.filter_excel_files(
 )
 
 # Plot the data and the corresponding slopes
-for i in range(30):
+for i in range(2):
     print(i, end=' ')
-    ex._plot_tos_data(dataset.path_filtered[i], column='CO2 Conversion (%)', x_max_plot=20,
+    ex._plot_tos_data(dataset.path_filtered[i], column='CO2 Conversion (%)',
+                      # x_max_plot=13,
                       temp_threshold=3.5,
                       init_tos_buffer=0.5,
                       adjacency_slope=1.5,
                       plot_selected=True, plot_slope=True, savgol=True,
-                      methods_slope=['initial slope', 'final slope',],# 'overall slope'],
+                      methods_slope=['initial slope', 'final slope', 'overall slope'],
                       show=False, )
     plt.show()
 print()

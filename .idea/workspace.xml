@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated submodule structure and project name" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py">
+      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/extract_from_gc_data-checkpoint.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data_2.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -72,20 +79,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.extract.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.extract_from_gc_data_2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.us_code.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.extract.executor": "Run",
+    "Python.extract_from_gc_data.executor": "Run",
+    "Python.extract_from_gc_data_2.executor": "Run",
+    "Python.test.executor": "Run",
+    "Python.us_code.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "ShowUsagesActions.previewPropertyKey": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -266,7 +274,23 @@
       <option name="project" value="LOCAL" />
       <updated>1738167717292</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="updated extract.py by fixing how to calculate initial and final slope for fluctuating data.">
+      <option name="closed" value="true" />
+      <created>1738308619598</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1738308619598</updated>
+    </task>
+    <task id="LOCAL-00017" summary="updated extract.py">
+      <option name="closed" value="true" />
+      <created>1738312468129</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1738312468129</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -305,9 +329,10 @@
     <MESSAGE value="renamed branches" />
     <MESSAGE value="merged different-10hrs_2 branch into main." />
     <MESSAGE value="merged different-10hrs_2 branch into main." />
-    <MESSAGE value="updated extract.py" />
     <MESSAGE value="updated submodule structure and project name" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated submodule structure and project name" />
+    <MESSAGE value="updated extract.py by fixing how to calculate initial and final slope for fluctuating data." />
+    <MESSAGE value="updated extract.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated extract.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -319,23 +344,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data_2.py</url>
-          <line>60</line>
+          <line>38</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>53</line>
+          <line>54</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/data/extract.py</url>
-          <line>318</line>
-          <option name="timeStamp" value="16" />
+          <line>544</line>
+          <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/data/extract.py</url>
-          <line>331</line>
-          <option name="timeStamp" value="17" />
+          <line>545</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data/extract.py</url>
+          <line>546</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
