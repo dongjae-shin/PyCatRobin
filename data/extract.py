@@ -354,7 +354,6 @@ class DataForGP:
         for target in self.targets:
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
-            self.df_stat.insert(len(self.df_stat.columns), f'{target}_std_total', None)
 
         # ignoring warning
         with warnings.catch_warnings(action="ignore"):
@@ -367,18 +366,28 @@ class DataForGP:
                 for target in self.targets:
                     mean = df_group[target].mean()
                     std = df_group[target].std()
-                    std_total = self.df_us_unique[target].std()
                     if verbose:
                         print(f'mean of {target}: {mean:5.2f}')
                         print(f'std. dev. of {target}: {std:5.2f}')
                     df_integrated.loc[f'{target}_mean'] = mean
                     df_integrated.loc[f'{target}_std'] = std
-                    df_integrated.loc[f'{target}_std_total'] = std_total
                 df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
                 df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
                                                                  .dt.strftime('%Y%m%d').to_list())
                 # append an integrated row
                 self.df_stat.loc[i-1] = df_integrated
+
+            # add a row for total unique data
+            df_integrated[:] = None # dummy
+            # calculate statistics of each target for each duplicate group
+            for target in self.targets:
+                std = self.df_us_unique[target].std()
+                if verbose:
+                    print(f'total std. dev. of {target}: {std:5.2f}')
+                df_integrated.loc[f'{target}_std'] = std
+                df_integrated.loc['GroupID'] = 'total_unique'
+            # append an integrated row
+            self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 
     def export_sheet(self, unique: bool = True):
         """
