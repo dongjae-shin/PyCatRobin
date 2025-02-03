@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gaussian_process/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gaussian_process/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/predict.py" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py and structure">
+      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -327,7 +325,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738593263676</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="updated extract.py and structure">
+      <option name="closed" value="true" />
+      <created>1738594069190</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1738594069191</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -369,7 +375,8 @@
     <MESSAGE value="updated submodule structure and project name" />
     <MESSAGE value="updated extract.py by fixing how to calculate initial and final slope for fluctuating data." />
     <MESSAGE value="updated extract.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated extract.py" />
+    <MESSAGE value="updated extract.py and structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated extract.py and structure" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -386,7 +393,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>71</line>
+          <line>61</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
       </breakpoints>

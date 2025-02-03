@@ -856,7 +856,7 @@ def _plot_linear_line_fitting(
         # Apply Savitzky-Golay filter to smooth the data
         from scipy.signal import savgol_filter
         col_val = savgol_filter(col_val, window_length=min(len(col_val),10), polyorder=1)
-        plt.plot(tos, col_val, c='orange', label='Savitzky_Golay')
+        # plt.plot(tos, col_val, c='orange', label='Savitzky_Golay')
 
     # Find the index of t_init
     t_init_index = np.argmin(np.abs(tos - t_init))
