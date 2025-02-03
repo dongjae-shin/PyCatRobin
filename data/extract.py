@@ -555,7 +555,7 @@ def _plot_tos_data(
         init_tos_buffer (float, optional): Initial time-on-stream buffer for index calculation. Defaults to 1.0.
         plot_selected (bool, optional): Whether to plot the selected region. Defaults to False.
         plot_slope (bool, optional): Whether to plot the slope of the target values. Defaults to False.
-        methods_slope (list, optional): List of methods to calculate the slope. Defaults to ['delta'].
+        methods_slope (list, optional): List of methods to calculate the slope. Defaults to ['delta']. 'delta', 'initial value', and 'final value' do not additionally plot anything.
         temp_max (float, optional): Maximum value for the temperature axis. Defaults to False.
         show (bool, optional): Whether to display the plot. Defaults to True.
         savefig (str, optional): Path to save the figure. Defaults to None.
@@ -852,6 +852,12 @@ def _plot_linear_line_fitting(
     Returns:
         float: Slope of the fitted line
     """
+    if savgol:
+        # Apply Savitzky-Golay filter to smooth the data
+        from scipy.signal import savgol_filter
+        col_val = savgol_filter(col_val, window_length=min(len(col_val),10), polyorder=1)
+        plt.plot(tos, col_val, c='orange', label='Savitzky_Golay')
+
     # Find the index of t_init
     t_init_index = np.argmin(np.abs(tos - t_init))
     t_final_index = np.argmin(np.abs(tos - t_final))
@@ -862,13 +868,9 @@ def _plot_linear_line_fitting(
     t_fit = tos[start_index:end_index]
     y_fit = col_val[start_index:end_index]
 
-    if savgol:
-        # Apply Savitzky-Golay filter to smooth the data
-        from scipy.signal import savgol_filter
-        y_fit = savgol_filter(y_fit, window_length=min(len(y_fit),10), polyorder=1)
-    if plot and savgol:
-        # Plot Savitzky-Golay-filtered data points used for fitting
-        plt.scatter(t_fit, y_fit, c='blue', s=5, label='savgol')
+    if plot:
+        # Plot data points used for fitting
+        plt.scatter(t_fit, y_fit, c='blue', s=5, label='for fitting')
 
     # Perform linear fitting
     coeffs = np.polyfit(t_fit, y_fit, 1)
