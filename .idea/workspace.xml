@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gaussian_process/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gaussian_process/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/predict.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -319,7 +319,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738320494459</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="updated extract.py">
+      <option name="closed" value="true" />
+      <created>1738593263676</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1738593263676</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
