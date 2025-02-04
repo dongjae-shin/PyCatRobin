@@ -212,10 +212,8 @@ class DataForGP:
         # plot recent data
         for i, row_number in enumerate(row_numbers):
             print(f"{i + 1}: Recent Row Plot of CO2 conversion:")
-            _plot_tos_data(
-                self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
-                init_tos_buffer, plot_selected, plot_slope, temp_max=temp_max, savgol=savgol
-            )
+            _plot_tos_data(self.path_filtered[row_number], column, x_max_plot, y_max_plot, temp_threshold,
+                           init_tos_buffer, plot_selected, plot_slope, temp_max=temp_max, savgol=savgol)
             print(
                 f"{column}_{method}: {_calculate_target(
                     self.path_filtered[row_number], column, method, verbose, adjacency_slope, duration, temp_threshold, 
@@ -427,12 +425,14 @@ class DataForGP:
         temp_threshold: float = 3.5, init_tos_buffer: float = 1.0,
         plot_selected: bool = False, plot_slope: bool = False, methods_slope=None,
         temp_max: float = False, show: bool = True, savefig: str = None,
-        duration: float = 10.0, adjacency_slope: float = 0.1, savgol: bool = True
+        duration: float = 10.0, adjacency_slope: float = 0.1, savgol: bool = True,
+        gui: bool = True
         ):
         """
-        Plot Time-on-Stream (TOS) data with specific target and temperature.
+        Plot Time-on-Stream (TOS) data with specific target and temperature in graphical user interface.
 
         Args:
+            gui:
             column (str): Column name to plot. Defaults to 'CO2 Conversion (%)'.
             x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
             y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
@@ -447,15 +447,66 @@ class DataForGP:
             duration (float, optional): Duration to calculate the final index. Defaults to 10.0.
             adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
             savgol(bool, optional): Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
+            gui (bool, optional): Whether to use a graphical user interface for plotting. Defaults to True.
 
         Returns:
             None
         """
-        # Iterate over each filtered path and plot the TOS data
-        for i, path in enumerate(self.path_filtered):
-            _plot_tos_data(path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer, plot_selected,
-                           plot_slope, methods_slope, temp_max, show, savefig, duration, adjacency_slope, savgol,
-                           filename=f'({i + 1}/{len(self.path_filtered)}) ' + path.rsplit('/')[-1])
+        # Show plots in GUI
+        if gui:
+            from matplotlib.widgets import Button
+
+            fig, ax = plt.subplots()
+            ax2 = ax.twinx()
+            plt.subplots_adjust(bottom=0.26)
+
+            self.current_plot_index = 0
+
+            def plot_current():
+                ax.clear()
+                ax2.clear()
+                path = self.path_filtered[self.current_plot_index]
+                _plot_tos_data(
+                    path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer, plot_selected,
+                    plot_slope, methods_slope, temp_max, show=False, savefig=savefig, duration=duration,
+                    adjacency_slope=adjacency_slope, savgol=savgol,
+                    filename=f'({self.current_plot_index + 1}/{len(self.path_filtered)}) ' + path.rsplit('/')[-1],
+                    ax=ax, ax2=ax2
+                )
+                plt.draw()
+
+            def next_plot(event):
+                self.current_plot_index = (self.current_plot_index + 1) % len(self.path_filtered)
+                plot_current()
+
+            def prev_plot(event):
+                self.current_plot_index = (self.current_plot_index - 1) % len(self.path_filtered)
+                plot_current()
+
+            def close_plot(event):
+                plt.close()
+
+            axprev = fig.add_axes([0.7, 0.05, 0.1, 0.075])
+            axnext = fig.add_axes([0.81, 0.05, 0.1, 0.075])
+            axclose = fig.add_axes([0.59, 0.05, 0.1, 0.075])
+
+            bnext = Button(axnext, 'Next')
+            bnext.on_clicked(next_plot)
+
+            bprev = Button(axprev, 'Previous')
+            bprev.on_clicked(prev_plot)
+
+            bclose = Button(axclose, 'Close')
+            bclose.on_clicked(close_plot)
+
+            plot_current()
+            plt.show()
+        else:
+            # Iterate over each filtered path and plot the TOS data
+            for i, path in enumerate(self.path_filtered):
+                _plot_tos_data(path, column, x_max_plot, y_max_plot, temp_threshold, init_tos_buffer, plot_selected,
+                               plot_slope, methods_slope, temp_max, show, savefig, duration, adjacency_slope, savgol,
+                               filename=f'({i + 1}/{len(self.path_filtered)}) ' + path.rsplit('/')[-1])
 
 def _is_not_nominal_value_vectorized(to_be_tested: pd.Series,
                                     allowed_values: np.array) -> pd.Series:
@@ -541,7 +592,9 @@ def _plot_tos_data(
         duration: float = 10.0,
         adjacency_slope: float = 0.1,
         savgol: bool = True,
-        filename: str = None
+        filename: str = None,
+        ax: plt.Axes = None,
+        ax2: plt.Axes = None
 ):
     """
     Plot Time-on-Stream (TOS) data with specific target and temperature.
@@ -563,6 +616,8 @@ def _plot_tos_data(
         adjacency_slope (float, optional): Slope threshold for initial and final slope calculations. Defaults to 0.1.
         savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
         filename (str, optional): Filename to display on the plot. Defaults to None.
+        ax (plt.Axes): Matplotlib Axes object to plot on. Defaults to None.
+        ax2 (plt.Axes): Matplotlib Axes object to plot temperature on. Defaults to None.
 
     Returns:
         None
@@ -574,30 +629,35 @@ def _plot_tos_data(
         _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer)
 
     # Plot
-    l1 = plt.scatter(tos, col_val,
+    if ax is None:
+        fig, ax = plt.subplots()
+    if ax2 is None:
+        ax2 = ax.twinx()
+
+    l1 = ax.scatter(tos, col_val,
                      color=[0.5, 1.0, 0.5, 1.0], s=5, label=column)  # whole profile
     if plot_selected:
-        l2 = plt.scatter(tos[selected_index], col_val[selected_index],
+        l2 = ax.scatter(tos[selected_index], col_val[selected_index],
                          color='g', s=5, label='selected')  # selected region
-        plt.scatter(
+        ax.scatter(
             [tos[initial_index], tos[final_index]],
             [col_val[initial_index], col_val[final_index]],
             edgecolors='g', color='y', s=18
         )
-        plt.axvline(x=tos[initial_index], color='gray', linestyle='--')
+        ax.axvline(x=tos[initial_index], color='gray', linestyle='--')
 
-    plt.xlabel('Time on stream (hrs)')
-    plt.ylabel(column, c='g')
+    ax.set_xlabel('Time on stream (hrs)')
+    ax.set_ylabel(column, c='g')
     if y_max_plot:
-        plt.ylim(0, y_max_plot)
+        ax.set_ylim(0, y_max_plot)
     if x_max_plot:
-        plt.xlim(0, x_max_plot)
+        ax.set_xlim(0, x_max_plot)
 
     if filename:
-        plt.title(
+        ax.set_title(
             f'duration: {tos[final_index] - tos[initial_index]:.2f}\n{filename}')
     else:
-        plt.title(
+        ax.set_title(
             f'duration: {tos[final_index] - tos[initial_index]:.2f}')
 
     # plot linear line for slopes
@@ -610,17 +670,16 @@ def _plot_tos_data(
             # Plot using the extracted indices
             if method in ['overall slope']:
                 _plot_linear_line_two_points(tos[initial_index], tos[final_index], col_val[initial_index],
-                                             col_val[final_index], show=False)
+                                             col_val[final_index], show=False, ax=ax)
             if method in ['initial slope', 'final slope']:
                 _plot_linear_line_fitting(tos[initial_index], tos[final_index], col_val[initial_index],
-                                          col_val[final_index], tos, col_val, savgol, show=False)
+                                          col_val[final_index], tos, col_val, savgol, show=False, ax=ax)
 
     # Plot temperature: secondary axis for temperature
-    axs_2nd = plt.twinx()
-    l3 = axs_2nd.scatter(tos, temp, s=5, color='r', alpha=0.2)
-    axs_2nd.set_ylabel('Temperature (C)', color='r')
+    l3 = ax2.scatter(tos, temp, s=5, color='r', alpha=0.2)
+    ax2.secondary_yaxis("right").set_ylabel('Temperature (C)', color='r') # if axes.twinx(), totally new axes is made.
     if temp_max:
-        axs_2nd.set_ylim(0, temp_max)
+        ax2.set_ylim(0, temp_max)
 
     # legends & title
     if plot_selected:
@@ -629,7 +688,7 @@ def _plot_tos_data(
         ls = [l1, l3]
     labs = [l.get_label() for l in ls]
     # plt.legend(ls, labs)#, loc=(0.55,0.73))
-    plt.legend(ls, labs, loc='lower left', bbox_to_anchor=(0.58, 0))
+    ax.legend(ls, labs, loc='lower left', bbox_to_anchor=(0.58, 0))
 
     if savefig:
         # plt.tight_layout()
@@ -790,7 +849,8 @@ def _extract_indices_target(
     return tos, temp, col_val, initial_index, final_index, selected_index
 
 def _plot_linear_line_two_points(
-        t_init: float, t_final: float, y_init: float, y_final: float, plot: bool = True, show: bool = False
+        t_init: float, t_final: float, y_init: float, y_final: float, plot: bool = True, show: bool = False,
+        ax: plt.Axes = None
 ) -> float:
     """ plot linear line connecting two points
 
@@ -801,6 +861,7 @@ def _plot_linear_line_two_points(
         y_final (float): Final value.
         plot (bool): Whether to plot the fitted line.
         show (bool): Whether to display the plot.
+        ax (plt.Axes): Matplotlib Axes object to plot on.
 
     Returns:
         float: Slope of the fitted line
@@ -817,13 +878,16 @@ def _plot_linear_line_two_points(
                                 y_init,
                                 y_final)
 
+    if ax is None:
+        ax = plt
+
     if plot:
-        plt.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
-        plt.scatter([t_init, t_final],
+        ax.plot(x_plot, y_plot, c='k', alpha=0.5, label='two-point linear')
+        ax.scatter([t_init, t_final],
                     [y_init, y_final],
                     color='orange', edgecolors='gray'
                     )
-        plt.text(
+        ax.text(
             (t_init + t_final) / 2,
             (y_init + y_final) / 2,
             f'slope={slope:.2f}'
@@ -833,7 +897,8 @@ def _plot_linear_line_two_points(
     return slope
 
 def _plot_linear_line_fitting(
-        t_init, t_final, y_init, y_final, tos, col_val, savgol: bool = True, plot: bool=True, show: bool=False
+        t_init, t_final, y_init, y_final, tos, col_val, savgol: bool = True, plot: bool=True, show: bool=False,
+        ax: plt.Axes = None
 ) -> float:
     """
     Plot linear line fitting data points around t_init.
@@ -848,6 +913,7 @@ def _plot_linear_line_fitting(
         savgol: Whether to apply Savitzky-Golay filter to the data when calculating initial and final slopes. Defaults to True.
         plot (bool): Whether to plot the fitted line.
         show (bool): Whether to display the plot.
+        ax (plt.Axes): Matplotlib Axes object to plot on.
 
     Returns:
         float: Slope of the fitted line
@@ -868,9 +934,12 @@ def _plot_linear_line_fitting(
     t_fit = tos[start_index:end_index]
     y_fit = col_val[start_index:end_index]
 
+    if ax is None:
+        ax = plt
+
     if plot:
         # Plot data points used for fitting
-        plt.scatter(t_fit, y_fit, c='blue', s=5, label='for fitting')
+        ax.scatter(t_fit, y_fit, c='blue', s=5, label='for fitting')
 
     # Perform linear fitting
     coeffs = np.polyfit(t_fit, y_fit, 1)
@@ -882,11 +951,11 @@ def _plot_linear_line_fitting(
         y_plot = linear_func(x_plot)
 
         # Plot the fitted line
-        plt.plot(x_plot, y_plot, c='b', alpha=0.5, label='linear fit')
+        ax.plot(x_plot, y_plot, c='b', alpha=0.5, label='linear fit')
         # Plot the initial and final points that define data range for fitting
-        plt.scatter([t_init, t_final], [y_init, y_final], color='orange', edgecolors='gray')
+        ax.scatter([t_init, t_final], [y_init, y_final], color='orange', edgecolors='gray')
         # Annotate the slope value
-        plt.text(t_final, y_final, f'slope={coeffs[0]:.2f}')
+        ax.text(t_final, y_final, f'slope={coeffs[0]:.2f}')
 
     if show:
         plt.show()
