@@ -34,7 +34,7 @@ for column in [
     'CO Forward Production Rate (mol/molRh/s)',
     # 'Selectivity to CO (%)'
     ]:
-               dataset.assign_target_values(methods=['initial value', 'final value', 'delta', 'initial slope', 'final slope', 'overall slope'],
+               dataset.assign_target_values(methods=['initial value', 'final value'],#, 'delta', 'initial slope', 'final slope', 'overall slope'],
                                             column=column,
                                             temp_threshold=3.5,
                                             init_tos_buffer=0.5,
@@ -48,7 +48,7 @@ dataset.construct_unique_dataframe(verbose=True)
 dataset.calculate_statistics_duplicate_group(verbose=False)
 
 analysis = da.DataAnalysis(dataset=dataset)
-analysis.compare_targets_std_dev(target_wise=True)
+qanalysis.compare_targets_std_dev(target_wise=True)
 
 
 # # Plot the data and the corresponding slopes

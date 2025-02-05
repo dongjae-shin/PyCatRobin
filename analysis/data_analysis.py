@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import warnings
 from matplotlib.widgets import Button
 
 from data.extract import DataForGP
@@ -13,12 +14,13 @@ class DataAnalysis:
         self.dataset = dataset
         self.unique_properties = None
 
-    def compare_targets_std_dev(self, target_wise: bool = False):
+    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'viridis'):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
+            colormap (str): The colormap to use for the plot.
 
         Returns:
             None
@@ -82,7 +84,7 @@ class DataAnalysis:
 
             # Plot the data
             plt.figure(figsize=(12, 6))
-            sns.barplot(data=df_melted, x='Target', y='Standard Deviation', hue='GroupID')
+            sns.barplot(data=df_melted, x='Target', y='Standard Deviation', hue='GroupID', palette=colormap)
             plt.xticks(rotation=45, ha='right')
             plt.title('Standard Deviation of Target Values by GroupID')
             plt.tight_layout()
@@ -111,7 +113,7 @@ class DataAnalysis:
         #     hue='GroupID',
         #     kde=True
         # )
-        plt.title(f'Histogram of {column}\n (under construction)')
+        plt.title(f'Histogram of {column}')
         plt.show()
 
 

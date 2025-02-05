@@ -130,6 +130,9 @@ class DataForGP:
         # convert 'experiment_date' column into datetime format
         self.df_us['experiment_date'] = pd.to_datetime(self.df_us['experiment_date'], format='%Y%m%d')
 
+        # add 'location' column
+        self.df_us['location'] = self.df_us['filename'].apply(_get_location)
+
     def convert_measured_to_nominal(self,
                                     allowed_values: np.array = None,
                                     which_column: str = 'Rh_total_mass',
@@ -221,7 +224,9 @@ class DataForGP:
                 ) :5.3f}"
             )
 
-    def apply_duplicate_groupid(self, verbose=False):
+    def apply_duplicate_groupid(self,
+                                exclude_columns: List[str] = ['filename', 'experiment_date', 'location'],
+                                verbose: bool = False):
         """
         Apply group IDs to duplicate entries in the DataFrame.
 
@@ -233,7 +238,7 @@ class DataForGP:
         """
         # Create a new column 'GroupID' to identify duplicate rows
         # Group duplicate rows and assign a unique group number to each group
-        subset_columns = [col for col in self.df_us.columns if col not in ['filename', 'experiment_date']]
+        subset_columns = [col for col in self.df_us.columns if col not in exclude_columns]
         self.df_us["GroupID"] = (self.df_us.loc[self.df_us.duplicated(subset=subset_columns, keep=False)]
                                  .groupby(subset_columns)
                                  .ngroup() + 1)
@@ -312,6 +317,7 @@ class DataForGP:
                 df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
                 df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
                                                                  .dt.strftime('%Y%m%d').to_list())
+                df_integrated.loc['location'] = ', '.join(df_group['location'].to_list())
 
                 # append an integrated row
                 self.df_us_unique.loc[-1] = df_integrated
@@ -352,6 +358,8 @@ class DataForGP:
         for target in self.targets:
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
+        # add a column for dataframe for each duplicate group
+        self.df_stat.insert(len(self.df_stat.columns), 'dataframe', None)
 
         # ignoring warning
         with warnings.catch_warnings(action="ignore"):
@@ -372,6 +380,9 @@ class DataForGP:
                 df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
                 df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
                                                                  .dt.strftime('%Y%m%d').to_list())
+                df_integrated.loc['location'] = ', '.join(df_group['location'].to_list())
+                df_integrated.loc['dataframe'] = df_group
+
                 # append an integrated row
                 self.df_stat.loc[i-1] = df_integrated
 
@@ -954,3 +965,11 @@ def _plot_linear_line_fitting(
     if show:
         plt.show()
     return coeffs[0]
+
+def _get_location(filename: str) -> str:
+    if 'UCSB' in filename:
+        return 'UCSB'
+    if 'Cargnello' in filename:
+        return 'Cargnello'
+    if 'SLAC' in filename:
+        return 'SLAC'
