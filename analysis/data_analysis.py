@@ -27,7 +27,7 @@ class DataAnalysis:
             columns = [col for col in self.dataset.df_stat.columns if '_std' in col]
 
             # extract the properties from the columns
-            properties = []
+            properties = [] # e.g., 'CO2 Conversion (%)', 'Selectivity to CO (%)'
             for col in columns:
                 parts = col.rsplit('_', 2)
                 if len(parts) > 2:
@@ -40,7 +40,7 @@ class DataAnalysis:
                 # Create subplots
                 nrows = (len(columns_property) + 2) // 3
                 ncols = min(len(columns_property), 3)
-                fig, axs = plt.subplots(nrows, ncols, figsize=(12, 6))
+                fig, axs = plt.subplots(nrows, ncols, figsize=(13, 6))
                 axs = np.ravel(axs)
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
@@ -48,13 +48,25 @@ class DataAnalysis:
                                                           value_vars=column,
                                                           var_name='Target',
                                                           value_name='Standard Deviation')
-                    sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i])
-                    axs[i].set_title(f'{column.rstrip("_std")}')
+                    # Generate colors from a predefined colormap
+                    cmap = plt.cm.get_cmap('viridis', len(df_melted['GroupID'].unique()))
+                    colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
+                    colors[-1] = 'hotpink'
+                    # Plot the data
+                    sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
+                                hue='GroupID', legend=False)
+                    axs[i].set_title(f'{column.rstrip("_std")}', fontsize=10)
+
+                    # Show ylabel only for the leftmost axes, and  xlabel only for the lowest axes
+                    if i % ncols != 0:
+                        axs[i].set_ylabel('')
+                    if i < (nrows - 1) * ncols:
+                        axs[i].set_xlabel('')
 
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_histogram(column.rstrip("_std"))
+                            self._generate_histogram(col.rstrip("_std"))
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Show a set of subplots for every property
@@ -93,13 +105,13 @@ class DataAnalysis:
             hue='GroupID',
             kde=True
         )
-        sns.histplot(
-            self.dataset.df_us_unique,
-            x=column,
-            hue='GroupID',
-            kde=True
-        )
-        plt.title(f'Histogram of {column}')
+        # sns.histplot(
+        #     self.dataset.df_us_unique,
+        #     x=column,
+        #     hue='GroupID',
+        #     kde=True
+        # )
+        plt.title(f'Histogram of {column}\n (under construction)')
         plt.show()
 
 
