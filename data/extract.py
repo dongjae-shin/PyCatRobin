@@ -1,7 +1,6 @@
 import os
 from typing import List, Tuple
 from glob import glob
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,6 +8,7 @@ import datetime
 import warnings
 from datetime import timedelta
 from IPython.display import display
+from matplotlib.widgets import Button
 
 class DataForGP:
     """
@@ -432,7 +432,6 @@ class DataForGP:
         Plot Time-on-Stream (TOS) data with specific target and temperature in graphical user interface.
 
         Args:
-            gui:
             column (str): Column name to plot. Defaults to 'CO2 Conversion (%)'.
             x_max_plot (float, optional): Maximum value for the x-axis. Defaults to None.
             y_max_plot (float, optional): Maximum value for the y-axis. Defaults to None.
@@ -454,14 +453,11 @@ class DataForGP:
         """
         # Show plots in GUI
         if gui:
-            from matplotlib.widgets import Button
-
             fig, ax = plt.subplots()
             ax2 = ax.twinx()
             plt.subplots_adjust(bottom=0.26)
 
             self.current_plot_index = 0
-
             def plot_current():
                 ax.clear()
                 ax2.clear()
@@ -492,10 +488,8 @@ class DataForGP:
 
             bnext = Button(axnext, 'Next')
             bnext.on_clicked(next_plot)
-
             bprev = Button(axprev, 'Previous')
             bprev.on_clicked(prev_plot)
-
             bclose = Button(axclose, 'Close')
             bclose.on_clicked(close_plot)
 
