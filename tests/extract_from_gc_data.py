@@ -57,7 +57,7 @@ dataset.plot_tos_data(column='CO2 Conversion (%)', #'Selectivity to CO (%)',
 
 analysis = da.DataAnalysis(dataset=dataset)
 analysis.compare_targets_std_dev(target_wise=True)
-# analysis._generate_histogram(column='CO Forward Production Rate (mol/molRh/s)_initial value')
+analysis._generate_histogram(column='CO Forward Production Rate (mol/molRh/s)_initial value')
 
 # # Export the processed data
 dataset.export_sheet(unique=True)
