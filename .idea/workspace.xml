@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py and data_analysis.py">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat">
+      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +83,7 @@
   "keyToString": {
     "Notification.DisplayName-DoNotAsk-GitHub Copilot": "GitHub Copilot",
     "Notification.DoNotAsk-GitHub Copilot": "true",
-    "Python.extract.executor": "Run",
+    "Python.extract.executor": "Debug",
     "Python.extract_from_gc_data.executor": "Run",
     "Python.extract_from_gc_data_2.executor": "Run",
     "Python.test.executor": "Run",
@@ -377,7 +380,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738732583836</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat">
+      <option name="closed" value="true" />
+      <created>1738772314585</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1738772314585</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -424,7 +435,8 @@
     <MESSAGE value="updated extract_from_gc_data.py" />
     <MESSAGE value="added data_analysis.py" />
     <MESSAGE value="updated extract.py and data_analysis.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated extract.py and data_analysis.py" />
+    <MESSAGE value="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -440,19 +452,29 @@
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>49</line>
-          <option name="timeStamp" value="41" />
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>144</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>51</line>
-          <option name="timeStamp" value="44" />
+          <line>62</line>
+          <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="45" />
+          <line>63</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>129</line>
+          <option name="timeStamp" value="56" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

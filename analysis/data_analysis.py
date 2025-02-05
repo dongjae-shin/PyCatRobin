@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 import numpy as np
 import warnings
@@ -68,7 +69,7 @@ class DataAnalysis:
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_histogram(col.rstrip("_std"))
+                            self._generate_histogram(column=col.rstrip("_std"), cmap=colormap)
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Show a set of subplots for every property
@@ -90,21 +91,48 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_histogram(self, column: str):
+    def _generate_histogram(self, column: str, cmap: str = 'viridis'):
         """
         Generate a histogram for the specified column.
 
         Args:
             column (str): The column to generate the histogram for.
+            cmap (str): The colormap to use for the plot.
 
         Returns:
             None
         """
+        # df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
+        # i=1
+        # df = pd.DataFrame(
+        #     {'filename'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['filename'].iloc[i-1],
+        #      'experiment_date': self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[i-1],
+        #      'GroupID'        : [i] * len(self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[i-1]), # filename as dummy
+        #      'location'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['location'].iloc[i-1],
+        #      f'{column}'      : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i][f'{column}_list'].iloc[i-1]}
+        # )
+        #
+        # # test = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == 2]['filename']
+        # # test = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == 3]['filename'].iloc[2]
+        # # concatenate other dataframe to df in axis=0
+        # for i in range(2, len(self.dataset.df_stat['GroupID'].unique())+1):
+        #     df = pd.concat((
+        #         df,
+        #         pd.DataFrame(
+        #         {'filename'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['filename'].iloc[i-1],
+        #          'experiment_date': self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[0],
+        #          'GroupID'        : [i] * len(self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[0]), # filename as dummy
+        #          'location'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['location'].iloc[0],
+        #          f'{column}'      : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i][f'{column}_list'].iloc[0]}
+        #         )
+        #     ), axis=0)
+
         plt.figure()
         sns.histplot(
             self.dataset.df_us,
             x=column,
             hue='GroupID',
+            palette=cmap,
             kde=True
         )
         # sns.histplot(
@@ -115,6 +143,5 @@ class DataAnalysis:
         # )
         plt.title(f'Histogram of {column}')
         plt.show()
-
 
 

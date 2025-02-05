@@ -290,7 +290,7 @@ class DataForGP:
             self.df_us[f'{column}_{method}'] = target_values
             self.targets.append(f'{column}_{method}')
             
-    def construct_unique_dataframe(self, verbose: bool = False):
+    def construct_unique_dataframe(self, dataframe_column: bool = False, verbose: bool = False):
         if 'GroupID' not in self.df_us.columns:
             raise ValueError("self.df_us does not have 'GroupID' column. Please run apply_duplicate_groupid() first.")
 
@@ -299,6 +299,10 @@ class DataForGP:
 
         # calculate each group's average target value
         self.df_us_unique = self.df_us[self.df_us["GroupID"] == 0]
+        if dataframe_column:
+            # add a column for dataframe for each duplicate group
+            self.df_us_unique.insert(len(self.df_us_unique.columns), 'dataframe', None)
+
         # ignoring warning
         with warnings.catch_warnings(action="ignore"):
             # convert datetime column, self.df_us_unique['experiment_date'], to string
@@ -318,6 +322,8 @@ class DataForGP:
                 df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
                                                                  .dt.strftime('%Y%m%d').to_list())
                 df_integrated.loc['location'] = ', '.join(df_group['location'].to_list())
+                if dataframe_column:
+                    df_integrated.loc['dataframe'] = df_group
 
                 # append an integrated row
                 self.df_us_unique.loc[-1] = df_integrated
@@ -358,6 +364,7 @@ class DataForGP:
         for target in self.targets:
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_list', None)
         # add a column for dataframe for each duplicate group
         self.df_stat.insert(len(self.df_stat.columns), 'dataframe', None)
 
@@ -377,10 +384,10 @@ class DataForGP:
                         print(f'std. dev. of {target}: {std:5.2f}')
                     df_integrated.loc[f'{target}_mean'] = mean
                     df_integrated.loc[f'{target}_std'] = std
-                df_integrated.loc['filename'] = ', '.join(df_group['filename'].to_list())
-                df_integrated.loc['experiment_date'] = ', '.join(df_group['experiment_date']
-                                                                 .dt.strftime('%Y%m%d').to_list())
-                df_integrated.loc['location'] = ', '.join(df_group['location'].to_list())
+                    df_integrated.loc[f'{target}_list'] = df_group[target].to_list()
+                df_integrated.loc['filename'] = df_group['filename'].to_list()
+                df_integrated.loc['experiment_date'] = df_group['experiment_date'].dt.strftime('%Y%m%d').to_list()
+                df_integrated.loc['location'] = df_group['location'].to_list()
                 df_integrated.loc['dataframe'] = df_group
 
                 # append an integrated row
