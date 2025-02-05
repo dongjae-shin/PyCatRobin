@@ -86,13 +86,19 @@ class DataAnalysis:
         Returns:
             None
         """
-        test = self.dataset.df_us[column]
         plt.figure()
-        # sns.histplot(
-        #     self.dataset.df_us[column],
-        #
-        #     kde=True
-        # )
+        sns.histplot(
+            self.dataset.df_us,
+            x=column,
+            hue='GroupID',
+            kde=True
+        )
+        sns.histplot(
+            self.dataset.df_us_unique,
+            x=column,
+            hue='GroupID',
+            kde=True
+        )
         plt.title(f'Histogram of {column}')
         plt.show()
 
