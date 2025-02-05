@@ -34,13 +34,13 @@ for column in [
     'CO Forward Production Rate (mol/molRh/s)',
     'Selectivity to CO (%)'
     ]:
-               dataset.assign_target_values(methods=['initial value', 'final value', 'delta', 'initial slope', 'final slope', 'overall slope'],
-                                            column=column,
-                                            temp_threshold=3.5,
-                                            init_tos_buffer=0.5,
-                                            adjacency_slope=1.0,
-                                            savgol=True
-                                            )
+    dataset.assign_target_values(methods=['initial value', 'final value', 'delta', 'initial slope', 'final slope', 'overall slope'],
+                                column=column,
+                                temp_threshold=3.5,
+                                init_tos_buffer=0.5,
+                                adjacency_slope=1.0,
+                                savgol=True
+                                )
 
 # Construct unique DataFrame using group IDs
 dataset.construct_unique_dataframe(verbose=True)
@@ -53,11 +53,11 @@ dataset.plot_tos_data(column='CO2 Conversion (%)', #'Selectivity to CO (%)',
                       plot_selected=True, plot_slope=True,
                       methods_slope=['initial slope', 'final slope', 'overall slope'], show=True, adjacency_slope=1.0,
                       savgol=True,
-                      gui=False)
+                      gui=True)
 
 analysis = da.DataAnalysis(dataset=dataset)
 analysis.compare_targets_std_dev(target_wise=True)
-analysis._generate_histogram(column='CO Forward Production Rate (mol/molRh/s)_initial value')
+# analysis._generate_histogram(column='CO Forward Production Rate (mol/molRh/s)_initial value')
 
 # # Export the processed data
 dataset.export_sheet(unique=True)
