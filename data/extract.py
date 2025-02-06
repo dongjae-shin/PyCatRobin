@@ -402,6 +402,7 @@ class DataForGP:
                     print(f'total std. dev. of {target}: {std:5.2f}')
                 df_integrated.loc[f'{target}_std'] = std
                 df_integrated.loc['GroupID'] = 'total' # unique
+                df_integrated.loc[f'{target}_list'] = self.df_us_unique[target].to_list()
             # append an integrated row
             self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 

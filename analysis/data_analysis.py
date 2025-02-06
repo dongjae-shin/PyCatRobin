@@ -15,7 +15,7 @@ class DataAnalysis:
         self.dataset = dataset
         self.unique_properties = None
 
-    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'viridis'):
+    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'tab10'):
         """
         Compare the standard deviation of the target values for each column.
 
@@ -52,9 +52,9 @@ class DataAnalysis:
                                                           var_name='Target',
                                                           value_name='Standard Deviation')
                     # Generate colors from a predefined colormap
-                    cmap = plt.cm.get_cmap('viridis', len(df_melted['GroupID'].unique()))
+                    cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
                     colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
-                    colors[-1] = 'hotpink'
+                    colors[-1] = 'black'
                     # Plot the data
                     sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
                                 hue='GroupID', legend=False)
@@ -91,7 +91,7 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_histogram(self, column: str, cmap: str = 'viridis'):
+    def _generate_histogram(self, column: str, cmap: str = 'tab10'):
         """
         Generate a histogram for the specified column.
 
@@ -102,45 +102,49 @@ class DataAnalysis:
         Returns:
             None
         """
-        # df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
-        # i=1
-        # df = pd.DataFrame(
-        #     {'filename'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['filename'].iloc[i-1],
-        #      'experiment_date': self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[i-1],
-        #      'GroupID'        : [i] * len(self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[i-1]), # filename as dummy
-        #      'location'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['location'].iloc[i-1],
-        #      f'{column}'      : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i][f'{column}_list'].iloc[i-1]}
-        # )
-        #
-        # # test = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == 2]['filename']
-        # # test = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == 3]['filename'].iloc[2]
-        # # concatenate other dataframe to df in axis=0
-        # for i in range(2, len(self.dataset.df_stat['GroupID'].unique())+1):
-        #     df = pd.concat((
-        #         df,
-        #         pd.DataFrame(
-        #         {'filename'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['filename'].iloc[i-1],
-        #          'experiment_date': self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[0],
-        #          'GroupID'        : [i] * len(self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['experiment_date'].iloc[0]), # filename as dummy
-        #          'location'       : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i]['location'].iloc[0],
-        #          f'{column}'      : self.dataset.df_stat[self.dataset.df_stat['GroupID'] == i][f'{column}_list'].iloc[0]}
-        #         )
-        #     ), axis=0)
+        # shallow copy: connected to the original df. it's like using nickname
+        df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
+        i=1
+        test = df_stat[df_stat['GroupID'] == i][f'{column}_std']
+        df = pd.DataFrame(
+            {'filename'       : df_stat[df_stat['GroupID'] == i]['filename'][i-1],
+             'experiment_date': df_stat[df_stat['GroupID'] == i]['experiment_date'][i-1],
+             'GroupID'        : [i] * len(df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]), # filename as dummy
+             'location'       : df_stat[df_stat['GroupID'] == i]['location'][i-1],
+             f'{column}'      : df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]}
+        )
+        test = df_stat['GroupID'].unique()[1:]
+        # concatenate other dataframe to df in axis=0
+        for i, group in enumerate(df_stat['GroupID'].unique()[1:]): # slicing: to exclude the group 'total'
+            test = df_stat[df_stat['GroupID'] == group]['experiment_date']
+            df = pd.concat((
+                df,
+                pd.DataFrame(
+                {'filename'       : df_stat[df_stat['GroupID'] == group]['filename'][i+1],
+                 'experiment_date': df_stat[df_stat['GroupID'] == group]['experiment_date'][i+1],
+                 'GroupID'        : [group] * len(df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]), # filename as dummy
+                 'location'       : df_stat[df_stat['GroupID'] == group]['location'][i+1],
+                 f'{column}'      : df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]}
+                )
+            ), axis=0)
+        df.reset_index(drop=True, inplace=True)
 
-        plt.figure()
-        sns.histplot(
-            self.dataset.df_us,
+        fig, ax = plt.subplots()
+        hist = sns.histplot(
+            df,
             x=column,
             hue='GroupID',
+            shrink=0.95,
+            multiple='dodge',
+            stat='count',
             palette=cmap,
-            kde=True
+            kde=True,
+            ax=ax
         )
-        # sns.histplot(
-        #     self.dataset.df_us_unique,
-        #     x=column,
-        #     hue='GroupID',
-        #     kde=True
-        # )
+        # extract count of each group from hist
+        num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
+        ax.set_ylim(0, np.max(num_elements_group))
+
         plt.title(f'Histogram of {column}')
         plt.show()
 

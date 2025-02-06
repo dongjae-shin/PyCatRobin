@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract.py and data_analysis.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -79,6 +81,7 @@
   "keyToString": {
     "Notification.DisplayName-DoNotAsk-GitHub Copilot": "GitHub Copilot",
     "Notification.DoNotAsk-GitHub Copilot": "true",
+    "Python.data_analysis.executor": "Run",
     "Python.extract.executor": "Debug",
     "Python.extract_from_gc_data.executor": "Run",
     "Python.extract_from_gc_data_2.executor": "Run",
@@ -89,7 +92,7 @@
     "ShowUsagesActions.previewPropertyKey": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -400,7 +403,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738789097519</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="updated extract.py and data_analysis.py">
+      <option name="closed" value="true" />
+      <created>1738797105496</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1738797105496</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -474,14 +485,19 @@
           <option name="timeStamp" value="66" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="67" />
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>145</line>
+          <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>57</line>
-          <option name="timeStamp" value="68" />
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>144</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>131</line>
+          <option name="timeStamp" value="91" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
