@@ -128,27 +128,58 @@ class DataAnalysis:
                 )
             ), axis=0)
         df.reset_index(drop=True, inplace=True)
+        # set values of column, of which GroupID is 'total', to 'all'
+        df.loc[df['GroupID'] == 'total', 'location'] = 'all'
+        # test = df[df['GroupID'] == 'total']['location'] #= 'all'
 
         # Plot the histogram
-        fig, ax = plt.subplots()
-        hist = sns.histplot(
-            df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
+        # fig, ax = plt.subplots()
+
+        import plotly.express as px
+
+        # hist = sns.histplot(
+        #     df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
+        # )
+        #
+        # num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
+        # ax.set_ylim(0, np.max(num_elements_group))
+        # plt.title(f'Histogram of {column}')
+
+        fig1 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='rug',
+                            hover_data=df.columns)
+        fig2 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='violin',
+                            hover_data=df.columns)
+        fig2.update_layout(
+            plot_bgcolor='white',
         )
-        # Extract count of each group from hist and set ylim
-        num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
-        ax.set_ylim(0, np.max(num_elements_group))
-        plt.title(f'Histogram of {column}')
-        plt.show()
+        fig2.update_xaxes(
+            mirror=True,
+            ticks='outside',
+            showline=True,
+            linecolor='black',
+            gridcolor='lightgrey'
+        )
+        fig2.update_yaxes(
+            mirror=True,
+            ticks='outside',
+            showline=True,
+            linecolor='black',
+            gridcolor='lightgrey'
+        )
 
-        # Add hover functionality
-        cursor = mplcursors.cursor(hist, hover=True)
+        # plt.show()
 
-        @cursor.connect("add")
-        def on_add(sel):
-            group_id = sel.artist.get_offsets()[sel.index, 0]
-            group_data = df[df['GroupID'] == group_id]
-            sel.annotation.set(text=group_data.to_string(index=False))
+        from dash import Dash, dcc, html, dash_table
 
-        plt.show()
+        app = Dash()
+        app.layout = [
+            html.Div(children='My First App with Data and a Graph'),
+            dcc.Graph(figure=fig1),
+            dcc.Graph(figure=fig2),
+            dash_table.DataTable(data=df.to_dict('records'), page_size=10)
+        ]
+
+        # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
+        app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
 
 

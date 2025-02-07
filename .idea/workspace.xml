@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated calculate_statistics_duplicate_group in extract.py and _generate_histogram in data_analysis.py;">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated data_analysis.py;">
+      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
     </list>
@@ -83,6 +85,7 @@
     "Python.extract.executor": "Run",
     "Python.extract_from_gc_data.executor": "Run",
     "Python.extract_from_gc_data_2.executor": "Run",
+    "Python.hover.executor": "Run",
     "Python.test.executor": "Run",
     "Python.us_code.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -417,7 +420,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738879907371</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="updated data_analysis.py;">
+      <option name="closed" value="true" />
+      <created>1738892500986</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1738892500986</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -466,7 +477,8 @@
     <MESSAGE value="added data_analysis.py" />
     <MESSAGE value="updated extract.py and data_analysis.py" />
     <MESSAGE value="updated calculate_statistics_duplicate_group in extract.py and _generate_histogram in data_analysis.py;" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated calculate_statistics_duplicate_group in extract.py and _generate_histogram in data_analysis.py;" />
+    <MESSAGE value="updated data_analysis.py;" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated data_analysis.py;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -490,6 +502,11 @@
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
           <line>62</line>
           <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
+          <line>147</line>
+          <option name="timeStamp" value="94" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
