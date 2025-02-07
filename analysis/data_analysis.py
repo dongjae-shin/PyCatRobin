@@ -16,13 +16,14 @@ class DataAnalysis:
         self.dataset = dataset
         self.unique_properties = None
 
-    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'tab10'):
+    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn'):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
+            plot_module_hist (str): The module to use for plotting histograms. Either 'seaborn' or 'plotly'.
 
         Returns:
             None
@@ -70,7 +71,9 @@ class DataAnalysis:
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_histogram(column=col.rstrip("_std"), cmap=colormap)
+                            self._generate_histogram(
+                                column=col.rstrip("_std"), cmap=colormap, plot_module=plot_module_hist
+                            )
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Show a set of subplots for every property
@@ -92,13 +95,14 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_histogram(self, column: str, cmap: str = 'tab10'):
+    def _generate_histogram(self, column: str, cmap: str = 'tab10', plot_module: str = 'seaborn'):
         """
         Generate a histogram for the specified column.
 
         Args:
             column (str): The column to generate the histogram for.
             cmap (str): The colormap to use for the plot.
+            plot_module (str): The module to use for plotting. Either 'seaborn' or 'plotly'.
 
         Returns:
             None
@@ -132,54 +136,50 @@ class DataAnalysis:
         df.loc[df['GroupID'] == 'total', 'location'] = 'all'
         # test = df[df['GroupID'] == 'total']['location'] #= 'all'
 
-        # Plot the histogram
-        # fig, ax = plt.subplots()
+        if plot_module == 'seaborn':
+            Plot the histogram
+            fig, ax = plt.subplots()
+            hist = sns.histplot(
+                df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
+            )
 
-        import plotly.express as px
+            num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
+            ax.set_ylim(0, np.max(num_elements_group))
+            plt.title(f'Histogram of {column}')
+            plt.show()
 
-        # hist = sns.histplot(
-        #     df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
-        # )
-        #
-        # num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
-        # ax.set_ylim(0, np.max(num_elements_group))
-        # plt.title(f'Histogram of {column}')
+        if plot_module == 'plotly':
+            import plotly.express as px
 
-        fig1 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='rug',
-                            hover_data=df.columns)
-        fig2 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='violin',
-                            hover_data=df.columns)
-        fig2.update_layout(
-            plot_bgcolor='white',
-        )
-        fig2.update_xaxes(
-            mirror=True,
-            ticks='outside',
-            showline=True,
-            linecolor='black',
-            gridcolor='lightgrey'
-        )
-        fig2.update_yaxes(
-            mirror=True,
-            ticks='outside',
-            showline=True,
-            linecolor='black',
-            gridcolor='lightgrey'
-        )
+            fig1 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='rug',
+                                hover_data=df.columns)
+            fig2 = px.histogram(df, x=column, color='GroupID', pattern_shape='location', marginal='violin',
+                                hover_data=df.columns)
+            fig2.update_layout(plot_bgcolor='white')
+            fig2.update_xaxes(
+                mirror=True,
+                ticks='outside',
+                showline=True,
+                linecolor='black',
+                gridcolor='lightgrey'
+            )
+            fig2.update_yaxes(
+                mirror=True,
+                ticks='outside',
+                showline=True,
+                linecolor='black',
+                gridcolor='lightgrey'
+            )
 
-        # plt.show()
-
-        from dash import Dash, dcc, html, dash_table
-
-        app = Dash()
-        app.layout = [
-            html.Div(children='My First App with Data and a Graph'),
-            dcc.Graph(figure=fig1),
-            dcc.Graph(figure=fig2),
-            dash_table.DataTable(data=df.to_dict('records'), page_size=10)
-        ]
-
-        # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
-        app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
+            from dash import Dash, dcc, html, dash_table
+            app = Dash()
+            app.layout = [
+                html.Div(children='My First App with Data and a Graph'),
+                dcc.Graph(figure=fig1),
+                dcc.Graph(figure=fig2),
+                dash_table.DataTable(data=df.to_dict('records'), page_size=10)
+            ]
+            # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
+            app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
 
 
