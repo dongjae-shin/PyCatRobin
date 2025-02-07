@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import mplcursors
 import pandas as pd
 import seaborn as sns
 import numpy as np
@@ -105,16 +106,15 @@ class DataAnalysis:
         # shallow copy: connected to the original df. it's like using nickname
         df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
         i=1
-        test = df_stat[df_stat['GroupID'] == i][f'{column}_std']
+        # Initialize the DataFrame with the first group's data
         df = pd.DataFrame(
             {'filename'       : df_stat[df_stat['GroupID'] == i]['filename'][i-1],
              'experiment_date': df_stat[df_stat['GroupID'] == i]['experiment_date'][i-1],
-             'GroupID'        : [i] * len(df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]), # filename as dummy
+             'GroupID'        : [i] * len(df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]),
              'location'       : df_stat[df_stat['GroupID'] == i]['location'][i-1],
              f'{column}'      : df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]}
-        )
-        test = df_stat['GroupID'].unique()[1:]
-        # concatenate other dataframe to df in axis=0
+        ) # 'GroupID' -> len(): to extract number of groups + total
+        # Concatenate other groups' data to the DataFrame in axis=0
         for i, group in enumerate(df_stat['GroupID'].unique()[1:]): # slicing: to exclude the group 'total'
             test = df_stat[df_stat['GroupID'] == group]['experiment_date']
             df = pd.concat((
@@ -122,30 +122,33 @@ class DataAnalysis:
                 pd.DataFrame(
                 {'filename'       : df_stat[df_stat['GroupID'] == group]['filename'][i+1],
                  'experiment_date': df_stat[df_stat['GroupID'] == group]['experiment_date'][i+1],
-                 'GroupID'        : [group] * len(df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]), # filename as dummy
+                 'GroupID'        : [group] * len(df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]),
                  'location'       : df_stat[df_stat['GroupID'] == group]['location'][i+1],
                  f'{column}'      : df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]}
                 )
             ), axis=0)
         df.reset_index(drop=True, inplace=True)
 
+        # Plot the histogram
         fig, ax = plt.subplots()
         hist = sns.histplot(
-            df,
-            x=column,
-            hue='GroupID',
-            shrink=0.95,
-            multiple='dodge',
-            stat='count',
-            palette=cmap,
-            kde=True,
-            ax=ax
+            df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
         )
-        # extract count of each group from hist
+        # Extract count of each group from hist and set ylim
         num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
         ax.set_ylim(0, np.max(num_elements_group))
-
         plt.title(f'Histogram of {column}')
+        plt.show()
+
+        # Add hover functionality
+        cursor = mplcursors.cursor(hist, hover=True)
+
+        @cursor.connect("add")
+        def on_add(sel):
+            group_id = sel.artist.get_offsets()[sel.index, 0]
+            group_data = df[df['GroupID'] == group_id]
+            sel.annotation.set(text=group_data.to_string(index=False))
+
         plt.show()
 
 
