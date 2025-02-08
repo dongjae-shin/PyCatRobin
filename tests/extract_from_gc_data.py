@@ -29,14 +29,14 @@ dataset.apply_duplicate_groupid(verbose=False)
 # Calculate and add target values into the DataFrame
 for column in [
     'CO2 Conversion (%)',
-    # 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
-    # 'CO Forward Production Rate (mol/molRh/s)',
-    # 'Selectivity to CO (%)'
+    'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
+    'CO Forward Production Rate (mol/molRh/s)',
+    'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
             'initial value',
-            'final value', 'delta', 'initial slope', 'final slope', 'overall slope'
+            'final value', 'initial slope', 'final slope', 'overall slope'
         ],
         column=column,
         temp_threshold=3.5,

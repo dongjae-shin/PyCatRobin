@@ -5,6 +5,8 @@ import seaborn as sns
 import numpy as np
 import warnings
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
 from openpyxl.styles.builtins import styles
@@ -52,6 +54,7 @@ class DataAnalysis:
                 ncols = min(len(columns_property), 3)
                 fig, axs = plt.subplots(nrows, ncols, figsize=(13, 8))
                 axs = np.ravel(axs)
+                n_plot = 0
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
                     df_melted = self.dataset.df_stat.melt(id_vars=['GroupID'],
@@ -72,14 +75,19 @@ class DataAnalysis:
                         axs[i].set_ylabel('')
                     if i < (nrows - 1) * ncols:
                         axs[i].set_xlabel('')
+                    n_plot += 1
 
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_histogram(
-                                column=col.rstrip("_std"), cmap=colors, plot_module=plot_module_hist
-                            )
+                            self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
+                                                             plot_module=plot_module_hist)
                     fig.canvas.mpl_connect('button_press_event', on_click)
+
+                # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
+                for i in range(len(axs)):
+                    if i + 1 > n_plot:
+                        axs[i].axis('off')
 
                 # Show a set of subplots for every property
                 fig.tight_layout()
@@ -100,18 +108,8 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_histogram(self, column: str, cmap: str = 'tab10', plot_module: str = 'seaborn'):
-        """
-        Generate a histogram for the specified column.
+    def _generate_data_distribution(self, column: str, cmap: str = 'tab10', plot_module: str = 'seaborn'):
 
-        Args:
-            column (str): The column to generate the histogram for.
-            cmap (str): The colormap to use for the plot.
-            plot_module (str): The module to use for plotting. Either 'seaborn' or 'plotly'.
-
-        Returns:
-            None
-        """
         # shallow copy: connected to the original df. it's like using nickname
         df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
         i=1
@@ -141,7 +139,7 @@ class DataAnalysis:
 
         if plot_module == 'seaborn':
             # Plot a violinplot
-            fig, axs = plt.subplots(nrows=2, ncols=1)
+            fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
 
             hue_order = df['GroupID'].unique()
             sns.violinplot(
@@ -150,38 +148,53 @@ class DataAnalysis:
             )
 
             # Overlay a stripplot to the violinplot to differentiate the 'location'
-            markers = ['X', 'o', '*', '^', 's', 'v', 'D', 'P',]
+            markers = ['X', 'o', 'P', '^', '*', 'v', 'D', 'P',]
             legend_elements = []
             locmarks = [[df['location'].unique()[i], markers[i]] for i in range(len(df['location'].unique()))]
+            # Manually implement the legend for the location since seaborn does not support it
             for locmark in locmarks:
                 # Select the data for the location
                 df_selected = df[df['location'] == locmark[0]].reset_index(drop=True)
                 # Add dummy rows so df_selected has always all GroupID values -> use the same hue range with the violin plot
                 for i, group_id in enumerate(hue_order):
-                    df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'UCSB', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
+                    with warnings.catch_warnings(action="ignore"):
+                        df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'UCSB', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
                 # Plot the strip plot for the location with the corresponding marker
-                sns.stripplot(
-                    df_selected, x=column,  hue='GroupID', jitter=False, dodge=True,
-                    palette=['yellow'] * len(hue_order), ax=axs[0], legend=False, size=5, marker=locmark[1],
-                    linewidth=0.1, hue_order=hue_order,
+                strip = sns.stripplot(
+                    df_selected, x=column,  hue='GroupID', jitter=True, dodge=True,
+                    palette=['red'] * len(hue_order), ax=axs[0], legend=False, size=5, marker=locmark[1],
+                    linewidth=0.5, edgecolor='w', hue_order=hue_order,
                 )
                 # Add the legend element that is not tied to the plot but corresponds to locmark
                 legend_elements.append(
-                    plt.Line2D([0], [0], color='y', label=locmark[0], marker=locmark[1], lw=0, markersize=5)
+                    Line2D(
+                        [0], [0], label=locmark[0], marker=locmark[1], color='w',
+                        markersize=9, markeredgecolor='w', markerfacecolor='red'
+                    )
                 )
             axs[0].legend(handles=legend_elements, title='Location')
+            axs[0].set_yticks([])
 
             # Plot the histogram
             sns.histplot(
                 df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
                 kde=False, ax=axs[1]
             )
-            # Make the xlim of axs[1] the same as that of axs[0]
+            # Make the boundary of axs[1] the same as that of axs[0]
             axs[1].set_xlim(axs[0].get_xlim())
             axs[0].set_xlabel('')
 
             fig.suptitle(f'Distribution of {column}')
             plt.tight_layout()
+            plt.show()
+
+            # Add hover functionality
+            cursor = mplcursors.cursor(strip, hover=True)
+
+            # @cursor.connect("add")
+            # def on_add(sel):
+            #     sel.annotation.set(text=)
+
             plt.show()
 
         if plot_module == 'plotly':
