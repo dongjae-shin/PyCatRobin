@@ -4,7 +4,10 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import warnings
+
+from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
+from openpyxl.styles.builtins import styles
 
 from data.extract import DataForGP
 
@@ -16,7 +19,9 @@ class DataAnalysis:
         self.dataset = dataset
         self.unique_properties = None
 
-    def compare_targets_std_dev(self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn'):
+    def compare_targets_std_dev(
+            self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn'
+    ):
         """
         Compare the standard deviation of the target values for each column.
 
@@ -45,7 +50,7 @@ class DataAnalysis:
                 # Create subplots
                 nrows = (len(columns_property) + 2) // 3
                 ncols = min(len(columns_property), 3)
-                fig, axs = plt.subplots(nrows, ncols, figsize=(13, 6))
+                fig, axs = plt.subplots(nrows, ncols, figsize=(13, 8))
                 axs = np.ravel(axs)
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
@@ -72,7 +77,7 @@ class DataAnalysis:
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
                             self._generate_histogram(
-                                column=col.rstrip("_std"), cmap=colormap, plot_module=plot_module_hist
+                                column=col.rstrip("_std"), cmap=colors, plot_module=plot_module_hist
                             )
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
@@ -120,7 +125,6 @@ class DataAnalysis:
         ) # 'GroupID' -> len(): to extract number of groups + total
         # Concatenate other groups' data to the DataFrame in axis=0
         for i, group in enumerate(df_stat['GroupID'].unique()[1:]): # slicing: to exclude the group 'total'
-            test = df_stat[df_stat['GroupID'] == group]['experiment_date']
             df = pd.concat((
                 df,
                 pd.DataFrame(
@@ -134,18 +138,50 @@ class DataAnalysis:
         df.reset_index(drop=True, inplace=True)
         # set values of column, of which GroupID is 'total', to 'all'
         df.loc[df['GroupID'] == 'total', 'location'] = 'all'
-        # test = df[df['GroupID'] == 'total']['location'] #= 'all'
 
         if plot_module == 'seaborn':
-            Plot the histogram
-            fig, ax = plt.subplots()
-            hist = sns.histplot(
-                df, x=column, hue='GroupID', shrink=0.95, multiple='dodge', stat='count', palette=cmap, kde=True, ax=ax
+            # Plot a violinplot
+            fig, axs = plt.subplots(nrows=2, ncols=1)
+
+            hue_order = df['GroupID'].unique()
+            sns.violinplot(
+                df, x=column,  hue='GroupID', split=False, inner='stick', palette=cmap, ax=axs[0],
+                legend=False, hue_order=hue_order
             )
 
-            num_elements_group = df_stat[f'{column}_list'][:-1].apply(len).tolist() # slicing: excluding 'total' group
-            ax.set_ylim(0, np.max(num_elements_group))
-            plt.title(f'Histogram of {column}')
+            # Overlay a stripplot to the violinplot to differentiate the 'location'
+            markers = ['X', 'o', '*', '^', 's', 'v', 'D', 'P',]
+            legend_elements = []
+            locmarks = [[df['location'].unique()[i], markers[i]] for i in range(len(df['location'].unique()))]
+            for locmark in locmarks:
+                # Select the data for the location
+                df_selected = df[df['location'] == locmark[0]].reset_index(drop=True)
+                # Add dummy rows so df_selected has always all GroupID values -> use the same hue range with the violin plot
+                for i, group_id in enumerate(hue_order):
+                    df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'UCSB', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
+                # Plot the strip plot for the location with the corresponding marker
+                sns.stripplot(
+                    df_selected, x=column,  hue='GroupID', jitter=False, dodge=True,
+                    palette=['yellow'] * len(hue_order), ax=axs[0], legend=False, size=5, marker=locmark[1],
+                    linewidth=0.1, hue_order=hue_order,
+                )
+                # Add the legend element that is not tied to the plot but corresponds to locmark
+                legend_elements.append(
+                    plt.Line2D([0], [0], color='y', label=locmark[0], marker=locmark[1], lw=0, markersize=5)
+                )
+            axs[0].legend(handles=legend_elements, title='Location')
+
+            # Plot the histogram
+            sns.histplot(
+                df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
+                kde=False, ax=axs[1]
+            )
+            # Make the xlim of axs[1] the same as that of axs[0]
+            axs[1].set_xlim(axs[0].get_xlim())
+            axs[0].set_xlabel('')
+
+            fig.suptitle(f'Distribution of {column}')
+            plt.tight_layout()
             plt.show()
 
         if plot_module == 'plotly':

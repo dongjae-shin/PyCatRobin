@@ -1,6 +1,4 @@
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 import data.extract as ex
 import analysis.data_analysis as da
@@ -30,17 +28,22 @@ dataset.apply_duplicate_groupid(verbose=False)
 
 # Calculate and add target values into the DataFrame
 for column in [
-    'CO2 Conversion (%)', #'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
+    'CO2 Conversion (%)',
+    # 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
     # 'CO Forward Production Rate (mol/molRh/s)',
     # 'Selectivity to CO (%)'
     ]:
-    dataset.assign_target_values(methods=['initial value', 'final value'], #'delta', 'initial slope', 'final slope', 'overall slope'],
-                                column=column,
-                                temp_threshold=3.5,
-                                init_tos_buffer=0.5,
-                                adjacency_slope=1.0,
-                                savgol=True
-                                )
+    dataset.assign_target_values(
+        methods=[
+            'initial value',
+            'final value', 'delta', 'initial slope', 'final slope', 'overall slope'
+        ],
+        column=column,
+        temp_threshold=3.5,
+        init_tos_buffer=0.5,
+        adjacency_slope=1.0,
+        savgol=True
+        )
 
 # Construct unique DataFrame using group IDs
 dataset.construct_unique_dataframe(verbose=True)
@@ -59,6 +62,6 @@ analysis = da.DataAnalysis(dataset=dataset)
 analysis.compare_targets_std_dev(target_wise=True)
 # analysis._generate_histogram(column='CO2 Conversion (%)_initial value')
 
-# # Export the processed data
+# Export the processed data
 dataset.export_sheet(unique=True)
 dataset.export_sheet(unique=False)
