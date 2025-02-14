@@ -20,23 +20,32 @@ dataset = ex.DataForGP(path=path)
 dataset.find_excel_files()
 dataset.filter_excel_files(exclude_keywords=exclude_keywords, verbose=True)
 # Construct the DataFrame
-dataset.construct_dataframe(extensive=False)
+dataset.construct_dataframe(extensive=True)
 # Convert measured values to nominal values
 dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
 # Apply duplicate group IDs
-dataset.apply_duplicate_groupid(verbose=False)
+dataset.apply_duplicate_groupid(
+    # exclude_columns=['filename', 'experiment_date', 'diluent_mass', 'bed_length',
+    #    'inner_diameter', 'pretreat_ramp_rate', 'pretreat_gas_composition',
+    #    'diluent', 'location'],
+    verbose=False
+)
 
 # Calculate and add target values into the DataFrame
 for column in [
     'CO2 Conversion (%)',
-    'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
-    'CO Forward Production Rate (mol/molRh/s)',
-    'Selectivity to CO (%)'
+   # 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
+#    'CO Forward Production Rate (mol/molRh/s)',
+#    'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
-            'initial value',
-            'final value', 'initial slope', 'final slope', 'overall slope'
+            # 'initial value',
+            # 'final value',
+            # 'initial slope',
+            # 'final slope',
+            'overall slope',
+            # 'delta'
         ],
         column=column,
         temp_threshold=3.5,
@@ -63,5 +72,5 @@ analysis.compare_targets_std_dev(target_wise=True)
 # analysis._generate_histogram(column='CO2 Conversion (%)_initial value')
 
 # Export the processed data
-dataset.export_sheet(unique=True)
-dataset.export_sheet(unique=False)
+# dataset.export_sheet(unique=True)
+# dataset.export_sheet(unique=False)
