@@ -231,6 +231,7 @@ class DataForGP:
         Apply group IDs to duplicate entries in the DataFrame.
 
         Args:
+            exclude_columns (List[str]): List of columns to exclude when identifying duplicate groups.
             verbose (bool): If True, print the DataFrame with Group IDs and duplicate groups.
 
         Returns:
