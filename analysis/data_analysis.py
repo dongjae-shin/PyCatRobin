@@ -231,4 +231,11 @@ class DataAnalysis:
             # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
             app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
 
+        def pearson_correlation_target(self):
+            """
+            Calculate the Pearson correlation coefficient between the target values.
 
+            Returns:
+                None
+            """
+            pass

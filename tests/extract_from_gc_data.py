@@ -31,26 +31,28 @@ dataset.apply_duplicate_groupid(
 )
 
 # Calculate and add target values into the DataFrame
+savgol=False
+
 for column in [
-   # 'CO2 Conversion (%)',
+   'CO2 Conversion (%)',
    # 'CH4 Net Production Rate (mol/molRh/s)', 'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
             'initial value',
-            'final value',
-            'initial slope',
-            'final slope',
-            'overall slope',
+            # 'final value',
+            # 'initial slope',
+            # 'final slope',
+            # 'overall slope',
             # 'delta'
         ],
         column=column,
         temp_threshold=3.5,
         init_tos_buffer=0.5,
         adjacency_slope=1.0,
-        savgol=True
+        savgol=savgol
         )
 
 # Construct unique DataFrame using group IDs
@@ -59,17 +61,17 @@ dataset.construct_unique_dataframe(verbose=True)
 dataset.calculate_statistics_duplicate_group(verbose=False)
 
 # Plot the data and the corresponding slopes
-# dataset.plot_tos_data(column='CO2 Conversion (%)', #'Selectivity to CO (%)',
-#                       x_max_plot=20, temp_threshold=3.5, init_tos_buffer=0.5,
-#                       plot_selected=True, plot_slope=True,
-#                       methods_slope=['initial slope', 'final slope', 'overall slope'], show=True, adjacency_slope=1.0,
-#                       savgol=True,
-#                       gui=True)
+dataset.plot_tos_data(column='CO2 Conversion (%)', #'Selectivity to CO (%)',
+                      x_max_plot=20, temp_threshold=3.5, init_tos_buffer=0.5, adjacency_slope=1.0,
+                      plot_selected=True, plot_slope=True,
+                      methods_slope=['initial slope', 'final slope', 'overall slope'], show=True,
+                      savgol=savgol,
+                      gui=True)
 
 analysis = da.DataAnalysis(dataset=dataset)
 analysis.compare_targets_std_dev(target_wise=True)
-analysis._generate_histogram(column='CO2 Conversion (%)_initial value')
+# analysis._generate_histogram(column='CO2 Conversion (%)_initial value')
 
 # Export the processed data
-# dataset.export_sheet(unique=True)
+dataset.export_sheet(unique=True)
 # dataset.export_sheet(unique=False)

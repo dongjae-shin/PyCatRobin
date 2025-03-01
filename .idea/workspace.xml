@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract_from_gc_data.py">
-      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated extract_from_gc_data.py and extract.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/plot_tos_curves.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +83,7 @@
     "Notification.DoNotAsk-GitHub Copilot": "true",
     "Python.data_analysis.executor": "Run",
     "Python.extract.executor": "Run",
-    "Python.extract_from_gc_data.executor": "Debug",
+    "Python.extract_from_gc_data.executor": "Run",
     "Python.extract_from_gc_data_2.executor": "Run",
     "Python.hover.executor": "Run",
     "Python.test.executor": "Run",
@@ -469,7 +468,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739550365127</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="updated extract_from_gc_data.py and extract.py">
+      <option name="closed" value="true" />
+      <created>1740614283408</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1740614283408</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -496,7 +503,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="cloned into other local directory, synced with Dropbox" />
     <MESSAGE value="added some classes and functions in extract.py" />
     <MESSAGE value="modified extract.py, and two python files added." />
     <MESSAGE value="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods." />
@@ -521,7 +527,8 @@
     <MESSAGE value="updated data_analysis.py so it can plot violin, strip, and histplot (seaborn) together in _generate_histogram()." />
     <MESSAGE value="updated data_analysis.py" />
     <MESSAGE value="updated extract_from_gc_data.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated extract_from_gc_data.py" />
+    <MESSAGE value="updated extract_from_gc_data.py and extract.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated extract_from_gc_data.py and extract.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -532,19 +539,24 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data_2.py</url>
+          <url>file://$PROJECT_DIR$/tests/plot_tos_curves.py</url>
           <line>34</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>70</line>
+          <line>72</line>
           <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>68</line>
+          <line>70</line>
           <option name="timeStamp" value="69" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="70" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
