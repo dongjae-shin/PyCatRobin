@@ -10,24 +10,52 @@ from sklearn.compose import make_column_selector as selector
 from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, FunctionTransformer
 
+import torch
+from botorch.models import SingleTaskGP, MixedSingleTaskGP
+from botorch.fit import fit_gpytorch_mll
+from botorch.models.transforms.outcome import Standardize
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from gpytorch.kernels import RBFKernel, MaternKernel, ScaleKernel
+from gpytorch.constraints import GreaterThan, Interval
+from gpytorch.priors import LogNormalPrior
+
 class GaussianProcess:
     def __init__(self):
         self.df = None
         self.df_Xtrain = None
         self.df_ytrain = None
+        self.x_range_min = None
+        self.x_range_max = None
         self.transformer_X = None
         self.transformer_y = None
         self.df_Xtrain_trans = None
         self.df_ytrain_trans = None
+        self.tensor_Xtrain = None
+        self.tensor_ytrain = None
+
+    def preprocess_data_at_once(self,
+                                path: str,
+                                x_range_min: list = [300, 0.1, 0.005, 0],
+                                x_range_max: list = [550, 1.0, 0.02, 1]):
+        """
+        Preprocess data by reading, constructing transformers, and transforming data.
+
+        Args:
+            path (str): Path to the Excel file.
+            x_range_min (list): Minimum values for X scaling.
+            x_range_max (list): Maximum values for X scaling.
+        """
+        self.read_data(path)
+        self.construct_transformer(x_range_min=x_range_min, x_range_max=x_range_max)
+        self.transform_data()
+        self.convert_to_tensor()
 
     def read_data(self, path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
+        Read the Excel file and return Xtrain and ytrain DataFrames.
 
         Args:
             path: path to the Excel file made by data.extract.DataForGP
-
-        Returns:
-
         """
         self.df = pd.read_excel(path, header=0)
         self.df = self.df.drop(labels=['filename','experiment_date', 'location', 'GroupID'], axis=1)
@@ -47,6 +75,10 @@ class GaussianProcess:
     def construct_transformer(self,
                               x_range_min: list = [300, 0.1, 0.005, 0],
                               x_range_max: list = [550, 1.0, 0.02, 1]):
+
+        # Save x_range_min and x_range_max as attributes
+        self.x_range_min = x_range_min
+        self.x_range_max = x_range_max
 
         # Select numerical feature columns & define numerical transformer
         numerical_columns_selector = selector(dtype_exclude=object)
@@ -93,6 +125,12 @@ class GaussianProcess:
         self.df_Xtrain_trans = self.transformer_X.transform(self.df_Xtrain)
         self.df_ytrain_trans = self.transformer_y.transform(self.df_ytrain)
         return self.df_Xtrain_trans, self.df_ytrain_trans
+
+    def convert_to_tensor(self):
+        self.tensor_Xtrain = torch.tensor(self.df_Xtrain_trans)
+        self.tensor_ytrain = torch.tensor(self.df_ytrain_trans)
+
+    def train_gp(self):
 
 
 def scale(data, max, min):

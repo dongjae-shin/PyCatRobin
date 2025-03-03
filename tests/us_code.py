@@ -167,8 +167,6 @@ gp = SingleTaskGP(
 #     "lengthscale_prior", LogNormalPrior(0.0, 2.0), "lengthscale"
 # )
 
-# display(gp)
-
 # Optimize kernel parameter & noise
 mll = ExactMarginalLogLikelihood(gp.likelihood, gp)
 fit_gpytorch_mll(mll)
