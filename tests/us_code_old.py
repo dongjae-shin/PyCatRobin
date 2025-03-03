@@ -136,7 +136,6 @@ ytrain_tensor = torch.tensor(ytrain_trans)
 
 from botorch.acquisition.analytic import PosteriorStandardDeviation
 from botorch.optim import optimize_acqf, optimize_acqf_mixed
-from gpytorch.priors import LogNormalPrior
 
 # Instantiate a GPR
 # gp = MixedSingleTaskGP(
@@ -161,11 +160,6 @@ gp = SingleTaskGP(
     ytrain_tensor,
     # covar_module=covar_module
 )
-
-# For regularization of lengthscales (compatible with fit_gpytorch_mll)
-# gp.covar_module.base_kernel.register_prior(
-#     "lengthscale_prior", LogNormalPrior(0.0, 2.0), "lengthscale"
-# )
 
 # Optimize kernel parameter & noise
 mll = ExactMarginalLogLikelihood(gp.likelihood, gp)

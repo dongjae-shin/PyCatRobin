@@ -19,6 +19,9 @@ from gpytorch.kernels import RBFKernel, MaternKernel, ScaleKernel
 from gpytorch.constraints import GreaterThan, Interval
 from gpytorch.priors import LogNormalPrior
 
+from botorch.acquisition.analytic import PosteriorStandardDeviation
+from botorch.optim import optimize_acqf, optimize_acqf_mixed
+
 class GaussianProcess:
     def __init__(self):
         self.df = None
@@ -32,6 +35,7 @@ class GaussianProcess:
         self.df_ytrain_trans = None
         self.tensor_Xtrain = None
         self.tensor_ytrain = None
+        self.gp = None
 
     def preprocess_data_at_once(self,
                                 path: str,
@@ -130,8 +134,43 @@ class GaussianProcess:
         self.tensor_Xtrain = torch.tensor(self.df_Xtrain_trans)
         self.tensor_ytrain = torch.tensor(self.df_ytrain_trans)
 
-    def train_gp(self):
 
+    def train_gp(self, X: torch.tensor = None, y: torch.tensor = None, covar_module=None):
+        # If X and y are not provided, use the transformed data within the class
+        if X is None and y is None:
+            X = self.tensor_Xtrain
+            y = self.tensor_ytrain
+
+        if covar_module is None:
+            # Define the model (default kernel: MaternKernel)
+            model = SingleTaskGP(
+                train_X=X,
+                train_Y=y,
+                outcome_transform=Standardize(m=1)
+            )
+        else:
+            model = SingleTaskGP(
+                train_X=X,
+                train_Y=y,
+                outcome_transform=Standardize(m=1),
+                covar_module=covar_module # ScaleKernel(RBFKernel(ard_num_dims=4)) / ScaleKernel(MaternKernel(nu=2.5, ard_num_dims=4))
+            )
+
+        # For the case of mixed input features
+        # gp = MixedSingleTaskGP(
+        #     Xtrain_tensor,
+        #     ytrain_tensor,
+        #     cat_dims = [3, 4]
+        # )
+
+        # Define the marginal log likelihood (MLL)
+        mll = ExactMarginalLogLikelihood(model.likelihood, model)
+        # Fit the model
+        fit_gpytorch_mll(mll)
+
+        self.gp = model
+
+        return self.gp
 
 def scale(data, max, min):
     # Original(physical) space => Scaled space [0, 1]
