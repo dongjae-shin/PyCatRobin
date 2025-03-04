@@ -1,6 +1,8 @@
 import pandas as pd
+import torch
 import numpy as np
-from botorch.acquisition import PosteriorStandardDeviation, UpperConfidenceBound
+from botorch.acquisition.analytic import PosteriorStandardDeviation, UpperConfidenceBound
+# from botorch.acquisition import PosteriorStandardDeviation, UpperConfidenceBound
 # from botorch.optim import optimize_acqf, optimize_acqf_mixed
 
 class DiscreteGrid:
@@ -37,11 +39,48 @@ class DiscreteGrid:
         self.X_discrete_wi = X_discrete[X_discrete.iloc[:, -1] == 0].reset_index(drop=True)
         self.X_discrete_np = X_discrete[X_discrete.iloc[:, -1] == 1].reset_index(drop=True)
 
-    def uncertainty_sampling_discrete(self, gp, synth_method: str, n_candidates: int = 5):
+    def uncertainty_sampling_discrete(
+            self,
+            gp,
+            transformer_X,
+            synth_method: str,
+            n_candidates: int = 5,
+            columns=None
+    ):
         # suggest n_candidates samples with the highest uncertainty on discrete grid
+
+        if columns is None:
+            columns = ['reaction_temp', 'Rh_total_mass', 'Rh_weight_loading', 'synth_method']
 
         # Instantiate a acquisition function
         US = PosteriorStandardDeviation(gp)
+
+        if synth_method == 'WI':
+            # adding column information for preprocessor
+            self.X_discrete_wi.columns = columns
+
+            # scaling and making tensor
+            X_discrete_wi_trans = torch.tensor(
+                transformer_X.transform(self.X_discrete_wi)
+            )
+            # calculate posterior standard deviation for all the possible feature vectors
+            std = US.forward(
+                X_discrete_wi_trans.reshape(
+                    len(X_discrete_wi_trans), 1, X_discrete_wi_trans.shape[1])
+            ).detach().numpy()
+
+            top_ids = np.argsort(-std)[:n_candidates]  # negativity: sort in reverse order
+
+            # show top 'n_candidates' uncertain conditions
+            print(
+                self.X_discrete_wi.join(
+                    pd.DataFrame(std, columns=['std. dev.'])  # append uncertainty info.
+                ).iloc[top_ids, :]
+            )
+        if synth_method == 'NP':
+            pass
+
+
 
     def upper_confidence_bound_discrete(self, gp, n_candidates):
         # suggest n_candidates samples with the highest upper confidence bound on discrete grid
