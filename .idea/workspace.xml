@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated gaussian_process.py and acquisition.py">
-      <change afterPath="$PROJECT_DIR$/tests/grid_construction.py" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated acquisition.py">
       <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/active_learning/acquisition.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/acquisition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/active_learning/gaussian_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/gaussian_process.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/gp_code.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/gp_code.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,7 +96,7 @@
     "ShowUsagesActions.previewPropertyKey": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -530,7 +527,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740981085527</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="updated acquisition.py">
+      <option name="closed" value="true" />
+      <created>1741051638087</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1741051638087</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -557,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="modified extract.py, and two python files added." />
     <MESSAGE value="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods." />
     <MESSAGE value="Update extract.py and extract_from_gc_data.py" />
     <MESSAGE value="Update extract.py" />
@@ -582,7 +586,8 @@
     <MESSAGE value="updated extract_from_gc_data.py" />
     <MESSAGE value="updated extract_from_gc_data.py and extract.py" />
     <MESSAGE value="updated gaussian_process.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated gaussian_process.py" />
+    <MESSAGE value="updated acquisition.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated acquisition.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

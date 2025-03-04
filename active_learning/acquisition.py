@@ -10,6 +10,8 @@ class DiscreteGrid:
         self.x_step = x_step
         self.list_grids = None
         self.n_grid_total = None
+        self.X_discrete_wi = None
+        self.X_discrete_np = None
 
     def construct_grid(self):
         # unlabeled data set for all the possible combinations of input features
@@ -32,10 +34,10 @@ class DiscreteGrid:
         X_discrete = pd.DataFrame(X_discrete)
 
         # Unlabeled data set for WI and NP
-        X_discrete_wi = X_discrete[X_discrete.iloc[:, -1] == 0].reset_index(drop=True)
-        X_discrete_np = X_discrete[X_discrete.iloc[:, -1] == 1].reset_index(drop=True)
+        self.X_discrete_wi = X_discrete[X_discrete.iloc[:, -1] == 0].reset_index(drop=True)
+        self.X_discrete_np = X_discrete[X_discrete.iloc[:, -1] == 1].reset_index(drop=True)
 
-    def uncertainty_sampling_discrete(self, gp, n_candidates):
+    def uncertainty_sampling_discrete(self, gp, synth_method: str, n_candidates: int = 5):
         # suggest n_candidates samples with the highest uncertainty on discrete grid
 
         # Instantiate a acquisition function
