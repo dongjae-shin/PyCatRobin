@@ -13,6 +13,5 @@ gp1.train_gp()
 # print the attributes
 print('gp1.tensor_Xtrain: ', gp1.tensor_Xtrain)
 print('gp1.tensor_ytrain: ', gp1.tensor_ytrain)
-# print('gp1.gp: ', gp1.gp)
+print('gp1.gp: ', gp1.gp)
 print('gp1.gp.kernel: ', gp1.gp.covar_module)
-# print('type(gp1.gp): ', type(gp1.gp))
