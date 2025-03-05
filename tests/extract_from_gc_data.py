@@ -34,20 +34,20 @@ dataset.apply_duplicate_groupid(
 savgol=False
 
 for column in [
-   'CO2 Conversion (%)',
+   # 'CO2 Conversion (%)',
    # 'CH4 Net Production Rate (mol/molRh/s)',
    # 'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
             'initial value',
-            # 'final value',
-            # 'initial slope',
-            # 'final slope',
+            'final value',
+            'initial slope',
+            'final slope',
             # 'overall slope',
-            # 'delta'
+            'delta'
         ],
         column=column,
         temp_threshold=3.5,

@@ -149,8 +149,9 @@ class DataAnalysis:
 
             # Overlay a stripplot to the violinplot to differentiate the 'location'
             markers = ['X', 'o', 'P', '^', '*', 'v', 'D', 'P',]
+            colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
             legend_elements = []
-            locmarks = [[df['location'].unique()[i], markers[i]] for i in range(len(df['location'].unique()))]
+            locmarks = [[df['location'].unique()[i], markers[i], colors[i]] for i in range(len(df['location'].unique()))]
             # Manually implement the legend for the location since seaborn does not support it
             for locmark in locmarks:
                 # Select the data for the location
@@ -158,18 +159,19 @@ class DataAnalysis:
                 # Add dummy rows so df_selected has always all GroupID values -> use the same hue range with the violin plot
                 for i, group_id in enumerate(hue_order):
                     with warnings.catch_warnings(action="ignore"):
-                        df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'UCSB', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
+                        df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'dummy_location', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
                 # Plot the strip plot for the location with the corresponding marker
                 strip = sns.stripplot(
                     df_selected, x=column,  hue='GroupID', jitter=True, dodge=True,
-                    palette=['red'] * len(hue_order), ax=axs[0], legend=False, size=5, marker=locmark[1],
+                    palette=[locmark[2]] * len(hue_order),
+                    ax=axs[0], legend=False, size=5, marker=locmark[1],
                     linewidth=0.5, edgecolor='w', hue_order=hue_order,
                 )
                 # Add the legend element that is not tied to the plot but corresponds to locmark
                 legend_elements.append(
                     Line2D(
                         [0], [0], label=locmark[0], marker=locmark[1], color='w',
-                        markersize=9, markeredgecolor='w', markerfacecolor='red'
+                        markersize=9, markeredgecolor='w', markerfacecolor=locmark[2]
                     )
                 )
             axs[0].legend(handles=legend_elements, title='Location')
