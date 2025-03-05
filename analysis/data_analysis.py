@@ -53,6 +53,10 @@ class DataAnalysis:
                 nrows = (len(columns_property) + 2) // 3
                 ncols = min(len(columns_property), 3)
                 fig, axs = plt.subplots(nrows, ncols, figsize=(13, 8))
+
+                # set title of the fig
+                fig.suptitle(f'{property}', fontsize=16)
+
                 axs = np.ravel(axs)
                 n_plot = 0
                 for i, column in enumerate(columns_property): # Subplots over methods
@@ -68,7 +72,9 @@ class DataAnalysis:
                     # Plot the data
                     sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
                                 hue='GroupID', legend=False)
-                    axs[i].set_title(f'{column.rstrip("_std")}', fontsize=10)
+                    # Set the title of the subplot with the signal-to-noise ratio (SNR)
+                    snr = df_melted.iloc[-1]['Standard Deviation'] / df_melted.iloc[:-1]['Standard Deviation'].max()
+                    axs[i].set_title(f'{column.split("_")[1]} (SNR={snr:.2f})', fontsize=12)
 
                     # Show ylabel only for the leftmost axes, and  xlabel only for the lowest axes
                     if i % ncols != 0:

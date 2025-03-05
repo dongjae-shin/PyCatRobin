@@ -34,10 +34,10 @@ dataset.apply_duplicate_groupid(
 savgol=False
 
 for column in [
-   # 'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
-   # 'CO Net Production Rate (mol/molRh/s)',
-   # 'CO Forward Production Rate (mol/molRh/s)',
+   'CO2 Conversion (%)',
+   'CH4 Net Production Rate (mol/molRh/s)',
+   'CO Net Production Rate (mol/molRh/s)',
+   'CO Forward Production Rate (mol/molRh/s)',
    'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
