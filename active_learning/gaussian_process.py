@@ -16,6 +16,7 @@ from gpytorch.mlls import ExactMarginalLogLikelihood
 class GaussianProcess:
     def __init__(self):
         self.df = None
+        self.columns = None
         self.df_Xtrain = None
         self.df_ytrain = None
         self.x_range_min = None
@@ -63,8 +64,10 @@ class GaussianProcess:
         )
         print(f'self.df.dtypes: {self.df.dtypes}')
 
-        self.df_Xtrain = self.df.drop(labels=['CO2 Conversion (%)_initial value'], axis=1)
-        self.df_ytrain = self.df[['CO2 Conversion (%)_initial value']]
+        self.columns = self.df.columns
+
+        self.df_Xtrain = self.df.drop(labels=self.columns[-1], axis=1)
+        self.df_ytrain = self.df[[self.columns[-1]]]
         return self.df_Xtrain, self.df_ytrain
 
     def construct_transformer(self,

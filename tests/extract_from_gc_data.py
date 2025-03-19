@@ -35,17 +35,17 @@ savgol=False
 
 for column in [
    'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
-   'CO Net Production Rate (mol/molRh/s)',
-   'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO Net Production Rate (mol/molRh/s)',
+   # 'CO Forward Production Rate (mol/molRh/s)',
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
-            'initial value',
-            'final value',
-            'initial slope',
-            'final slope',
+            # 'initial value',
+            # 'final value',
+            # 'initial slope',
+            # 'final slope',
             # 'overall slope',
             'delta'
         ],
@@ -69,10 +69,9 @@ dataset.calculate_statistics_duplicate_group(verbose=False)
 #                       savgol=savgol,
 #                       gui=True)
 
-analysis = da.DataAnalysis(dataset=dataset)
-analysis.compare_targets_std_dev(target_wise=True)
-# analysis._generate_histogram(column='CO2 Conversion (%)_initial value')
+# analysis = da.DataAnalysis(dataset=dataset)
+# analysis.compare_targets_std_dev(target_wise=True)
 
 # Export the processed data
-# dataset.export_sheet(unique=True)
+dataset.export_sheet(unique=True)
 # dataset.export_sheet(unique=False)

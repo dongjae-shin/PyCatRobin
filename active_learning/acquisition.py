@@ -5,11 +5,44 @@ from botorch.acquisition.analytic import PosteriorStandardDeviation, UpperConfid
 # from botorch.acquisition import PosteriorStandardDeviation, UpperConfidenceBound
 # from botorch.optim import optimize_acqf, optimize_acqf_mixed
 
+from active_learning.gaussian_process import GaussianProcess
+
 class DiscreteGrid:
-    def __init__(self, x_range_min: list, x_range_max: list, x_step: list):
+    """
+    A class to construct a discrete grid of input features and perform acquisition functions
+    for active learning with Gaussian Processes.
+
+    Attributes:
+        x_range_min (list): Minimum values for each input feature.
+        x_range_max (list): Maximum values for each input feature.
+        x_step (list): Step sizes for each input feature.
+        gp (GaussianProcess): An instance of the GaussianProcess class.
+        list_grids (list): List of grids for each input feature.
+        n_grid_total (int): Total number of combinations in the constructed grid.
+        X_discrete_wi (pd.DataFrame): Unlabeled data set for WI method.
+        X_discrete_np (pd.DataFrame): Unlabeled data set for NP method.
+
+    Methods:
+        construct_grid():
+            Constructs a grid of all possible combinations of input features.
+
+        uncertainty_sampling_discrete(gp, transformer_X, synth_method, n_candidates=5, columns=None):
+            Suggests samples with the highest uncertainty on the discrete grid.
+
+        upper_confidence_bound_discrete(gp, n_candidates):
+            TBD
+
+        expected_improvement_discrete(gp, n_candidates):
+            TBD
+    """
+    def __init__(
+            self, x_range_min: list, x_range_max: list, x_step: list,
+            gp: GaussianProcess = None
+    ):
         self.x_range_min = x_range_min
         self.x_range_max = x_range_max
         self.x_step = x_step
+        self.gp = gp
         self.list_grids = None
         self.n_grid_total = None
         self.X_discrete_wi = None
@@ -80,12 +113,11 @@ class DiscreteGrid:
         if synth_method == 'NP':
             pass
 
-
-
     def upper_confidence_bound_discrete(self, gp, n_candidates):
         # suggest n_candidates samples with the highest upper confidence bound on discrete grid
 
         UCB = UpperConfidenceBound(gp, beta=0.1)
+        pass
 
     def expected_improvement_discrete(self, gp, n_candidates):
         # suggest n_candidates samples with the highest expected improvement on discrete grid

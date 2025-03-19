@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="add latest data sheet">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="refactor gp_code.py to use home directory for file path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active_learning/acquisition.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/acquisition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/active_learning/gaussian_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/gaussian_process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/grid_construction.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/grid_construction.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,23 +49,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/dongjae-shin/LongTermCat.git",
-    "accountId": "b7b883db-0900-4ee5-9035-1c12d8894bc8"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
+    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
   },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
     },
-    "owner": "dongjae-shin",
-    "repository": "LongTermCat"
+    &quot;owner&quot;: &quot;dongjae-shin&quot;,
+    &quot;repository&quot;: &quot;LongTermCat&quot;
   },
-  "editorReviewEnabled": false
-}]]></component>
+  &quot;editorReviewEnabled&quot;: false
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -75,27 +78,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Notification.DisplayName-DoNotAsk-GitHub Copilot": "GitHub Copilot",
-    "Notification.DoNotAsk-GitHub Copilot": "true",
-    "Python.data_analysis.executor": "Run",
-    "Python.extract.executor": "Debug",
-    "Python.extract_from_gc_data.executor": "Run",
-    "Python.extract_from_gc_data_2.executor": "Run",
-    "Python.gp_code.executor": "Run",
-    "Python.grid_construction.executor": "Run",
-    "Python.hover.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.us_code.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "ShowUsagesActions.previewPropertyKey": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Notification.DisplayName-DoNotAsk-GitHub Copilot&quot;: &quot;GitHub Copilot&quot;,
+    &quot;Notification.DoNotAsk-GitHub Copilot&quot;: &quot;true&quot;,
+    &quot;Python.data_analysis.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_from_gc_data_2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gp_code.executor&quot;: &quot;Run&quot;,
+    &quot;Python.grid_construction.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hover.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.us_code.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -155,22 +158,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00004" summary="modified extract.py, to include apply_duplicate_groupid(), calculate_delta_co2_conv(), and export_sheet() methods.">
-      <option name="closed" value="true" />
-      <created>1736811022096</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1736811022096</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Update extract.py and extract_from_gc_data.py">
-      <option name="closed" value="true" />
-      <created>1737092332129</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1737092332129</updated>
     </task>
     <task id="LOCAL-00006" summary="Update extract.py">
       <option name="closed" value="true" />
@@ -548,7 +535,23 @@
       <option name="project" value="LOCAL" />
       <updated>1741137958600</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="updated title to show SNR in data_analysis.py">
+      <option name="closed" value="true" />
+      <created>1741189528787</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1741189528788</updated>
+    </task>
+    <task id="LOCAL-00054" summary="refactor gp_code.py to use home directory for file path">
+      <option name="closed" value="true" />
+      <created>1741390542337</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1741390542337</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -575,8 +578,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="new branch for testing new definition for selected_tos" />
-    <MESSAGE value="update extract.py" />
     <MESSAGE value="1. updated extract_indices_target() in extract.py. &#10;2. plot_slope argument of assign_target_values() to be put into plot_tos_data()" />
     <MESSAGE value="renamed branches" />
     <MESSAGE value="merged different-10hrs_2 branch into main." />
@@ -600,7 +601,9 @@
     <MESSAGE value="updated acquisition.py and grid_construction.py" />
     <MESSAGE value="enhanced data_analysis.py to include color differentiation in stripplot markers" />
     <MESSAGE value="add latest data sheet" />
-    <option name="LAST_COMMIT_MESSAGE" value="add latest data sheet" />
+    <MESSAGE value="updated title to show SNR in data_analysis.py" />
+    <MESSAGE value="refactor gp_code.py to use home directory for file path" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor gp_code.py to use home directory for file path" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -617,18 +620,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/active_learning/acquisition.py</url>
-          <line>66</line>
+          <line>99</line>
           <option name="timeStamp" value="81" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>170</line>
+          <line>176</line>
           <option name="timeStamp" value="82" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>76</line>
+          <line>82</line>
           <option name="timeStamp" value="93" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/grid_construction.py</url>
+          <line>40</line>
+          <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

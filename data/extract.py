@@ -147,6 +147,10 @@ class DataForGP:
         Returns:
 
         """
+
+        if self.df_us is None:
+            raise ValueError("self.df_us is not constructed yet. Please run construct_dataframe() first.")
+        
         if not allowed_values:
             # allowed grid values for m_rh
             m_rh_max = 0.02
