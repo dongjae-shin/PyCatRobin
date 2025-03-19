@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="refactor gp_code.py to use home directory for file path">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update several files.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/active_learning/acquisition.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/acquisition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/active_learning/gaussian_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/active_learning/gaussian_process.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/grid_construction.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/grid_construction.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -158,14 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Update extract.py">
-      <option name="closed" value="true" />
-      <created>1737161981894</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1737161981894</updated>
     </task>
     <task id="LOCAL-00007" summary="Update extract.py">
       <option name="closed" value="true" />
@@ -551,7 +540,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741390542337</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="update several files.">
+      <option name="closed" value="true" />
+      <created>1742370218697</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1742370218698</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -578,7 +575,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="1. updated extract_indices_target() in extract.py. &#10;2. plot_slope argument of assign_target_values() to be put into plot_tos_data()" />
     <MESSAGE value="renamed branches" />
     <MESSAGE value="merged different-10hrs_2 branch into main." />
     <MESSAGE value="merged different-10hrs_2 branch into main." />
@@ -603,7 +599,8 @@
     <MESSAGE value="add latest data sheet" />
     <MESSAGE value="updated title to show SNR in data_analysis.py" />
     <MESSAGE value="refactor gp_code.py to use home directory for file path" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor gp_code.py to use home directory for file path" />
+    <MESSAGE value="update several files." />
+    <option name="LAST_COMMIT_MESSAGE" value="update several files." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -635,7 +632,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/grid_construction.py</url>
-          <line>40</line>
+          <line>51</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>

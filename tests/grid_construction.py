@@ -1,9 +1,19 @@
+import os
+
 import active_learning.acquisition as aq
 import active_learning.gaussian_process as gpc
 
-# path = "/Users/djayshin/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/20250228_sheet_for_ML_unique.xlsx"
-path = "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/20250228_sheet_for_ML_unique.xlsx"
-path = "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/20250228_sheet_for_ML_unique.xlsx"
+# Define the home directory and path to data
+home_dir = os.path.expanduser("~")
+
+# initial CO2 conversion
+path = (home_dir +
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/20250228_sheet_for_ML_unique.xlsx")
+# new target value
+path = (home_dir +
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/20250319_sheet_for_ML_unique.xlsx")
+
+
 
 gp1 = gpc.GaussianProcess()
 gp1.preprocess_data_at_once(
@@ -82,7 +92,7 @@ levels = np.linspace(0, sigma_max, 32)  # for std
 # levels = np.linspace(-2,2,11) # mean
 
 # for temperature in [300, 350, 400, 450, 500, 550]:
-for temperature in [500]:
+for temperature in [300]:
     cmap = plt.contourf(
         W_rh,
         M_rh,
@@ -96,11 +106,9 @@ for temperature in [500]:
         cmap,
         label='posterior std. dev.',
         ticks=np.linspace(0, sigma_max, int(sigma_max / 0.1 + 1))
-
     )
 
     plot_grid(W_rh_plot, M_rh_plot)
-    # plot_train_data(Xtrain[(Xtrain[:, 3] == 1) & (Xtrain[:, 0] == temperature)])
     plot_train_data(gp1.df_Xtrain[(gp1.df_Xtrain['synth_method'] == 1) & (gp1.df_Xtrain['reaction_temp'] == temperature)])
 
     # plt.xlim(0.1, 1.0)
