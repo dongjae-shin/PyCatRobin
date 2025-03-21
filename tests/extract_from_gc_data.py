@@ -6,7 +6,8 @@ import analysis.data_analysis as da
 # Define the home directory and path to data
 home_dir = os.path.expanduser("~")
 path = (home_dir +
-        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
+        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/04 Catalysis Round Robin/01 Round Robin GC Results")
+        # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
 # Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -73,5 +74,5 @@ dataset.calculate_statistics_duplicate_group(verbose=False)
 # analysis.compare_targets_std_dev(target_wise=True)
 
 # Export the processed data
-dataset.export_sheet(unique=True)
+# dataset.export_sheet(unique=True)
 # dataset.export_sheet(unique=False)
