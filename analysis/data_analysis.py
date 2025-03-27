@@ -20,6 +20,7 @@ class DataAnalysis:
 
         self.dataset = dataset
         self.unique_properties = None
+        self.df_snr = None
 
     def compare_targets_std_dev(
             self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn'
@@ -239,11 +240,80 @@ class DataAnalysis:
             # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
             app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
 
-        def pearson_correlation_target(self):
+    def plot_heatmap_snr(
+            self,
+            properties: list[str] = None, methods: list[str] = None,
+            vmax: float = None, vmin: float = 0, cmap: str = 'Reds'
+    ):
+        """
+        Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
+
+        Args:
+            properties (list(str)): The list of properties to plot.
+            methods (list(str)): The list of methods to plot.
+            vmax (float): The maximum value of the colorbar.
+            vmin (float): The minimum value of the colorbar.
+            cmap (str): The colormap to use for the heatmap.
+
+        Returns:
+            None
+        """
+        # If properties and methods are not provided, use the unique properties
+        if properties is None:
+            if self.unique_properties is None:
+                columns = [col for col in self.dataset.df_stat.columns if '_std' in col]
+                # extract the properties from the columns
+                properties = []  # e.g., 'CO2 Conversion (%)', 'Selectivity to CO (%)'
+                for col in columns:
+                    parts = col.rsplit('_', 2)
+                    if len(parts) > 2:
+                        properties.append(parts[0])
+                self.unique_properties = list(set(properties))
+            properties = self.unique_properties
+        # If methods are not provided, use the unique methods
+        if methods is None:
+            methods = [col.split('_')[1] for col in self.dataset.df_stat.columns if '_std' in col]
+            # make elements of methods unique
+            methods = list(set(methods))
+
+        # Make (len(properties) x (len(methods)) DataFrame consists of corresponding SNR values
+        # Make the row index corresponds to methods and the column index corresponds to properties
+        df_snr = pd.DataFrame(index=methods, columns=properties)
+        for prop in properties:
+            for method in methods:
+                column = f'{prop}_{method}_std'
+                snr = self.dataset.df_stat[column].iloc[-1] / self.dataset.df_stat[column].iloc[:-1].max()
+                df_snr.loc[method, prop] = snr
+        self.df_snr = df_snr
+        # Ensure the DataFrame is filled with float values
+        df_snr = df_snr.astype(float)
+
+        # Plot the heatmap
+        fig, ax = plt.subplots(figsize=(10.3, 10))
+        # Set the font sizes for the plot
+        plt.rcParams.update({'font.size': 15})
+        vmax = df_snr.max().max() if vmax is None else vmax
+        sns.heatmap(
+            df_snr,
+            annot=True, fmt='.2f',
+            annot_kws={'fontsize': 12}, # set fontsize for the annotation
+            cmap=cmap,
+            cbar_kws={'label': 'Signal-to-Noise Ratio (SNR)'},
+            vmax=vmax, vmin=vmin,
+            ax=ax, # use the ax parameter to plot the heatmap on the provided axis
+        )
+        # Rotate xtick labels
+        plt.xticks(ha='left', fontsize=15, rotation=-30)
+        plt.yticks(ha='center', fontsize=15)
+        plt.tight_layout()
+        plt.show()
+
+    def pearson_correlation_target(self):
             """
             Calculate the Pearson correlation coefficient between the target values.
 
             Returns:
                 None
             """
+
             pass
