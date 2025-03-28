@@ -66,8 +66,10 @@ class DataForGP:
         self.targets = []
 
     def find_excel_files(self):
-        extension = '*.xlsx'
-        self.path_found = glob(pathname=os.path.join(self.path, extension))
+        extension = ['*.xlsx', '*.xls']
+        self.path_found = []
+        for ext in extension:
+            self.path_found.extend(glob(pathname=os.path.join(self.path, ext)))
         print(f'{len(self.path_found)} excel files were found:')
 
     def filter_excel_files(self, exclude_keywords, verbose=False):
@@ -548,7 +550,7 @@ def get_input_vector(excel_path: str = None,
 
     """
     if excel_path == None:
-        print('excel_path should be give.')
+        print('excel_path should be given.')
         return
 
     df = pd.read_excel(
@@ -560,7 +562,10 @@ def get_input_vector(excel_path: str = None,
     temp = float(df[df['Variable'] == 'Reaction Temperature']['Value'].values[0])
     w_rh = float(df[df['Variable'] == 'Weight Loading']['Value'].values[0])
     m_catal = float(df[df['Variable'] == 'Catalyst Mass']['Value'].values[0])
-    m_rh = m_catal * w_rh / 100.
+    if 'PSU' in excel_path: # need to be cleaned up after communication with PSU
+        m_rh = m_catal
+    else:
+        m_rh = m_catal * w_rh / 100.
     synth_method = df[df['Variable'] == 'Synthesis Method']['Value'].values[0]
     expt_date = df[df['Variable'] == 'Experiment Date']['Value'].values[0]
     filename = excel_path.rsplit('/')[-1]
@@ -982,7 +987,11 @@ def _plot_linear_line_fitting(
 def _get_location(filename: str) -> str:
     if 'UCSB' in filename:
         return 'UCSB'
-    if 'Cargnello' in filename:
+    elif 'Cargnello' in filename:
         return 'Cargnello'
-    if 'SLAC' in filename:
+    elif 'SLAC' in filename:
         return 'SLAC'
+    elif 'PSU' in filename:
+        return 'PSU'
+    else:
+        return 'Unknown: add new location.'

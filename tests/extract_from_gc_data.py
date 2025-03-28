@@ -6,8 +6,8 @@ import analysis.data_analysis as da
 # Define the home directory and path to data
 home_dir = os.path.expanduser("~")
 path = (home_dir +
-        # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/04 Catalysis Round Robin/01 Round Robin GC Results")
-        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
+        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/04 Catalysis Round Robin/01 Round Robin GC Results")
+        # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
 # Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -36,11 +36,11 @@ dataset.apply_duplicate_groupid(
 savgol=False
 
 for column in [
-   'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO2 Conversion (%)',
+   # 'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
-   'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'CO Forward Production Rate (mol/molRh/s)',
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
@@ -72,7 +72,8 @@ dataset.calculate_statistics_duplicate_group(verbose=False)
 #                       gui=True)
 
 analysis = da.DataAnalysis(dataset=dataset)
-analysis.plot_heatmap_snr(vmax=6.28)
+analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)')
+analysis.plot_heatmap_snr(vmax=7.53)
 analysis.compare_targets_std_dev(target_wise=True)
 
 # Export the processed data

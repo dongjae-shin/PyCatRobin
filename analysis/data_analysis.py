@@ -11,7 +11,8 @@ from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
 from openpyxl.styles.builtins import styles
 
-from data.extract import DataForGP
+from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
+
 
 class DataAnalysis:
     def __init__(self, dataset: DataForGP = None):
@@ -270,6 +271,7 @@ class DataAnalysis:
                         properties.append(parts[0])
                 self.unique_properties = list(set(properties))
             properties = self.unique_properties
+
         # If methods are not provided, use the unique methods
         if methods is None:
             methods = [col.split('_')[1] for col in self.dataset.df_stat.columns if '_std' in col]
@@ -279,12 +281,18 @@ class DataAnalysis:
         # Make (len(properties) x (len(methods)) DataFrame consists of corresponding SNR values
         # Make the row index corresponds to methods and the column index corresponds to properties
         df_snr = pd.DataFrame(index=methods, columns=properties)
+
+        # sort index and column names of df_snr
+        df_snr.sort_index(axis=0, inplace=True)
+        df_snr.sort_index(axis=1, inplace=True)
+
         for prop in properties:
             for method in methods:
                 column = f'{prop}_{method}_std'
                 snr = self.dataset.df_stat[column].iloc[-1] / self.dataset.df_stat[column].iloc[:-1].max()
                 df_snr.loc[method, prop] = snr
         self.df_snr = df_snr
+
         # Ensure the DataFrame is filled with float values
         df_snr = df_snr.astype(float)
 
@@ -308,12 +316,52 @@ class DataAnalysis:
         plt.tight_layout()
         plt.show()
 
+        # reset the font size
+        plt.rcParams.update({'font.size': 10})
+
+    def plot_tos_data_duplicate(self, column: str = 'CO Forward Production Rate (mol/molRh/s)'):
+        group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
+        for group_id in group_ids:
+            file_names = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['filename'].tolist()[0]
+            locations = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['location'].tolist()[0]
+            reaction_temp = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['reaction_temp'].values[0]
+            w_Rh = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['Rh_weight_loading'].values[0]
+            m_Rh = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['Rh_total_mass'].values[0]
+            synth_method = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['synth_method'].values[0]
+
+            for i, file_name in enumerate(file_names):
+                # element of self.dataset.path_filtered that contains the string 'file_name'
+                path = [s for s in self.dataset.path_filtered if file_name in s][0]
+                # _plot_tos_data(path=path, column=column, show=False)
+
+                temp_threshold = 3.5
+                init_tos_buffer = 0.5
+                duration = 10
+                tos, temp, col_val, initial_index, final_index, selected_index = \
+                    _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer)
+
+                plt.scatter(
+                    tos, col_val,
+                    # color=[0.5, 1.0, 0.5, 1.0],
+                    s=5, label=locations[i]
+                )
+
+            plt.xlabel('Time on stream (hrs)')
+            plt.ylabel(column)
+            plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')
+            plt.legend()
+            plt.show()
+
+
+        # self.dataset.df_stat['fi']
+
+
     def pearson_correlation_target(self):
-            """
-            Calculate the Pearson correlation coefficient between the target values.
+        """
+        Calculate the Pearson correlation coefficient between the target values.
 
-            Returns:
-                None
-            """
+        Returns:
+            None
+        """
 
-            pass
+        pass
