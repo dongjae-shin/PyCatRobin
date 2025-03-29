@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="add plot_heatmap_snr() method to DataAnalysis class in data_analysis.py" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,23 +47,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/dongjae-shin/LongTermCat.git",
-    "accountId": "b7b883db-0900-4ee5-9035-1c12d8894bc8"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
+    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
   },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
     },
-    "owner": "dongjae-shin",
-    "repository": "LongTermCat"
+    &quot;owner&quot;: &quot;dongjae-shin&quot;,
+    &quot;repository&quot;: &quot;LongTermCat&quot;
   },
-  "editorReviewEnabled": false
-}]]></component>
+  &quot;editorReviewEnabled&quot;: false
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -72,27 +76,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Notification.DisplayName-DoNotAsk-GitHub Copilot": "GitHub Copilot",
-    "Notification.DoNotAsk-GitHub Copilot": "true",
-    "Python.data_analysis.executor": "Run",
-    "Python.extract.executor": "Run",
-    "Python.extract_from_gc_data.executor": "Run",
-    "Python.extract_from_gc_data_2.executor": "Run",
-    "Python.gp_code.executor": "Run",
-    "Python.grid_construction.executor": "Run",
-    "Python.hover.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.us_code.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "ShowUsagesActions.previewPropertyKey": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Notification.DisplayName-DoNotAsk-GitHub Copilot&quot;: &quot;GitHub Copilot&quot;,
+    &quot;Notification.DoNotAsk-GitHub Copilot&quot;: &quot;true&quot;,
+    &quot;Python.data_analysis.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_from_gc_data_2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gp_code.executor&quot;: &quot;Run&quot;,
+    &quot;Python.grid_construction.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hover.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.us_code.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -140,7 +144,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-495700d161d3-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.22562.220" />
+        <option value="bundled-python-sdk-4f4e415b4190-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.26053.29" />
       </set>
     </attachedChunks>
   </component>
@@ -152,14 +156,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00011" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1737775460951</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1737775460951</updated>
     </task>
     <task id="LOCAL-00012" summary="1. updated extract_indices_target() in extract.py. &#10;2. plot_slope argument of assign_target_values() to be put into plot_tos_data()">
       <option name="closed" value="true" />
@@ -545,7 +541,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743060003204</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py">
+      <option name="closed" value="true" />
+      <created>1743144318067</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1743144318067</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -572,7 +576,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated submodule structure and project name" />
     <MESSAGE value="updated extract.py by fixing how to calculate initial and final slope for fluctuating data." />
     <MESSAGE value="updated extract.py" />
     <MESSAGE value="updated extract.py and structure" />
@@ -597,7 +600,8 @@
     <MESSAGE value="refactor grid_construction.py for improved plotting and file path management" />
     <MESSAGE value="update extract_from_gc_data.py to change data path for Round Robin GC Results" />
     <MESSAGE value="add plot_heatmap_snr() method to DataAnalysis class in data_analysis.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="add plot_heatmap_snr() method to DataAnalysis class in data_analysis.py" />
+    <MESSAGE value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -614,8 +618,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>75</line>
+          <line>77</line>
           <option name="timeStamp" value="97" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
+          <line>76</line>
+          <option name="timeStamp" value="99" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
