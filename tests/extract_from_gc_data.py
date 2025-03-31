@@ -38,10 +38,10 @@ savgol=False
 
 for column in [
    'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
-   'CO Net Production Rate (mol/molRh/s)',
-   'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO Net Production Rate (mol/molRh/s)',
+   # 'CO Forward Production Rate (mol/molRh/s)',
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
@@ -73,8 +73,12 @@ dataset.calculate_statistics_duplicate_group(verbose=False)
 #                       gui=True)
 
 analysis = da.DataAnalysis(dataset=dataset)
+
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)')
-analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
+# analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
+# analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)')
+# analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)')
+# analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)')
 # analysis.plot_heatmap_snr(vmax=7.53)
 analysis.plot_heatmap_snr(vmax=2.5)
 analysis.compare_targets_std_dev(target_wise=True)
