@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="comment out unused columns in extract_from_gc_data.py">
+      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,23 +49,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
-    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dongjae-shin/LongTermCat.git",
+    "accountId": "13aebc2b-0e60-47c8-9aa0-f9a1590f00e6"
   },
-  &quot;recentNewPullRequestHead&quot;: {
-    &quot;server&quot;: {
-      &quot;useHttp&quot;: false,
-      &quot;host&quot;: &quot;github.com&quot;,
-      &quot;port&quot;: null,
-      &quot;suffix&quot;: null
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
     },
-    &quot;owner&quot;: &quot;dongjae-shin&quot;,
-    &quot;repository&quot;: &quot;LongTermCat&quot;
+    "owner": "dongjae-shin",
+    "repository": "LongTermCat"
   },
-  &quot;editorReviewEnabled&quot;: false
-}</component>
+  "editorReviewEnabled": false
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -156,22 +158,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00012" summary="1. updated extract_indices_target() in extract.py. &#10;2. plot_slope argument of assign_target_values() to be put into plot_tos_data()">
-      <option name="closed" value="true" />
-      <created>1737782055294</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1737782055294</updated>
-    </task>
-    <task id="LOCAL-00013" summary=".">
-      <option name="closed" value="true" />
-      <created>1737881337320</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1737881337320</updated>
     </task>
     <task id="LOCAL-00014" summary="updated extract.py">
       <option name="closed" value="true" />
@@ -549,7 +535,23 @@
       <option name="project" value="LOCAL" />
       <updated>1743144318067</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="refactor extract.py to improve m_catal calculation thanks to corrected data from PSU.">
+      <option name="closed" value="true" />
+      <created>1743211843767</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1743211843767</updated>
+    </task>
+    <task id="LOCAL-00062" summary="comment out unused columns in extract_from_gc_data.py">
+      <option name="closed" value="true" />
+      <created>1743438723937</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1743438723937</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -576,8 +578,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated extract.py by fixing how to calculate initial and final slope for fluctuating data." />
-    <MESSAGE value="updated extract.py" />
     <MESSAGE value="updated extract.py and structure" />
     <MESSAGE value="updated extract.py; implemented GUI for DataForGP.plot_tos_data()." />
     <MESSAGE value="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat" />
@@ -601,7 +601,9 @@
     <MESSAGE value="update extract_from_gc_data.py to change data path for Round Robin GC Results" />
     <MESSAGE value="add plot_heatmap_snr() method to DataAnalysis class in data_analysis.py" />
     <MESSAGE value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
+    <MESSAGE value="refactor extract.py to improve m_catal calculation thanks to corrected data from PSU." />
+    <MESSAGE value="comment out unused columns in extract_from_gc_data.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="comment out unused columns in extract_from_gc_data.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -618,12 +620,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>77</line>
-          <option name="timeStamp" value="97" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>76</line>
+          <line>87</line>
           <option name="timeStamp" value="99" />
         </line-breakpoint>
       </breakpoints>

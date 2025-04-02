@@ -15,6 +15,10 @@ from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
 
 
 class DataAnalysis:
+
+    # Global dictionary for the location
+    location_dict = {'UCSB': 0, 'Cargnello': 1, 'SLAC': 2, 'PSU': 3}
+
     def __init__(self, dataset: DataForGP = None):
         if dataset is None:
             raise ValueError("Please provide a dataset.")
@@ -319,8 +323,21 @@ class DataAnalysis:
         # reset the font size
         plt.rcParams.update({'font.size': 10})
 
-    def plot_tos_data_duplicate(self, column: str = 'CO Forward Production Rate (mol/molRh/s)'):
+    def plot_tos_data_duplicate(self,
+                                column: str = 'CO Forward Production Rate (mol/molRh/s)',
+                                cmap_location: str = 'Set1',
+                                location_dict_auto: bool = False
+                                ):
         group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
+        # If True, automatically make Dictionary that connects the location to unique integer values
+        # If False, use the predefined location_dict
+        if location_dict_auto:
+            location_dict = {loc: i for i, loc in enumerate(self.dataset.df_us['location'].unique())}
+        else:
+            location_dict = self.location_dict
+        # Extract discrete colors corresponding to the number of locations from the colormap, cmap_location
+        cmap = plt.cm.get_cmap(cmap_location, len(location_dict))
+
         for group_id in group_ids:
             file_names = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['filename'].tolist()[0]
             locations = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['location'].tolist()[0]
@@ -329,21 +346,30 @@ class DataAnalysis:
             m_Rh = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['Rh_total_mass'].values[0]
             synth_method = self.dataset.df_stat[self.dataset.df_stat['GroupID'] == group_id]['synth_method'].values[0]
 
+            # Group data by location
+            location_data = {}
             for i, file_name in enumerate(file_names):
-                # element of self.dataset.path_filtered that contains the string 'file_name'
                 path = [s for s in self.dataset.path_filtered if file_name in s][0]
-                # _plot_tos_data(path=path, column=column, show=False)
-
                 temp_threshold = 3.5
                 init_tos_buffer = 0.5
                 duration = 10
                 tos, temp, col_val, initial_index, final_index, selected_index = \
                     _extract_indices_target(path, column, duration, temp_threshold, init_tos_buffer)
+                if locations[i] not in location_data:
+                    location_data[locations[i]] = {'tos': [], 'col_val': [], 'count': 0}
+                location_data[locations[i]]['tos'].extend(tos)
+                location_data[locations[i]]['col_val'].extend(col_val)
+                location_data[locations[i]]['count'] += 1
 
+            # Plot data for each location
+            for location, data in location_data.items():
                 plt.scatter(
-                    tos, col_val,
-                    # color=[0.5, 1.0, 0.5, 1.0],
-                    s=5, label=locations[i]
+                    data['tos'], data['col_val'],
+                    s=10,
+                    edgecolors='gray',
+                    linewidths=0.2,
+                    color=cmap(location_dict[location]),
+                    label=f'{location} ({data["count"]})'
                 )
 
             plt.xlabel('Time on stream (hrs)')
@@ -351,9 +377,6 @@ class DataAnalysis:
             plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')
             plt.legend()
             plt.show()
-
-
-        # self.dataset.df_stat['fi']
 
 
     def pearson_correlation_target(self):
