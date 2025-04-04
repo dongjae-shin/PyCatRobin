@@ -28,7 +28,8 @@ class DataAnalysis:
         self.df_snr = None
 
     def compare_targets_std_dev(
-            self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn'
+            self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn',
+            plot_hist: bool = True
     ):
         """
         Compare the standard deviation of the target values for each column.
@@ -37,6 +38,7 @@ class DataAnalysis:
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
             plot_module_hist (str): The module to use for plotting histograms. Either 'seaborn' or 'plotly'.
+            plot_hist: If True, plot the histogram of the target values.
 
         Returns:
             None
@@ -93,7 +95,8 @@ class DataAnalysis:
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
                             self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
-                                                             plot_module=plot_module_hist)
+                                                             plot_module=plot_module_hist,
+                                                             plot_hist=plot_hist)
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
@@ -120,7 +123,9 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_data_distribution(self, column: str, cmap: str = 'tab10', plot_module: str = 'seaborn'):
+    def _generate_data_distribution(self,
+                                    column: str, cmap: str = 'tab10', plot_module: str = 'seaborn',
+                                    plot_hist: bool = True):
 
         # shallow copy: connected to the original df. it's like using nickname
         df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
@@ -151,7 +156,9 @@ class DataAnalysis:
 
         if plot_module == 'seaborn':
             # Plot a violinplot
-            fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
+            fig, axs = plt.subplots(nrows=2 if plot_hist else 1, ncols=1, sharex=True)
+            if not plot_hist:
+                axs = [axs]
 
             hue_order = df['GroupID'].unique()
             sns.violinplot(
@@ -189,21 +196,22 @@ class DataAnalysis:
             axs[0].legend(handles=legend_elements, title='Location')
             axs[0].set_yticks([])
 
-            # Plot the histogram
-            sns.histplot(
-                df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
-                kde=False, ax=axs[1]
-            )
-            # Make the boundary of axs[1] the same as that of axs[0]
-            axs[1].set_xlim(axs[0].get_xlim())
-            axs[0].set_xlabel('')
+            if plot_hist:
+                # Plot the histogram
+                sns.histplot(
+                    df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
+                    kde=False, ax=axs[1]
+                )
+                # Make the boundary of axs[1] the same as that of axs[0]
+                axs[1].set_xlim(axs[0].get_xlim())
+                axs[0].set_xlabel('')
 
             fig.suptitle(f'Distribution of {column}')
             plt.tight_layout()
             plt.show()
 
-            # Add hover functionality
-            cursor = mplcursors.cursor(strip, hover=True)
+            # # Add hover functionality
+            # cursor = mplcursors.cursor(strip, hover=True)
 
             # @cursor.connect("add")
             # def on_add(sel):
@@ -303,20 +311,22 @@ class DataAnalysis:
         # Plot the heatmap
         fig, ax = plt.subplots(figsize=(10.3, 10))
         # Set the font sizes for the plot
-        plt.rcParams.update({'font.size': 15})
+        label_size = 22
+        annot_size = 18
+        plt.rcParams.update({'font.size': label_size})
         vmax = df_snr.max().max() if vmax is None else vmax
         sns.heatmap(
             df_snr,
             annot=True, fmt='.2f',
-            annot_kws={'fontsize': 12}, # set fontsize for the annotation
+            annot_kws={'fontsize': annot_size}, # set fontsize for the annotation
             cmap=cmap,
             cbar_kws={'label': 'Signal-to-Noise Ratio (SNR)'},
             vmax=vmax, vmin=vmin,
             ax=ax, # use the ax parameter to plot the heatmap on the provided axis
         )
         # Rotate xtick labels
-        plt.xticks(ha='left', fontsize=15, rotation=-30)
-        plt.yticks(ha='center', fontsize=15)
+        plt.xticks(ha='left', fontsize=label_size, rotation=-30)
+        plt.yticks(ha='right', fontsize=label_size, rotation=30)
         plt.tight_layout()
         plt.show()
 
