@@ -104,6 +104,7 @@ class DiscreteGrid:
 
             top_ids = np.argsort(-std)[:n_candidates]  # negativity: sort in reverse order
 
+            # TODO: the results seem to have somthing wrong... all the uncertainties are the same
             # show top 'n_candidates' uncertain conditions
             print(
                 self.X_discrete_wi.join(
