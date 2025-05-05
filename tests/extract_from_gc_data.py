@@ -7,15 +7,23 @@ import analysis.data_analysis as da
 home_dir = os.path.expanduser("~")
 path = (home_dir +
         # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/04 Catalysis Round Robin/01 Round Robin GC Results")
-        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/03 Previous Data/20250404_temporary_data_UCSB+RR")
+        # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/03 Previous Data/20250404_temporary_data_UCSB+RR")
         # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250328_RR_data")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_2")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
+
 # Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
     # "_SLAC",   # data from SLAC
+    "_UCSB",  # data from UCSB
+    "_Cargnello", # data from Cargnello
+    "PSU",
 ]
 
 # Create an instance of DataForGP
@@ -39,19 +47,19 @@ savgol=False
 
 for column in [
    'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
-   # 'CO Net Production Rate (mol/molRh/s)',
-   # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'CH4 Net Production Rate (mol/molRh/s)',
+   'CO Net Production Rate (mol/molRh/s)',
+   'CO Forward Production Rate (mol/molRh/s)',
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         methods=[
-            # 'initial value',
-            # 'final value',
-            # 'initial slope',
-            # 'final slope',
-            # 'overall slope',
-            'delta'
+            'initial value',
+            'final value',
+            'initial slope',
+            'final slope',
+            'overall slope',
+            # 'delta'
         ],
         column=column,
         temp_threshold=3.5,
@@ -76,14 +84,14 @@ dataset.calculate_statistics_duplicate_group(verbose=False)
 analysis = da.DataAnalysis(dataset=dataset)
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)')
-# analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
+analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
 # analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)')
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)')
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)')
 # analysis.plot_heatmap_snr(vmax=7.53)
-# analysis.plot_heatmap_snr(vmax=2.5)
-# analysis.compare_targets_std_dev(target_wise=True, plot_hist=False)
+analysis.plot_heatmap_snr(vmax=2.5)
+analysis.compare_targets_std_dev(target_wise=True, plot_hist=False)
 
 # Export the processed data
-dataset.export_sheet(unique=True)
-dataset.export_sheet(unique=False)
+# dataset.export_sheet(unique=True)
+# dataset.export_sheet(unique=False)
