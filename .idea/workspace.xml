@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="comment out unused columns in extract_from_gc_data.py">
-      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update extract_from_gc_data.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,23 +48,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/dongjae-shin/LongTermCat.git",
-    "accountId": "13aebc2b-0e60-47c8-9aa0-f9a1590f00e6"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dongjae-shin/LongTermCat.git&quot;,
+    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
   },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
     },
-    "owner": "dongjae-shin",
-    "repository": "LongTermCat"
+    &quot;owner&quot;: &quot;dongjae-shin&quot;,
+    &quot;repository&quot;: &quot;LongTermCat&quot;
   },
-  "editorReviewEnabled": false
-}]]></component>
+  &quot;editorReviewEnabled&quot;: false
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -73,7 +72,6 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2rJKNZ2JyLVSqylxh9ULetLmHeq" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -158,46 +156,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00014" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1737920242685</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1737920242685</updated>
-    </task>
-    <task id="LOCAL-00015" summary="updated submodule structure and project name">
-      <option name="closed" value="true" />
-      <created>1738167717292</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1738167717292</updated>
-    </task>
-    <task id="LOCAL-00016" summary="updated extract.py by fixing how to calculate initial and final slope for fluctuating data.">
-      <option name="closed" value="true" />
-      <created>1738308619598</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1738308619598</updated>
-    </task>
-    <task id="LOCAL-00017" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1738312468129</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1738312468129</updated>
-    </task>
-    <task id="LOCAL-00018" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1738314212394</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1738314212395</updated>
     </task>
     <task id="LOCAL-00019" summary="updated extract.py">
       <option name="closed" value="true" />
@@ -551,7 +509,47 @@
       <option name="project" value="LOCAL" />
       <updated>1743438723937</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="refactor DataAnalysis class to include location dictionary and enhance plot_tos_data_duplicate method for better location data handling">
+      <option name="closed" value="true" />
+      <created>1743556699816</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1743556699816</updated>
+    </task>
+    <task id="LOCAL-00064" summary="refactor data_analysis.py to enhance compare_targets_std_dev and _generate_data_distribution methods with optional histogram plotting">
+      <option name="closed" value="true" />
+      <created>1743805004334</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1743805004334</updated>
+    </task>
+    <task id="LOCAL-00065" summary="update extract_from_gc_data.py to change data path and comment out unused keywords and method calls">
+      <option name="closed" value="true" />
+      <created>1743817863377</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1743817863377</updated>
+    </task>
+    <task id="LOCAL-00066" summary="add TODO comment in acquisition.py to address potential issue with uniform uncertainties">
+      <option name="closed" value="true" />
+      <created>1744221511416</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1744221511416</updated>
+    </task>
+    <task id="LOCAL-00067" summary="update extract_from_gc_data.py">
+      <option name="closed" value="true" />
+      <created>1746417157903</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1746417157903</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -578,11 +576,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated extract.py and structure" />
-    <MESSAGE value="updated extract.py; implemented GUI for DataForGP.plot_tos_data()." />
-    <MESSAGE value="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat" />
-    <MESSAGE value="added data_analysis.py" />
-    <MESSAGE value="updated extract.py and data_analysis.py" />
     <MESSAGE value="updated calculate_statistics_duplicate_group in extract.py and _generate_histogram in data_analysis.py;" />
     <MESSAGE value="updated data_analysis.py;" />
     <MESSAGE value="updated data_analysis.py so it can plot violin, strip, and histplot (seaborn) together in _generate_histogram()." />
@@ -603,7 +596,12 @@
     <MESSAGE value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
     <MESSAGE value="refactor extract.py to improve m_catal calculation thanks to corrected data from PSU." />
     <MESSAGE value="comment out unused columns in extract_from_gc_data.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="comment out unused columns in extract_from_gc_data.py" />
+    <MESSAGE value="refactor DataAnalysis class to include location dictionary and enhance plot_tos_data_duplicate method for better location data handling" />
+    <MESSAGE value="refactor data_analysis.py to enhance compare_targets_std_dev and _generate_data_distribution methods with optional histogram plotting" />
+    <MESSAGE value="update extract_from_gc_data.py to change data path and comment out unused keywords and method calls" />
+    <MESSAGE value="add TODO comment in acquisition.py to address potential issue with uniform uncertainties" />
+    <MESSAGE value="update extract_from_gc_data.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="update extract_from_gc_data.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -619,9 +617,24 @@
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
-          <line>87</line>
-          <option name="timeStamp" value="99" />
+          <url>file://$PROJECT_DIR$/data/extract.py</url>
+          <line>846</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data/extract.py</url>
+          <line>849</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data/extract.py</url>
+          <line>852</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data/extract.py</url>
+          <line>855</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

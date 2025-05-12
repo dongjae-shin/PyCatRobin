@@ -10,6 +10,7 @@ from matplotlib.lines import Line2D
 from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
 from openpyxl.styles.builtins import styles
+from statsmodels.formula.api import nominal_gee
 
 from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
 
@@ -19,11 +20,12 @@ class DataAnalysis:
     # Global dictionary for the location
     location_dict = {'UCSB': 0, 'Cargnello': 1, 'SLAC': 2, 'PSU': 3}
 
-    def __init__(self, dataset: DataForGP = None):
+    def __init__(self, dataset: DataForGP = None, dataset_all: DataForGP = None):
         if dataset is None:
             raise ValueError("Please provide a dataset.")
 
         self.dataset = dataset
+        self.dataset_all = dataset_all
         self.unique_properties = None
         self.df_snr = None
 
@@ -195,6 +197,7 @@ class DataAnalysis:
                 )
             axs[0].legend(handles=legend_elements, title='Location')
             axs[0].set_yticks([])
+            # axs[0].set_xlim(-3.3, 9.7)
 
             if plot_hist:
                 # Plot the histogram
@@ -256,17 +259,20 @@ class DataAnalysis:
     def plot_heatmap_snr(
             self,
             properties: list[str] = None, methods: list[str] = None,
-            vmax: float = None, vmin: float = 0, cmap: str = 'Reds'
+            vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
+            use_dataset_all: bool = False
     ):
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
 
         Args:
+            use_dataset_all:
             properties (list(str)): The list of properties to plot.
             methods (list(str)): The list of methods to plot.
             vmax (float): The maximum value of the colorbar.
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
+            use_dataset_all (bool): If True, additionally use the dataset_all; otherwise, use only the dataset.
 
         Returns:
             None
@@ -294,14 +300,17 @@ class DataAnalysis:
         # Make the row index corresponds to methods and the column index corresponds to properties
         df_snr = pd.DataFrame(index=methods, columns=properties)
 
-        # sort index and column names of df_snr
+        # Sort index and column names of df_snr so the axes of the heatmap are shown in a consistent order
         df_snr.sort_index(axis=0, inplace=True)
         df_snr.sort_index(axis=1, inplace=True)
 
         for prop in properties:
             for method in methods:
                 column = f'{prop}_{method}_std'
-                snr = self.dataset.df_stat[column].iloc[-1] / self.dataset.df_stat[column].iloc[:-1].max()
+                if use_dataset_all:
+                    snr = self.dataset_all.df_stat[column].iloc[-1] / self.dataset.df_stat[column].iloc[:-1].max()
+                else:
+                    snr = self.dataset.df_stat[column].iloc[-1] / self.dataset.df_stat[column].iloc[:-1].max()
                 df_snr.loc[method, prop] = snr
         self.df_snr = df_snr
 
@@ -336,7 +345,8 @@ class DataAnalysis:
     def plot_tos_data_duplicate(self,
                                 column: str = 'CO Forward Production Rate (mol/molRh/s)',
                                 cmap_location: str = 'Set1',
-                                location_dict_auto: bool = False
+                                location_dict_auto: bool = False,
+                                x_max_plot: float = 20
                                 ):
         group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
         # If True, automatically make Dictionary that connects the location to unique integer values
@@ -382,6 +392,7 @@ class DataAnalysis:
                     label=f'{location} ({data["count"]})'
                 )
 
+            plt.xlim(0, x_max_plot)
             plt.xlabel('Time on stream (hrs)')
             plt.ylabel(column)
             plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')
