@@ -233,8 +233,6 @@ class DataAnalysis:
             # def on_add(sel):
             #     sel.annotation.set(text=)
 
-            plt.show()
-
         if plot_module == 'plotly':
             import plotly.express as px
 

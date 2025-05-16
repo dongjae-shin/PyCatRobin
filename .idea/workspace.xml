@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot.">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,22 +153,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00021" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1738320494459</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1738320494459</updated>
-    </task>
-    <task id="LOCAL-00022" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1738593263676</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1738593263676</updated>
     </task>
     <task id="LOCAL-00023" summary="updated extract.py and structure">
       <option name="closed" value="true" />
@@ -548,7 +530,23 @@
       <option name="project" value="LOCAL" />
       <updated>1747358813690</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="1.updated data_analysis.py to enable choosing either vertical or horizontal version of violinplot through compare_targets_std_dev(). &#10;2.simplified the code in _generate_data_distribution_horizontal as in vertical version.">
+      <option name="closed" value="true" />
+      <created>1747360292943</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1747360292943</updated>
+    </task>
+    <task id="LOCAL-00071" summary="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage">
+      <option name="closed" value="true" />
+      <created>1747360437385</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1747360437385</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -575,8 +573,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated data_analysis.py so it can plot violin, strip, and histplot (seaborn) together in _generate_histogram()." />
-    <MESSAGE value="updated data_analysis.py" />
     <MESSAGE value="updated extract_from_gc_data.py" />
     <MESSAGE value="updated extract_from_gc_data.py and extract.py" />
     <MESSAGE value="updated gaussian_process.py" />
@@ -600,7 +596,9 @@
     <MESSAGE value="update extract_from_gc_data.py" />
     <MESSAGE value="update data_analysis.py to calculate SNRs for each location" />
     <MESSAGE value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
-    <option name="LAST_COMMIT_MESSAGE" value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
+    <MESSAGE value="1.updated data_analysis.py to enable choosing either vertical or horizontal version of violinplot through compare_targets_std_dev(). &#10;2.simplified the code in _generate_data_distribution_horizontal as in vertical version." />
+    <MESSAGE value="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage" />
+    <option name="LAST_COMMIT_MESSAGE" value="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
