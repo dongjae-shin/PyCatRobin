@@ -195,7 +195,7 @@ class DataAnalysis:
             groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
             df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
             # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.2, 0.2, size=len(df))
+            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
 
             sns.scatterplot(
                 df, x=column, y='GroupID_jitter',
@@ -324,7 +324,7 @@ class DataAnalysis:
             groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
             df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
             # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.2, 0.2, size=len(df))
+            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
 
             sns.scatterplot(
                 df, x='GroupID_jitter', y=column,
