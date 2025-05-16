@@ -1,4 +1,11 @@
+import sys
 import os
+
+# # Add the project root to sys.path so I can import submodules
+# project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
+# if project_root not in sys.path:
+#     sys.path.insert(0, project_root)
+
 import numpy as np
 
 import data.extract as ex
@@ -118,16 +125,15 @@ analysis = da.DataAnalysis(
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-# analysis.compare_targets_std_dev(
-#     target_wise=True, plot_hist=False,
-#     violinplot_direction='vertical'
-# )
+analysis.compare_targets_std_dev(
+    target_wise=True, plot_hist=False,
+    violinplot_direction='vertical'
+)
 
 # analysis._generate_data_distribution_horizontal(
-analysis._generate_data_distribution_vertical(
-    column='CO Net Production Rate (mol/molRh/s)_initial value',
-    plot_hist=False
-)
+#     column='CO Net Production Rate (mol/molRh/s)_initial value',
+#     plot_hist=False
+# )
 
 # Export the processed data
 # dataset.export_sheet(unique=True)
