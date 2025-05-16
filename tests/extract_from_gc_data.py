@@ -112,6 +112,7 @@ analysis = da.DataAnalysis(
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12)
 # analysis.plot_heatmap_snr(vmax=50, use_dataset_all=True)
+# TODO: modify compare_targets_std_dev() so it can use dataset_all.
 # analysis.plot_heatmap_snr(vmax=2.5)
 
 # average_value = analysis.df_snr.mean().mean()
