@@ -21,6 +21,12 @@ class DataAnalysis:
     location_dict = {'UCSB': 0, 'Cargnello': 1, 'SLAC': 2, 'PSU': 3}
 
     def __init__(self, dataset: DataForGP = None, dataset_all: DataForGP = None):
+        """
+        Initialize the DataAnalysis class.
+        Args:
+            dataset: dataset to be analyzed by standard deviation, signal-to-noise ratio (SNR), etc.
+            dataset_all: use this to compare the whole dataset's standard deviation with the one of each subset (w.r.t. location) in violinplot, SNR, barplot, etc.
+        """
         if dataset is None:
             raise ValueError("Please provide a dataset.")
 
@@ -96,7 +102,7 @@ class DataAnalysis:
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
+                            self._generate_data_distribution_vertical(column=col.rstrip("_std"), cmap=colors,
                                                              plot_module=plot_module_hist,
                                                              plot_hist=plot_hist)
                     fig.canvas.mpl_connect('button_press_event', on_click)
@@ -125,7 +131,7 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def _generate_data_distribution(self,
+    def _generate_data_distribution_horizontal(self,
                                     column: str, cmap: str = 'tab10', plot_module: str = 'seaborn',
                                     plot_hist: bool = True):
 
@@ -207,6 +213,8 @@ class DataAnalysis:
                 )
                 # Make the boundary of axs[1] the same as that of axs[0]
                 axs[1].set_xlim(axs[0].get_xlim())
+                # Make the y tick labels integer
+                axs[1].set_yticks(np.arange(0, axs[1].get_ylim()[1], 2))
                 axs[0].set_xlabel('')
 
             fig.suptitle(f'Distribution of {column}')
@@ -256,6 +264,94 @@ class DataAnalysis:
             # app.run_server(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
             app.run(debug=False, use_reloader=False)  # Turn off reloader if inside Jupyter
 
+    def _generate_data_distribution_vertical(self,
+                                    column: str, cmap: str = 'tab10', plot_module: str = 'seaborn',
+                                    plot_hist: bool = True):
+
+        # shallow copy: connected to the original df. it's like using nickname
+        df_stat = self.dataset.df_stat.copy().reset_index(drop=True)
+        i=1
+        # Initialize the DataFrame with the first group's data
+        df = pd.DataFrame(
+            {'filename'       : df_stat[df_stat['GroupID'] == i]['filename'][i-1],
+             'experiment_date': df_stat[df_stat['GroupID'] == i]['experiment_date'][i-1],
+             'GroupID'        : [i] * len(df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]),
+             'location'       : df_stat[df_stat['GroupID'] == i]['location'][i-1],
+             f'{column}'      : df_stat[df_stat['GroupID'] == i][f'{column}_list'][i-1]}
+        ) # 'GroupID' -> len(): to extract number of groups + total
+        # Concatenate other groups' data to the DataFrame in axis=0
+        for i, group in enumerate(df_stat['GroupID'].unique()[1:]): # slicing: to exclude the group 'total'
+            df = pd.concat((
+                df,
+                pd.DataFrame(
+                {'filename'       : df_stat[df_stat['GroupID'] == group]['filename'][i+1],
+                 'experiment_date': df_stat[df_stat['GroupID'] == group]['experiment_date'][i+1],
+                 'GroupID'        : [group] * len(df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]),
+                 'location'       : df_stat[df_stat['GroupID'] == group]['location'][i+1],
+                 f'{column}'      : df_stat[df_stat['GroupID'] == group][f'{column}_list'][i+1]}
+                )
+            ), axis=0)
+        df.reset_index(drop=True, inplace=True)
+        # set values of column, of which GroupID is 'total', to 'all'
+        df.loc[df['GroupID'] == 'total', 'location'] = 'all'
+
+        if plot_module == 'seaborn':
+            # Plot a violinplot
+            fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
+            if not plot_hist:
+                axs = [axs]
+
+            hue_order = df['GroupID'].unique()
+
+            sns.violinplot(
+                df, x='GroupID', y=column,
+                # hue='GroupID',
+                split=False, inner='stick',
+                palette=cmap,
+                ax=axs[0],
+                legend=False,
+                # hue_order=hue_order,
+                zorder=0
+            )
+
+            # Scatterplot instead of stripplot was used to give different markers to different locations
+            # the style argument to differentiate the locations is not supported in stripplot
+            # Step 1: Map each unique GroupID to a numeric position
+            groupid_labels = df['GroupID'].astype(str).unique()
+            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
+            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
+            # Step 2: Add jitter
+            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.2, 0.2, size=len(df))
+
+            sns.scatterplot(
+                df, x='GroupID_jitter', y=column,
+                hue='location',
+                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
+                ax=axs[0], legend=True,
+                style='location', edgecolor='w', s=30,
+                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
+                # hue_order=hue_order,
+                zorder=2
+            )
+            axs[0].set_xticks(list(groupid_to_num.values()))
+            axs[0].set_xticklabels(list(groupid_to_num.keys()))
+
+            if plot_hist:
+                # Plot the histogram
+                sns.histplot(
+                    df, y=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
+                    kde=False, ax=axs[1]
+                )
+                # Make the boundary of axs[1] the same as that of axs[0]
+                axs[1].set_ylim(axs[0].get_ylim())
+                # Make the x tick labels integer
+                axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
+                axs[1].set_ylabel('')
+
+            fig.suptitle(f'Distribution of {column}')
+            plt.tight_layout()
+            plt.show()
+
     def plot_heatmap_snr(
             self,
             properties: list[str] = None, methods: list[str] = None,
@@ -266,7 +362,7 @@ class DataAnalysis:
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
 
         Args:
-            use_dataset_all:
+            use_dataset_all: whether to use the dataset_all to calculate std. dev. as the nominator of SNR. When DataAnalysis instance does not have dataset_all, it is automatically set to False.
             properties (list(str)): The list of properties to plot.
             methods (list(str)): The list of methods to plot.
             vmax (float): The maximum value of the colorbar.
@@ -303,6 +399,10 @@ class DataAnalysis:
         # Sort index and column names of df_snr so the axes of the heatmap are shown in a consistent order
         df_snr.sort_index(axis=0, inplace=True)
         df_snr.sort_index(axis=1, inplace=True)
+
+        if self.dataset_all is None:
+            use_dataset_all = False
+            print('DataAnalysis instance does not have dataset_all. Original definition of signal-to-noise ratio is used.')
 
         for prop in properties:
             for method in methods:
