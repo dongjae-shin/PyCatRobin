@@ -37,16 +37,18 @@ class DataAnalysis:
 
     def compare_targets_std_dev(
             self, target_wise: bool = False, colormap: str = 'tab10', plot_module_hist: str = 'seaborn',
-            plot_hist: bool = True
+            plot_hist: bool = True, violinplot_direction: str = 'vertical'
     ):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
+            violinplot_direction:
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
             plot_module_hist (str): The module to use for plotting histograms. Either 'seaborn' or 'plotly'.
             plot_hist: If True, plot the histogram of the target values.
+            violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
 
         Returns:
             None
@@ -102,9 +104,14 @@ class DataAnalysis:
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_data_distribution_vertical(column=col.rstrip("_std"), cmap=colors,
-                                                             plot_module=plot_module_hist,
-                                                             plot_hist=plot_hist)
+                            if violinplot_direction == 'vertical':
+                                self._generate_data_distribution_vertical(column=col.rstrip("_std"), cmap=colors,
+                                                                          plot_module=plot_module_hist,
+                                                                          plot_hist=plot_hist)
+                            else:
+                                self._generate_data_distribution_horizontal(column=col.rstrip("_std"), cmap=colors,
+                                                                          plot_module=plot_module_hist,
+                                                                          plot_hist=plot_hist)
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
@@ -168,42 +175,40 @@ class DataAnalysis:
             if not plot_hist:
                 axs = [axs]
 
-            hue_order = df['GroupID'].unique()
+            # hue_order = df['GroupID'].unique()
+
             sns.violinplot(
-                df, x=column,  hue='GroupID', split=False, inner='stick', palette=cmap, ax=axs[0],
-                legend=False, hue_order=hue_order
+                df, x=column, y='GroupID',
+                hue='GroupID',
+                split=False, inner='stick',
+                palette=cmap,
+                ax=axs[0],
+                legend=False,
+                # hue_order=hue_order,
+                zorder=0
             )
 
-            # Overlay a stripplot to the violinplot to differentiate the 'location'
-            markers = ['X', 'o', 'P', '^', '*', 'v', 'D', 'P',]
-            colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray']
-            legend_elements = []
-            locmarks = [[df['location'].unique()[i], markers[i], colors[i]] for i in range(len(df['location'].unique()))]
-            # Manually implement the legend for the location since seaborn does not support it
-            for locmark in locmarks:
-                # Select the data for the location
-                df_selected = df[df['location'] == locmark[0]].reset_index(drop=True)
-                # Add dummy rows so df_selected has always all GroupID values -> use the same hue range with the violin plot
-                for i, group_id in enumerate(hue_order):
-                    with warnings.catch_warnings(action="ignore"):
-                        df_selected.loc[len(df_selected)+i+1] = [None, None, group_id, 'dummy_location', None]#df_selected.iloc[0] # add a row to avoid the error of the last row
-                # Plot the strip plot for the location with the corresponding marker
-                strip = sns.stripplot(
-                    df_selected, x=column,  hue='GroupID', jitter=True, dodge=True,
-                    palette=[locmark[2]] * len(hue_order),
-                    ax=axs[0], legend=False, size=5, marker=locmark[1],
-                    linewidth=0.5, edgecolor='w', hue_order=hue_order,
-                )
-                # Add the legend element that is not tied to the plot but corresponds to locmark
-                legend_elements.append(
-                    Line2D(
-                        [0], [0], label=locmark[0], marker=locmark[1], color='w',
-                        markersize=9, markeredgecolor='w', markerfacecolor=locmark[2]
-                    )
-                )
-            axs[0].legend(handles=legend_elements, title='Location')
-            axs[0].set_yticks([])
-            # axs[0].set_xlim(-3.3, 9.7)
+            # Scatterplot instead of stripplot was used to give different markers to different locations
+            # the style argument to differentiate the locations is not supported in stripplot
+            # Step 1: Map each unique GroupID to a numeric position
+            groupid_labels = df['GroupID'].astype(str).unique()
+            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
+            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
+            # Step 2: Add jitter
+            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.2, 0.2, size=len(df))
+
+            sns.scatterplot(
+                df, x=column, y='GroupID_jitter',
+                hue='location',
+                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
+                ax=axs[0], legend=True,
+                style='location', edgecolor='w', s=30,
+                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
+                # hue_order=hue_order,
+                zorder=2
+            )
+            axs[0].set_yticks(list(groupid_to_num.values()))
+            axs[0].set_yticklabels(list(groupid_to_num.keys()))
 
             if plot_hist:
                 # Plot the histogram
@@ -301,11 +306,11 @@ class DataAnalysis:
             if not plot_hist:
                 axs = [axs]
 
-            hue_order = df['GroupID'].unique()
+            # hue_order = df['GroupID'].unique()
 
             sns.violinplot(
                 df, x='GroupID', y=column,
-                # hue='GroupID',
+                hue='GroupID',
                 split=False, inner='stick',
                 palette=cmap,
                 ax=axs[0],

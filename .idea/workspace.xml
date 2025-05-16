@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update data_analysis.py to calculate SNRs for each location">
-      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
@@ -157,14 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00020" summary="updated extract.py">
-      <option name="closed" value="true" />
-      <created>1738320297679</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1738320297679</updated>
     </task>
     <task id="LOCAL-00021" summary="updated extract.py">
       <option name="closed" value="true" />
@@ -550,7 +540,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747064674452</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot.">
+      <option name="closed" value="true" />
+      <created>1747358813690</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1747358813690</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -577,7 +575,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated data_analysis.py;" />
     <MESSAGE value="updated data_analysis.py so it can plot violin, strip, and histplot (seaborn) together in _generate_histogram()." />
     <MESSAGE value="updated data_analysis.py" />
     <MESSAGE value="updated extract_from_gc_data.py" />
@@ -602,7 +599,8 @@
     <MESSAGE value="add TODO comment in acquisition.py to address potential issue with uniform uncertainties" />
     <MESSAGE value="update extract_from_gc_data.py" />
     <MESSAGE value="update data_analysis.py to calculate SNRs for each location" />
-    <option name="LAST_COMMIT_MESSAGE" value="update data_analysis.py to calculate SNRs for each location" />
+    <MESSAGE value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
+    <option name="LAST_COMMIT_MESSAGE" value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -616,21 +614,6 @@
           <url>file://$PROJECT_DIR$/tests/plot_tos_curves.py</url>
           <line>34</line>
           <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>171</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>179</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>361</line>
-          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

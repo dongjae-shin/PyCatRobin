@@ -117,16 +117,15 @@ analysis = da.DataAnalysis(
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-# analysis.compare_targets_std_dev(target_wise=True, plot_hist=False)
-# analysis._generate_data_distribution(
-#     column='CO Net Production Rate (mol/molRh/s)_initial value',
-#     # plot_hist=False
-# )
-
-analysis._generate_data_distribution_vertical(
-    column='CO Net Production Rate (mol/molRh/s)_initial value',
-    # plot_hist=False
+analysis.compare_targets_std_dev(
+    target_wise=True, plot_hist=False,
+    violinplot_direction='vertical'
 )
+
+# analysis._generate_data_distribution_horizontal(
+#     column='CO Net Production Rate (mol/molRh/s)_initial value',
+#     plot_hist=False
+# )
 
 # Export the processed data
 # dataset.export_sheet(unique=True)
