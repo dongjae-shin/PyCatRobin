@@ -449,7 +449,8 @@ class DataAnalysis:
                                 column: str = 'CO Forward Production Rate (mol/molRh/s)',
                                 cmap_location: str = 'Set1',
                                 location_dict_auto: bool = False,
-                                x_max_plot: float = 20
+                                x_max_plot: float = None,
+                                y_max_plot: float = None,
                                 ):
         group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
         # If True, automatically make Dictionary that connects the location to unique integer values
@@ -494,8 +495,10 @@ class DataAnalysis:
                     color=cmap(location_dict[location]),
                     label=f'{location} ({data["count"]})'
                 )
-
-            plt.xlim(0, x_max_plot)
+            if x_max_plot:
+                plt.xlim(0, x_max_plot)
+            if y_max_plot:
+                plt.ylim(0, y_max_plot)
             plt.xlabel('Time on stream (hrs)')
             plt.ylabel(column)
             plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')

@@ -1,12 +1,11 @@
 import sys
 import os
+import numpy as np
 
 # # Add the project root to sys.path so I can import submodules
 # project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
 # if project_root not in sys.path:
 #     sys.path.insert(0, project_root)
-
-import numpy as np
 
 import data.extract as ex
 import analysis.data_analysis as da
@@ -22,21 +21,21 @@ path = (home_dir +
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
-        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/250502_Round_Robin/250505_finalized_RR_data/alldata")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/250502_Round_Robin/250505_finalized_RR_data/premix")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/premix")
 
 # Keywords to exclude
 exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
-    # "_UCSB",  # data from UCSB
-    # "_Cargnello", # data from Cargnello
+    "_UCSB",  # data from UCSB
+    "_Cargnello", # data from Cargnello
     # "_SLAC",   # data from SLAC
-    # "PSU",
+    "_PSU",
 ]
 exclude_keywords_all = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -113,11 +112,11 @@ analysis = da.DataAnalysis(
     # dataset_all=dataset_all
 )
 
-# analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12)
+analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
-# analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12)
-# analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12)
-# analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12)
+analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
+analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
+analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 # analysis.plot_heatmap_snr(vmax=50, use_dataset_all=True)
 # TODO: modify compare_targets_std_dev() so it can use dataset_all.
 # analysis.plot_heatmap_snr(vmax=2.5)
