@@ -20,33 +20,36 @@ class DataAnalysis:
     # Global dictionary for the location
     location_dict = {'UCSB': 0, 'Cargnello': 1, 'SLAC': 2, 'PSU': 3}
 
-    def __init__(self, dataset: DataForGP = None, dataset_all: DataForGP = None):
+    def __init__(self, dataset: DataForGP = None):
         """
         Initialize the DataAnalysis class.
         Args:
             dataset: dataset to be analyzed by standard deviation, signal-to-noise ratio (SNR), etc.
-            dataset_all: use this to compare the whole dataset's standard deviation with the one of each subset (w.r.t. location) in violinplot, SNR, barplot, etc.
         """
         if dataset is None:
             raise ValueError("Please provide a dataset.")
 
         self.dataset = dataset
-        self.dataset_all = dataset_all
         self.df_stat = None
         self.unique_properties = None
         self.df_snr = None
         self.df_violinplot = None
 
-    def calculate_statistics_duplicate_group(self, verbose: bool = False):
+    def calculate_statistics_duplicate_group(self, verbose: bool = False,
+                                             dataset_all: DataForGP = None,
+                                             total: str = 'unique'):
         """
         Calculate statistics for duplicate groups. The statistics include the mean, standard deviation of each target, and
-        the total standard deviation of each target in the unique dataset. The calculated statistics are stored in the
-        DataFrame `self.df_stat`. The DataFrame `self.df_stat` is constructed by integrating the columns of the first
-        row in each duplicate group. The columns of the DataFrame `self.df_stat` are the same as the columns of the
-        DataFrame `self.df_us` except for the target values.
+        the total standard deviation of each target in the selected dataset by 'dataset_all' and 'total'. The calculated
+        statistics are stored in the DataFrame `self.df_stat`. The DataFrame `self.df_stat` is constructed by integrating
+        the columns of the first row in each duplicate group. The columns of the DataFrame `self.df_stat` are the same as the columns of the
+        DataFrame `self.df_us` except for the target values. self.df_stat is the core of statistical analyses including
+        signal-to-noise ratio (SNR), standard deviation, histogram, and violin plot.
 
         Args:
+            dataset_all: If provided, use this dataset to estimate the true variability of each target metric instead of self.dataset.
             verbose (bool): If True, print the calculated statistics.
+            total (str): 'unique' or 'duplicate'. If 'unique', duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability of each target metric.
 
         Returns:
             None
@@ -98,17 +101,37 @@ class DataAnalysis:
                 # append an integrated row
                 self.df_stat.loc[i-1] = df_integrated
 
-            # add a row for total unique data
+            # Define the total dataset to use for statistics calculation
+            if dataset_all is None:
+                if total == 'unique':
+                    # to be deprecated; stardard dev. of averages is not the same with standard dev. of all the data
+                    df_total_defined = self.dataset.df_us_unique
+                    print("Using unique dataset (dataset.df_us_unique) for total statistics.")
+                elif total == 'duplicate':
+                    df_total_defined = self.dataset.df_us
+                    print("Using duplicate dataset (dataset.df_us) for total statistics.")
+            elif dataset_all is not None:
+                if total == 'unique': # to be deprecated
+                    df_total_defined = dataset_all.df_us_unique
+                    print("Using unique dataset (dataset_all.df_us_unique) for total statistics.")
+                elif total == 'duplicate':
+                    df_total_defined = dataset_all.df_us
+                    print("Using duplicate dataset (dataset_all.df_us) for total statistics.")
+
+            # Add a row for the defined total data
             df_integrated[:] = None # dummy
-            # calculate statistics of each target for each duplicate group
+
+            # Calculate statistics of each target for each duplicate group
             for target in self.dataset.targets:
-                std = self.dataset.df_us_unique[target].std()
+                # std = self.dataset.df_us_unique[target].std() # std. dev. of averages; to be deprecated
+                std = df_total_defined[target].std()
                 if verbose:
                     print(f'total std. dev. of {target}: {std:5.2f}')
                 df_integrated.loc[f'{target}_std'] = std
                 df_integrated.loc['GroupID'] = 'total' # unique
-                df_integrated.loc[f'{target}_list'] = self.dataset.df_us_unique[target].to_list()
-            # append an integrated row
+                # df_integrated.loc[f'{target}_list'] = self.dataset.df_us_unique[target].to_list()
+                df_integrated.loc[f'{target}_list'] = df_total_defined[target].to_list()
+            # append an integrated row at the end of the self.df_stat DataFrame
             self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 
     def compare_targets_std_dev(
@@ -166,10 +189,8 @@ class DataAnalysis:
                     sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
                                 hue='GroupID', legend=False)
                     # Set the title of the subplot with the signal-to-noise ratio (SNR)
-                    snr = float(
-                        df_melted.loc[df_melted['GroupID'] == 'total', 'Standard Deviation'] / \
-                        df_melted.loc[df_melted['GroupID'] != 'total', 'Standard Deviation'].max()
-                    )
+                    snr = df_melted.loc[df_melted['GroupID'] == 'total', 'Standard Deviation'].values[0] / \
+                          df_melted.loc[df_melted['GroupID'] != 'total', 'Standard Deviation'].max()
 
                     axs[i].set_title(f'{column.split("_")[1]} (SNR={snr:.2f})', fontsize=12)
 
@@ -362,19 +383,16 @@ class DataAnalysis:
             self,
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
-            use_dataset_all: bool = False
     ):
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
 
         Args:
-            use_dataset_all: whether to use the dataset_all to calculate std. dev. as the nominator of SNR. When DataAnalysis instance does not have dataset_all, it is automatically set to False.
             properties (list(str)): The list of properties to plot.
             methods (list(str)): The list of methods to plot.
             vmax (float): The maximum value of the colorbar.
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
-            use_dataset_all (bool): If True, additionally use the dataset_all; otherwise, use only the dataset.
 
         Returns:
             None
@@ -406,17 +424,12 @@ class DataAnalysis:
         df_snr.sort_index(axis=0, inplace=True)
         df_snr.sort_index(axis=1, inplace=True)
 
-        if self.dataset_all is None:
-            use_dataset_all = False
-            print('DataAnalysis instance does not have dataset_all. Original definition of signal-to-noise ratio is used.')
-
         for prop in properties:
             for method in methods:
                 column = f'{prop}_{method}_std'
-                if use_dataset_all:
-                    snr = self.dataset_all.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
-                else:
-                    snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
+                snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
+                snr = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                      self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
                 df_snr.loc[method, prop] = snr
         self.df_snr = df_snr
 

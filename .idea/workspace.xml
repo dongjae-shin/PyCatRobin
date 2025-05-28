@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="update data_analysis.py to add optional y_max_plot parameter and adjust plot limits accordingly" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="merged df_stat_in_DataAnalysis branch into main.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,7 +91,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "ShowUsagesActions.previewPropertyKey": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "rm__dtset__all__modify__df__stat",
     "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
@@ -151,14 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00027" summary="added data_analysis.py">
-      <option name="closed" value="true" />
-      <created>1738717703140</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1738717703140</updated>
     </task>
     <task id="LOCAL-00028" summary="updated extract.py and data_analysis.py">
       <option name="closed" value="true" />
@@ -544,7 +540,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747542508386</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="merged df_stat_in_DataAnalysis branch into main.">
+      <option name="closed" value="true" />
+      <created>1748394623123</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1748394623124</updated>
+    </task>
+    <option name="localTasksCounter" value="77" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -591,7 +595,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated acquisition.py" />
     <MESSAGE value="updated acquisition.py and grid_construction.py" />
     <MESSAGE value="enhanced data_analysis.py to include color differentiation in stripplot markers" />
     <MESSAGE value="add latest data sheet" />
@@ -616,7 +619,8 @@
     <MESSAGE value="update data_analysis.py" />
     <MESSAGE value="refactor extract_from_gc_data.py" />
     <MESSAGE value="update data_analysis.py to add optional y_max_plot parameter and adjust plot limits accordingly" />
-    <option name="LAST_COMMIT_MESSAGE" value="update data_analysis.py to add optional y_max_plot parameter and adjust plot limits accordingly" />
+    <MESSAGE value="merged df_stat_in_DataAnalysis branch into main." />
+    <option name="LAST_COMMIT_MESSAGE" value="merged df_stat_in_DataAnalysis branch into main." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -633,7 +637,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/analysis/data_analysis.py</url>
-          <line>248</line>
+          <line>269</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>

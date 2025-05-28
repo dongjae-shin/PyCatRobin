@@ -34,7 +34,7 @@ exclude_keywords = [
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
     # "_UCSB",  # data from UCSB
     # "_Cargnello", # data from Cargnello
-    # "_SLAC",   # data from SLAC
+    "_SLAC",   # data from SLAC
     # "_PSU",
 ]
 exclude_keywords_all = [
@@ -48,7 +48,6 @@ dataset = ex.DataForGP(path=path)
 dataset.find_excel_files()
 dataset.filter_excel_files(exclude_keywords=exclude_keywords, verbose=True)
 dataset.construct_dataframe(extensive=False)
-# dataset.construct_dataframe(extensive=True)
 # dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
 dataset.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
 dataset.apply_duplicate_groupid(
@@ -56,16 +55,16 @@ dataset.apply_duplicate_groupid(
     verbose=False
 )
 
-# # Create another DataForGP instance for the data including all the locations
-# dataset_all = ex.DataForGP(path=path)
-# dataset_all.find_excel_files()
-# dataset_all.filter_excel_files(exclude_keywords=exclude_keywords_all, verbose=True)
-# dataset_all.construct_dataframe(extensive=False)
-# dataset_all.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02]))
-# dataset_all.apply_duplicate_groupid(
-#     exclude_columns=['filename', 'experiment_date', 'location'],
-#     verbose=False
-# )
+# Create an instance of DataForGP for all data
+dataset_all = ex.DataForGP(path=path)
+dataset_all.find_excel_files()
+dataset_all.filter_excel_files(exclude_keywords=exclude_keywords_all, verbose=True)
+dataset_all.construct_dataframe(extensive=False)
+dataset_all.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
+dataset_all.apply_duplicate_groupid(
+    exclude_columns=['filename', 'experiment_date', 'location'],
+    verbose=False
+)
 
 # Calculate and add target values into the DataFrame
 savgol=False
@@ -74,30 +73,28 @@ methods=[
             'final value',
             'initial slope',
             'final slope',
-            # 'overall slope',
-            'delta'
+            'overall slope',
+            # 'delta'
         ]
 for column in [
    'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
-   # 'CO Net Production Rate (mol/molRh/s)',
+   'CH4 Net Production Rate (mol/molRh/s)',
+   'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
         column=column, temp_threshold=3.5, init_tos_buffer=0.5, adjacency_slope=1.0,
         )
-    # dataset_all.assign_target_values(
-    #     savgol=savgol, methods=methods,
-    #     column=column, temp_threshold=3.5, init_tos_buffer=0.5, adjacency_slope=1.0,
-    #     )
+    dataset_all.assign_target_values(
+        savgol=savgol, methods=methods,
+        column=column, temp_threshold=3.5, init_tos_buffer=0.5, adjacency_slope=1.0,
+        )
 
 # Construct unique DataFrame using group IDs
-dataset.construct_unique_dataframe(verbose=True)
-# dataset_all.construct_unique_dataframe(verbose=True)
-# Calculate statistics DataFrame on the basis of GroupID
-# dataset_all.calculate_statistics_duplicate_group(verbose=False)
+dataset.construct_unique_dataframe(verbose=False)
+dataset_all.construct_unique_dataframe(verbose=False)
 
 # # Plot the data and the corresponding slopes
 # dataset.plot_tos_data(column='CO2 Conversion (%)', #'Selectivity to CO (%)',
@@ -107,20 +104,23 @@ dataset.construct_unique_dataframe(verbose=True)
 #                       savgol=savgol,
 #                       gui=True)
 
-analysis = da.DataAnalysis(
-    dataset=dataset,
-    # dataset_all=dataset_all
+analysis = da.DataAnalysis(dataset=dataset)
+# Calculate statistics DataFrame on the basis of GroupID
+analysis.calculate_statistics_duplicate_group(
+    dataset_all=dataset_all,
+    total='duplicate',
+    verbose=False
 )
-analysis.calculate_statistics_duplicate_group(verbose=False)
+
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
 # analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
-# analysis.plot_heatmap_snr(vmax=50, use_dataset_all=True)
-# TODO: modify compare_targets_std_dev() so it can use dataset_all.
-analysis.plot_heatmap_snr(vmax=2.5)
+
+# TODO: modify compare_targets_std_dev() so it can use entire DataFrame
+analysis.plot_heatmap_snr(vmax=1.6)
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
