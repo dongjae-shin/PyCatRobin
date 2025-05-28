@@ -32,10 +32,10 @@ exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
-    "_UCSB",  # data from UCSB
-    "_Cargnello", # data from Cargnello
+    # "_UCSB",  # data from UCSB
+    # "_Cargnello", # data from Cargnello
     # "_SLAC",   # data from SLAC
-    "_PSU",
+    # "_PSU",
 ]
 exclude_keywords_all = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -48,6 +48,7 @@ dataset = ex.DataForGP(path=path)
 dataset.find_excel_files()
 dataset.filter_excel_files(exclude_keywords=exclude_keywords, verbose=True)
 dataset.construct_dataframe(extensive=False)
+# dataset.construct_dataframe(extensive=True)
 # dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
 dataset.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
 dataset.apply_duplicate_groupid(
@@ -73,13 +74,13 @@ methods=[
             'final value',
             'initial slope',
             'final slope',
-            'overall slope',
-            # 'delta'
+            # 'overall slope',
+            'delta'
         ]
 for column in [
-   # 'CO2 Conversion (%)',
+   'CO2 Conversion (%)',
    # 'CH4 Net Production Rate (mol/molRh/s)',
-   'CO Net Production Rate (mol/molRh/s)',
+   # 'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
    # 'Selectivity to CO (%)'
     ]:
@@ -96,7 +97,6 @@ for column in [
 dataset.construct_unique_dataframe(verbose=True)
 # dataset_all.construct_unique_dataframe(verbose=True)
 # Calculate statistics DataFrame on the basis of GroupID
-dataset.calculate_statistics_duplicate_group(verbose=False)
 # dataset_all.calculate_statistics_duplicate_group(verbose=False)
 
 # # Plot the data and the corresponding slopes
@@ -111,23 +111,21 @@ analysis = da.DataAnalysis(
     dataset=dataset,
     # dataset_all=dataset_all
 )
-
-analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
+analysis.calculate_statistics_duplicate_group(verbose=False)
+# analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
+# analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
-analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
-analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
-analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
+# analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
+# analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
+# analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 # analysis.plot_heatmap_snr(vmax=50, use_dataset_all=True)
 # TODO: modify compare_targets_std_dev() so it can use dataset_all.
-# analysis.plot_heatmap_snr(vmax=2.5)
+analysis.plot_heatmap_snr(vmax=2.5)
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-analysis.compare_targets_std_dev(
-    target_wise=True, plot_hist=False,
-    violinplot_direction='vertical'
-)
+analysis.compare_targets_std_dev(target_wise=True, plot_hist=False, violinplot_direction='vertical')
 
 # analysis._generate_data_distribution_horizontal(
 #     column='CO Net Production Rate (mol/molRh/s)_initial value',

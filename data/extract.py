@@ -49,9 +49,6 @@ class DataForGP:
         construct_unique_dataframe(verbose=False):
             Constructs a unique DataFrame by averaging targets and integrating duplicate groups.
 
-        calculate_statistics_duplicate_group():
-            Calculates statistics for duplicate groups.
-
         export_sheet(unique=True):
             Exports the processed data to an Excel sheet.
     """
@@ -338,80 +335,6 @@ class DataForGP:
                 self.df_us_unique = self.df_us_unique.sort_index()
         self.df_us_unique = self.df_us_unique.sort_index(ascending=False)
         self.df_us_unique = self.df_us_unique.reset_index(drop=True)
-
-    def calculate_statistics_duplicate_group(self, verbose: bool = False):
-        """
-        Calculate statistics for duplicate groups. The statistics include the mean, standard deviation of each target, and
-        the total standard deviation of each target in the unique dataset. The calculated statistics are stored in the
-        DataFrame `self.df_stat`. The DataFrame `self.df_stat` is constructed by integrating the columns of the first
-        row in each duplicate group. The columns of the DataFrame `self.df_stat` are the same as the columns of the
-        DataFrame `self.df_us` except for the target values.
-
-        Args:
-            verbose (bool): If True, print the calculated statistics.
-
-        Returns:
-            None
-        """
-        if 'GroupID' not in self.df_us.columns:
-            raise ValueError("self.df_us does not have 'GroupID' column. Please run apply_duplicate_groupid() first.")
-
-        if self.df_us_unique is None:
-            raise ValueError("self.df_us_unique is not constructed yet. Please run construct_unique_dataframe() first.")
-
-        if len(self.targets) == 0:
-            raise ValueError("self.targets is not constructed yet. Please run assign_target_values() first.")
-
-        # use fist row as a dummy, and remove columns of self.df_stat corresponding to target values
-        self.df_stat = self.df_us.iloc[0, :] #
-        self.df_stat = self.df_stat.to_frame().T
-        self.df_stat = self.df_stat.drop(self.targets, axis=1)
-
-        # add columns for statistics of target values
-        for target in self.targets:
-            self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
-            self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
-            self.df_stat.insert(len(self.df_stat.columns), f'{target}_list', None)
-        # add a column for dataframe for each duplicate group
-        self.df_stat.insert(len(self.df_stat.columns), 'dataframe', None)
-
-        # ignoring warning
-        with warnings.catch_warnings(action="ignore"):
-            # for each duplicate group integrate columns such as filename, experiment_date, and targets
-            for i, df_group in self.df_us[self.df_us["GroupID"] > 0].groupby("GroupID"):
-                if verbose:
-                    print(f'Group {i}: ')
-                df_integrated = df_group.iloc[0, :].drop(self.targets) # use the first row in the group
-                # calculate statistics of each target for each duplicate group
-                for target in self.targets:
-                    mean = df_group[target].mean()
-                    std = df_group[target].std()
-                    if verbose:
-                        print(f'mean of {target}: {mean:5.2f}')
-                        print(f'std. dev. of {target}: {std:5.2f}')
-                    df_integrated.loc[f'{target}_mean'] = mean
-                    df_integrated.loc[f'{target}_std'] = std
-                    df_integrated.loc[f'{target}_list'] = df_group[target].to_list()
-                df_integrated.loc['filename'] = df_group['filename'].to_list()
-                df_integrated.loc['experiment_date'] = df_group['experiment_date'].dt.strftime('%Y%m%d').to_list()
-                df_integrated.loc['location'] = df_group['location'].to_list()
-                df_integrated.loc['dataframe'] = df_group
-
-                # append an integrated row
-                self.df_stat.loc[i-1] = df_integrated
-
-            # add a row for total unique data
-            df_integrated[:] = None # dummy
-            # calculate statistics of each target for each duplicate group
-            for target in self.targets:
-                std = self.df_us_unique[target].std()
-                if verbose:
-                    print(f'total std. dev. of {target}: {std:5.2f}')
-                df_integrated.loc[f'{target}_std'] = std
-                df_integrated.loc['GroupID'] = 'total' # unique
-                df_integrated.loc[f'{target}_list'] = self.df_us_unique[target].to_list()
-            # append an integrated row
-            self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 
     def export_sheet(self, unique: bool = True):
         """
