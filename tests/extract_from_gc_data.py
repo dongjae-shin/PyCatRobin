@@ -104,8 +104,9 @@ dataset_all.construct_unique_dataframe(verbose=False)
 #                       savgol=savgol,
 #                       gui=True)
 
+# Create an instance of DataAnalysis ------
 analysis = da.DataAnalysis(dataset=dataset)
-# Calculate statistics DataFrame on the basis of GroupID
+# Calculate statistics DataFrame on the basis of GroupID; it determines which data to use as entire dataset
 analysis.calculate_statistics_duplicate_group(
     dataset_all=dataset_all,
     total='duplicate',

@@ -697,7 +697,7 @@ def _calculate_target(
     #     return
 
     if verbose:
-        print(f"{column}->{method}: {target:.2f}")
+        print(f"{column}->{method}: {target:.4f}")
 
     else:
         return target
@@ -742,7 +742,7 @@ def _extract_indices_target(
     if column not in df.columns:
         raise ValueError(f"Keyword '{column}' is not included in {df.columns.tolist()}")
 
-    # Extract the 'Time', 'Temperature', and specified column values, and sort by 'Time'
+    # Extract the 'Time', 'Temperature', and specified column values, and sort by 'Time-on-Stream'
     df_sorted = df.sort_values(by=df.filter(like='Time').columns[0])
     tos = df_sorted.filter(like='Time').iloc[:, 0]
     temp = df_sorted.filter(like='Temperature').iloc[:, 0]
