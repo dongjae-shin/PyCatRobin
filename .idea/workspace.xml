@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="merged rm_dtset_all_modify_df_stat into main branch">
-      <change beforePath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CatNaviGATE.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/extract.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
-    </list>
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="minor updates" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -157,14 +151,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00029" summary="updated extract.py and add 'location' column and 'dataframe' column for DataForGP.df_stat">
-      <option name="closed" value="true" />
-      <created>1738772314585</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1738772314585</updated>
     </task>
     <task id="LOCAL-00030" summary="added data_analysis.py">
       <option name="closed" value="true" />
@@ -550,7 +536,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748406650653</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="minor updates">
+      <option name="closed" value="true" />
+      <created>1748476393360</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1748476393361</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -607,7 +601,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="enhanced data_analysis.py to include color differentiation in stripplot markers" />
     <MESSAGE value="add latest data sheet" />
     <MESSAGE value="updated title to show SNR in data_analysis.py" />
     <MESSAGE value="refactor gp_code.py to use home directory for file path" />
@@ -632,7 +625,8 @@
     <MESSAGE value="update data_analysis.py to add optional y_max_plot parameter and adjust plot limits accordingly" />
     <MESSAGE value="merged df_stat_in_DataAnalysis branch into main." />
     <MESSAGE value="merged rm_dtset_all_modify_df_stat into main branch" />
-    <option name="LAST_COMMIT_MESSAGE" value="merged rm_dtset_all_modify_df_stat into main branch" />
+    <MESSAGE value="minor updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor updates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
