@@ -77,11 +77,11 @@ methods=[
             # 'delta'
         ]
 for column in [
-   'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO2 Conversion (%)',
+   # 'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -126,7 +126,7 @@ analysis.plot_heatmap_snr(vmax=1.6)
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-analysis.compare_targets_std_dev(target_wise=True, plot_hist=False, violinplot_direction='vertical')
+analysis.compare_targets_std_dev(target_wise=True, snr_type='std_dev', plot_hist=False, violinplot_direction='vertical')
 
 # analysis._generate_data_distribution_horizontal(
 #     column='CO Net Production Rate (mol/molRh/s)_initial value',

@@ -21,7 +21,6 @@ class DataForGP:
         path_removed (list): List of paths to the removed Excel files.
         df_us (pd.DataFrame): DataFrame containing the processed data.
         df_us_unique (pd.DataFrame): DataFrame containing the unique processed data.
-        df_stat (pd.DataFrame): DataFrame containing statistical data of duplicate groups.
         targets (list): List to store target values.
 
     Methods:
@@ -59,7 +58,6 @@ class DataForGP:
         self.path_removed = None
         self.df_us = None
         self.df_us_unique = None
-        self.df_stat = None
         self.targets = []
 
     def find_excel_files(self):

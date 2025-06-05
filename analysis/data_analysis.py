@@ -47,9 +47,9 @@ class DataAnalysis:
         signal-to-noise ratio (SNR), standard deviation, histogram, and violin plot.
 
         Args:
-            dataset_all: If provided, use this dataset to estimate the true variability of each target metric instead of self.dataset.
+            dataset_all: If provided, use this dataset to estimate the true variability/range of each target metric instead of self.dataset.
             verbose (bool): If True, print the calculated statistics.
-            total (str): 'unique' or 'duplicate'. If 'unique', duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability of each target metric.
+            total (str): 'unique' or 'duplicate'. If 'unique', metrics of duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability/range of each target metric.
 
         Returns:
             None
@@ -63,7 +63,7 @@ class DataAnalysis:
         if len(self.dataset.targets) == 0:
             raise ValueError("self.dataset.targets is not constructed yet. Please run assign_target_values() first.")
 
-        # use fist row as a dummy, and remove columns of self.df_stat corresponding to target values
+        # use the first row as a dummy, and remove columns of self.df_stat corresponding to target values
         self.df_stat = self.dataset.df_us.iloc[0, :] #
         self.df_stat = self.df_stat.to_frame().T
         self.df_stat = self.df_stat.drop(self.dataset.targets, axis=1)
@@ -72,6 +72,7 @@ class DataAnalysis:
         for target in self.dataset.targets:
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_range', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_list', None)
         # add a column for dataframe for each duplicate group
         self.df_stat.insert(len(self.df_stat.columns), 'dataframe', None)
@@ -87,11 +88,14 @@ class DataAnalysis:
                 for target in self.dataset.targets:
                     mean = df_group[target].mean()
                     std = df_group[target].std()
+                    range_ = df_group[target].max() - df_group[target].min()
                     if verbose:
                         print(f'mean of {target}: {mean:5.2f}')
                         print(f'std. dev. of {target}: {std:5.2f}')
+                        print(f'range of {target}: {range_:5.2f}')
                     df_integrated.loc[f'{target}_mean'] = mean
                     df_integrated.loc[f'{target}_std'] = std
+                    df_integrated.loc[f'{target}_range'] = range_
                     df_integrated.loc[f'{target}_list'] = df_group[target].to_list()
                 df_integrated.loc['filename'] = df_group['filename'].to_list()
                 df_integrated.loc['experiment_date'] = df_group['experiment_date'].dt.strftime('%Y%m%d').to_list()
@@ -125,9 +129,12 @@ class DataAnalysis:
             for target in self.dataset.targets:
                 # std = self.dataset.df_us_unique[target].std() # std. dev. of averages; to be deprecated
                 std = df_total_defined[target].std()
+                range_ = df_total_defined[target].max() - df_total_defined[target].min()
                 if verbose:
                     print(f'total std. dev. of {target}: {std:5.2f}')
+                    print(f'total range of {target}: {range_:5.2f}')
                 df_integrated.loc[f'{target}_std'] = std
+                df_integrated.loc[f'{target}_range'] = range_
                 df_integrated.loc['GroupID'] = 'total' # unique
                 # df_integrated.loc[f'{target}_list'] = self.dataset.df_us_unique[target].to_list()
                 df_integrated.loc[f'{target}_list'] = df_total_defined[target].to_list()
@@ -135,13 +142,14 @@ class DataAnalysis:
             self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 
     def compare_targets_std_dev(
-            self, target_wise: bool = False, colormap: str = 'tab10',
+            self, target_wise: bool = False, colormap: str = 'tab10', snr_type: str = 'std_dev',
             plot_hist: bool = True, violinplot_direction: str = 'vertical'
     ):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
+            snr_type: The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev' or 'range'.
             violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
@@ -171,26 +179,34 @@ class DataAnalysis:
                 fig, axs = plt.subplots(nrows, ncols, figsize=(13, 8))
 
                 # set title of the fig
-                fig.suptitle(f'{property}', fontsize=16)
+                fig.suptitle(f'{property} (SNR type: {snr_type})', fontsize=16)
 
                 axs = np.ravel(axs)
                 n_plot = 0
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
                     df_melted = self.df_stat.melt(id_vars=['GroupID'],
-                                                          value_vars=column,
-                                                          var_name='Target',
-                                                          value_name='Standard Deviation')
+                                                          value_vars=[
+                                                              column,
+                                                              column.replace('_std', '_range'), # added for snr_type='range'
+                                                          ],
+                                                          var_name='Statistic',
+                                                          value_name='Value')
                     # Generate colors from a predefined colormap
                     cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
                     colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
                     colors[-1] = 'black'
-                    # Plot the data
-                    sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
+                    # Plot the data based on standard deviation
+                    sns.barplot(data=df_melted[df_melted['Statistic'] == column],
+                                x='GroupID', y='Value', ax=axs[i], palette=colors,
                                 hue='GroupID', legend=False)
                     # Set the title of the subplot with the signal-to-noise ratio (SNR)
-                    snr = df_melted.loc[df_melted['GroupID'] == 'total', 'Standard Deviation'].values[0] / \
-                          df_melted.loc[df_melted['GroupID'] != 'total', 'Standard Deviation'].max()
+                    if snr_type == 'std_dev':
+                        df_selected = df_melted[df_melted['Statistic'] == column]
+                    elif snr_type == 'range':
+                        df_selected = df_melted[df_melted['Statistic'] == column.replace('_std', '_range')]
+                    snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
+                          df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
 
                     axs[i].set_title(f'{column.split("_")[1]} (SNR={snr:.2f})', fontsize=12)
 
@@ -221,13 +237,13 @@ class DataAnalysis:
             # Melt the DataFrame to long format for seaborn
             df_melted = self.df_stat.melt(id_vars=['GroupID'],
                                              value_vars=[col for col in self.df_stat.columns if '_std' in col],
-                                             var_name='Target',
-                                             value_name='Standard Deviation')
-            df_melted['Target'] = df_melted['Target'].str.rstrip('_std')
+                                             var_name='Statistic',
+                                             value_name='Value')
+            df_melted['Statistic'] = df_melted['Statistic'].str.rstrip('_std')
 
             # Plot the data
             plt.figure(figsize=(12, 6))
-            sns.barplot(data=df_melted, x='Target', y='Standard Deviation', hue='GroupID', palette=colormap)
+            sns.barplot(data=df_melted, x='Statistic', y='Value', hue='GroupID', palette=colormap)
             plt.xticks(rotation=45, ha='right')
             plt.title('Standard Deviation of Target Values by GroupID')
             plt.tight_layout()
@@ -383,6 +399,7 @@ class DataAnalysis:
             self,
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
+            which_to_plot: str = 'snr' # 'snr' or 'std_dev'
     ):
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
@@ -427,7 +444,7 @@ class DataAnalysis:
         for prop in properties:
             for method in methods:
                 column = f'{prop}_{method}_std'
-                snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
+                # snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
                 snr = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
                       self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
                 df_snr.loc[method, prop] = snr
