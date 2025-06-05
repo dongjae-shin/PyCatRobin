@@ -121,7 +121,11 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
 # TODO: modify compare_targets_std_dev() so it can use entire DataFrame
-analysis.plot_heatmap_snr(vmax=1.6)
+analysis.plot_heatmap(
+    which_to_plot='snr',
+    snr_type='std_dev',
+    cmap='Reds',
+    vmax=1.6)
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')

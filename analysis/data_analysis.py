@@ -395,11 +395,12 @@ class DataAnalysis:
             plt.tight_layout()
             plt.show()
 
-    def plot_heatmap_snr(
+    def plot_heatmap(
             self,
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
-            which_to_plot: str = 'snr' # 'snr' or 'std_dev'
+            which_to_plot: str = 'snr', # 'snr' or 'std_dev',
+            snr_type: str = 'std_dev' # 'std_dev' or 'range'; used only if `which_to_plot` is 'snr'
     ):
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
@@ -410,6 +411,8 @@ class DataAnalysis:
             vmax (float): The maximum value of the colorbar.
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
+            which_to_plot (str): The type of data to plot. Either 'snr' or 'std_dev'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the standard deviation.
+            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev' or 'range'. Used only if `which_to_plot` is 'snr'.
 
         Returns:
             None
@@ -433,25 +436,33 @@ class DataAnalysis:
             # make elements of methods unique
             methods = list(set(methods))
 
-        # Make (len(properties) x (len(methods)) DataFrame consists of corresponding SNR values
+        # Make (len(properties) x (len(methods)) DataFrame consists of corresponding 'which_to_plot' values
         # Make the row index corresponds to methods and the column index corresponds to properties
-        df_snr = pd.DataFrame(index=methods, columns=properties)
+        df_heatmap = pd.DataFrame(index=methods, columns=properties)
 
-        # Sort index and column names of df_snr so the axes of the heatmap are shown in a consistent order
-        df_snr.sort_index(axis=0, inplace=True)
-        df_snr.sort_index(axis=1, inplace=True)
+        # Sort index and column names of df_heatmap so the axes of the heatmap are shown in a consistent order
+        df_heatmap.sort_index(axis=0, inplace=True)
+        df_heatmap.sort_index(axis=1, inplace=True)
 
         for prop in properties:
             for method in methods:
-                column = f'{prop}_{method}_std'
-                # snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
-                snr = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
-                      self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
-                df_snr.loc[method, prop] = snr
-        self.df_snr = df_snr
+                if which_to_plot == 'std_dev':
+                    column = f'{prop}_{method}_std'
+                    val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                elif which_to_plot == 'snr':
+                    if snr_type == 'std_dev':
+                        column = f'{prop}_{method}_std'
+                    elif snr_type == 'range':
+                        column = f'{prop}_{method}_range'
+                    else:
+                        raise ValueError("snr_type must be either 'std_dev' or 'range'.")
+                    val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                          self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                df_heatmap.loc[method, prop] = val
+        self.df_heatmap = df_heatmap
 
         # Ensure the DataFrame is filled with float values
-        df_snr = df_snr.astype(float)
+        df_heatmap = df_heatmap.astype(float)
 
         # Plot the heatmap
         fig, ax = plt.subplots(figsize=(10.3, 10))
@@ -459,13 +470,17 @@ class DataAnalysis:
         label_size = 22
         annot_size = 18
         plt.rcParams.update({'font.size': label_size})
-        vmax = df_snr.max().max() if vmax is None else vmax
+        vmax = df_heatmap.max().max() if vmax is None else vmax
+        if which_to_plot == 'snr':
+            cbar_label = 'Signal-to-Noise Ratio (SNR)'
+        elif which_to_plot == 'std_dev':
+            cbar_label = 'Max{Standard Deviation${_i}$}'
         sns.heatmap(
-            df_snr,
+            df_heatmap,
             annot=True, fmt='.2f',
             annot_kws={'fontsize': annot_size}, # set fontsize for the annotation
             cmap=cmap,
-            cbar_kws={'label': 'Signal-to-Noise Ratio (SNR)'},
+            cbar_kws={'label': cbar_label},
             vmax=vmax, vmin=vmin,
             ax=ax, # use the ax parameter to plot the heatmap on the provided axis
         )
