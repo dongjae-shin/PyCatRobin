@@ -21,7 +21,8 @@ path = (home_dir +
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
-        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/intra")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
@@ -32,10 +33,10 @@ exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
-    # "_UCSB",  # data from UCSB
-    # "_Cargnello", # data from Cargnello
-    "_SLAC",   # data from SLAC
-    # "_PSU",
+    "_UCSB",  # data from UCSB
+    "_Cargnello", # data from Cargnello
+    # "_SLAC",   # data from SLAC
+    "_PSU",
 ]
 exclude_keywords_all = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -77,11 +78,11 @@ methods=[
             # 'delta'
         ]
 for column in [
-   # 'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
+   'CO2 Conversion (%)',
+   'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -110,11 +111,14 @@ analysis = da.DataAnalysis(dataset=dataset)
 analysis.calculate_statistics_duplicate_group(
     dataset_all=dataset_all,
     total='duplicate',
-    verbose=False
+    verbose=False,
+    average_same_location=False,
+    # average_same_location=True,
 )
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
+analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12)
 # analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
 # analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
@@ -122,15 +126,20 @@ analysis.calculate_statistics_duplicate_group(
 
 # TODO: modify compare_targets_std_dev() so it can use entire DataFrame
 analysis.plot_heatmap(
-    which_to_plot='snr',
-    snr_type='std_dev',
-    cmap='Reds',
-    vmax=1.6)
+    # which_to_plot='snr',
+    which_to_plot='std_dev',
+    # snr_type='std_dev',
+    snr_type='range',
+    # cmap='Reds',
+    cmap='Blues',
+    vmax=33.05,
+    vmin=0.0,
+)
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-analysis.compare_targets_std_dev(target_wise=True, snr_type='std_dev', plot_hist=False, violinplot_direction='vertical')
+# analysis.compare_targets_std_dev(target_wise=True, snr_type='range', plot_hist=False, violinplot_direction='vertical')
 
 # analysis._generate_data_distribution_horizontal(
 #     column='CO Net Production Rate (mol/molRh/s)_initial value',

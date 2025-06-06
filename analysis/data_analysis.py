@@ -37,7 +37,8 @@ class DataAnalysis:
 
     def calculate_statistics_duplicate_group(self, verbose: bool = False,
                                              dataset_all: DataForGP = None,
-                                             total: str = 'unique'):
+                                             total: str = 'unique',
+                                             average_same_location: bool = False):
         """
         Calculate statistics for duplicate groups. The statistics include the mean, standard deviation of each target, and
         the total standard deviation of each target in the selected dataset by 'dataset_all' and 'total'. The calculated
@@ -50,6 +51,7 @@ class DataAnalysis:
             dataset_all: If provided, use this dataset to estimate the true variability/range of each target metric instead of self.dataset.
             verbose (bool): If True, print the calculated statistics.
             total (str): 'unique' or 'duplicate'. If 'unique', metrics of duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability/range of each target metric.
+            average_same_location (bool): If True, average the target values of the same location in each duplicate group. Useful for interlab standard deviation calculation.
 
         Returns:
             None
@@ -84,6 +86,19 @@ class DataAnalysis:
                 if verbose:
                     print(f'Group {i}: ')
                 df_integrated = df_group.iloc[0, :].drop(self.dataset.targets) # use the first row in the group
+
+                if average_same_location:
+                    # Group by 'location' and integrate rows with the same location by averaging the values of targets for pure 'interlab' std. dev.
+                    for location, df_subgroup in df_group.groupby('location'):
+                        if len(df_subgroup) > 1:
+                            # Average the values of all columns except 'location'
+                            df_sub_integrated = df_subgroup.iloc[:1, :]
+                            df_sub_integrated[self.dataset.targets] = df_subgroup[self.dataset.targets].mean()
+                            # remove rows from the df_group
+                            df_group = df_group[df_group['location'] != location]
+                            # add sub_integrated row to the df_group
+                            df_group = pd.concat([df_group, df_sub_integrated], axis=0)
+
                 # calculate statistics of each target for each duplicate group
                 for target in self.dataset.targets:
                     mean = df_group[target].mean()
@@ -398,7 +413,7 @@ class DataAnalysis:
     def plot_heatmap(
             self,
             properties: list[str] = None, methods: list[str] = None,
-            vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
+            vmax: float = None, vmin: float = None, cmap: str = 'Reds',
             which_to_plot: str = 'snr', # 'snr' or 'std_dev',
             snr_type: str = 'std_dev' # 'std_dev' or 'range'; used only if `which_to_plot` is 'snr'
     ):
@@ -471,6 +486,7 @@ class DataAnalysis:
         annot_size = 18
         plt.rcParams.update({'font.size': label_size})
         vmax = df_heatmap.max().max() if vmax is None else vmax
+        vmin = df_heatmap.min().min() if vmin is None else vmin
         if which_to_plot == 'snr':
             cbar_label = 'Signal-to-Noise Ratio (SNR)'
         elif which_to_plot == 'std_dev':
