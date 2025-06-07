@@ -515,6 +515,7 @@ class DataAnalysis:
                                 location_dict_auto: bool = False,
                                 x_max_plot: float = None,
                                 y_max_plot: float = None,
+                                font_scale: float = 1.0
                                 ):
         group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
         # If True, automatically make Dictionary that connects the location to unique integer values
@@ -550,6 +551,7 @@ class DataAnalysis:
                 location_data[locations[i]]['count'] += 1
 
             # Plot data for each location
+
             for location, data in location_data.items():
                 plt.scatter(
                     data['tos'], data['col_val'],
@@ -563,10 +565,14 @@ class DataAnalysis:
                 plt.xlim(0, x_max_plot)
             if y_max_plot:
                 plt.ylim(0, y_max_plot)
-            plt.xlabel('Time on stream (hrs)')
-            plt.ylabel(column)
-            plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')
-            plt.legend()
+            plt.xlabel('Time on stream (hrs)', fontsize=14*font_scale)
+            plt.ylabel(column, fontsize=14*font_scale, wrap=True)
+            plt.title(
+                f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})',
+                fontsize=12*font_scale, wrap=True
+            )
+            plt.legend(fontsize=12*font_scale)
+            plt.tight_layout()
             plt.show()
 
 
