@@ -126,7 +126,6 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
-# TODO: modify compare_targets_std_dev() so it can use entire DataFrame
 analysis.plot_heatmap(
     which_to_plot='snr',
     # which_to_plot='std_dev',
