@@ -15,13 +15,13 @@ home_dir = os.path.expanduser("~")
 path = (home_dir +
         # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/04 Catalysis Round Robin/01 Round Robin GC Results")
         # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/03 Previous Data/20250404_temporary_data_UCSB+RR")
-        "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
+        # "/Google Drive/Shared drives/Accelerating Innovations Team Drive/2. Research/8. Data/02 GC Experimental Data")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250328_RR_data")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_2")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/intra")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
@@ -49,8 +49,8 @@ dataset = ex.DataForGP(path=path)
 dataset.find_excel_files()
 dataset.filter_excel_files(exclude_keywords=exclude_keywords, verbose=True)
 dataset.construct_dataframe(extensive=False)
-dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
-# dataset.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
+# dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
+dataset.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
 dataset.apply_duplicate_groupid(
     exclude_columns=['filename', 'experiment_date', 'location'],
     verbose=False
@@ -62,7 +62,7 @@ dataset_all.find_excel_files()
 dataset_all.filter_excel_files(exclude_keywords=exclude_keywords_all, verbose=True)
 dataset_all.construct_dataframe(extensive=False)
 # dataset.convert_measured_to_nominal(which_column="Rh_total_mass")
-# dataset_all.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
+dataset_all.convert_measured_to_nominal(which_column="Rh_total_mass", allowed_values=np.array([0.02])) # for Round Robin data
 dataset_all.apply_duplicate_groupid(
     exclude_columns=['filename', 'experiment_date', 'location'],
     verbose=False
@@ -72,18 +72,18 @@ dataset_all.apply_duplicate_groupid(
 savgol=False
 methods=[
             'initial value',
-            # 'final value',
-            # 'initial slope',
-            # 'final slope',
-            # 'overall slope',
+            'final value',
+            'initial slope',
+            'final slope',
+            'overall slope',
             # 'delta'
         ]
 for column in [
    'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
-   # 'CO Net Production Rate (mol/molRh/s)',
+   'CH4 Net Production Rate (mol/molRh/s)',
+   'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -120,7 +120,7 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, font_scale=1.3)
-analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=23, font_scale=1.3) # for Old dataset
+# analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=23, font_scale=1.3) # for Old dataset
 # analysis.plot_tos_data_duplicate(column='CO Forward Production Rate (mol/molRh/s)')
 # analysis.plot_tos_data_duplicate(column='Selectivity to CO (%)', x_max_plot=12, y_max_plot=105)
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
@@ -128,20 +128,24 @@ analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', 
 
 # TODO: modify compare_targets_std_dev() so it can use entire DataFrame
 analysis.plot_heatmap(
-    # which_to_plot='snr',
-    which_to_plot='std_dev',
+    which_to_plot='snr',
+    # which_to_plot='std_dev',
     # snr_type='std_dev',
     snr_type='range',
-    # cmap='Reds',
-    cmap='Blues',
+    cmap='Reds',
+    # cmap='Blues',
     # vmax=33.05,
-    vmin=0.0,
+    # vmin=0.0,
 )
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
-# analysis.compare_targets_std_dev(target_wise=True, snr_type='range', plot_hist=False, violinplot_direction='vertical')
+analysis.compare_targets_std_dev(
+    target_wise=True,
+    snr_type='range', #'std_dev',
+    plot_hist=False, violinplot_direction='vertical'
+)
 
 # analysis._generate_data_distribution_horizontal(
 #     column='CO Net Production Rate (mol/molRh/s)_initial value',

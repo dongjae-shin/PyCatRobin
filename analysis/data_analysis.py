@@ -498,9 +498,9 @@ class DataAnalysis:
         vmax = df_heatmap.max().max() if vmax is None else vmax
         vmin = df_heatmap.min().min() if vmin is None else vmin
         if which_to_plot == 'snr':
-            cbar_label = 'Signal-to-Noise Ratio (SNR)'
+            cbar_label = 'Signal-to-noise ratio (SNR)'
         elif which_to_plot == 'std_dev':
-            cbar_label = 'Max{Standard Deviation${_i}$}'
+            cbar_label = 'Max{standard deviation${_i}$}'
         sns.heatmap(
             df_heatmap,
             annot=True, fmt='.2f',
