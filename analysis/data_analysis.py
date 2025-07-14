@@ -92,7 +92,7 @@ class DataAnalysis:
                     for location, df_subgroup in df_group.groupby('location'):
                         if len(df_subgroup) > 1:
                             # Average the values of all columns except 'location'
-                            df_sub_integrated = df_subgroup.iloc[:1, :]
+                            df_sub_integrated = df_subgroup.iloc[:1, :] # use the first row as a dummy
                             df_sub_integrated[self.dataset.targets] = df_subgroup[self.dataset.targets].mean()
                             # remove rows from the df_group
                             df_group = df_group[df_group['location'] != location]
@@ -140,7 +140,7 @@ class DataAnalysis:
             # Add a row for the defined total data
             df_integrated[:] = None # dummy
 
-            # Calculate statistics of each target for each duplicate group
+            # Calculate statistics of each target for 'total' group
             for target in self.dataset.targets:
                 # std = self.dataset.df_us_unique[target].std() # std. dev. of averages; to be deprecated
                 std = df_total_defined[target].std()
@@ -187,7 +187,7 @@ class DataAnalysis:
 
             # Plot the data
             for property in self.unique_properties: # Figures over properties
-                columns_property = [col for col in columns if property in col]# Figures over properties
+                columns_property = [col for col in columns if property in col] # Figures over properties
                 # Create subplots
                 nrows = (len(columns_property) + 2) // 3
                 ncols = min(len(columns_property), 3)
@@ -200,21 +200,31 @@ class DataAnalysis:
                 n_plot = 0
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
-                    df_melted = self.df_stat.melt(id_vars=['GroupID'],
-                                                          value_vars=[
-                                                              column,
-                                                              column.replace('_std', '_range'), # added for snr_type='range'
-                                                          ],
-                                                          var_name='Statistic',
-                                                          value_name='Value')
+                    df_melted = self.df_stat.melt(
+                        id_vars=['GroupID'],
+                        value_vars=[
+                            column, # e.g., 'CO2 Conversion (%)_std', 'Selectivity to CO (%)_std'
+                            column.replace('_std', '_range'), # added for snr_type='range'
+                            ],
+                        var_name='Statistic',
+                        value_name='Value'
+                    )
                     # Generate colors from a predefined colormap
                     cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
                     colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
                     colors[-1] = 'black'
                     # Plot the data based on standard deviation
-                    sns.barplot(data=df_melted[df_melted['Statistic'] == column],
-                                x='GroupID', y='Value', ax=axs[i], palette=colors,
-                                hue='GroupID', legend=False)
+                    if snr_type == 'range':
+                        sns.barplot(data=df_melted[df_melted['Statistic'] == column.replace('_std', '_range')],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Range')
+                    elif snr_type == 'std_dev':
+                        sns.barplot(data=df_melted[df_melted['Statistic'] == column],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Standard Deviation')
+
                     # Set the title of the subplot with the signal-to-noise ratio (SNR)
                     if snr_type == 'std_dev':
                         df_selected = df_melted[df_melted['Statistic'] == column]
