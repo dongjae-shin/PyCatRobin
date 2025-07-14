@@ -21,12 +21,15 @@ path = (home_dir +
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
-        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/intra")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/premix")
+
+path_all = (home_dir +
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
 
 # Keywords to exclude
 exclude_keywords = [
@@ -57,7 +60,7 @@ dataset.apply_duplicate_groupid(
 )
 
 # Create an instance of DataForGP for all data
-dataset_all = ex.DataForGP(path=path)
+dataset_all = ex.DataForGP(path=path_all)
 dataset_all.find_excel_files()
 dataset_all.filter_excel_files(exclude_keywords=exclude_keywords_all, verbose=True)
 dataset_all.construct_dataframe(extensive=False)
@@ -79,11 +82,11 @@ methods=[
             # 'delta'
         ]
 for column in [
-   'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO2 Conversion (%)',
+   # 'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -126,16 +129,16 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
-analysis.plot_heatmap(
-    which_to_plot='snr',
-    # which_to_plot='std_dev',
-    # snr_type='std_dev',
-    snr_type='range',
-    cmap='Reds',
-    # cmap='Blues',
-    # vmax=33.05,
-    # vmin=0.0,
-)
+# analysis.plot_heatmap(
+#     which_to_plot='snr',
+#     # which_to_plot='std_dev',
+#     # snr_type='std_dev',
+#     snr_type='range',
+#     cmap='Reds',
+#     # cmap='Blues',
+#     # vmax=33.05,
+#     # vmin=0.0,
+# )
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
@@ -143,7 +146,8 @@ analysis.plot_heatmap(
 analysis.compare_targets_std_dev(
     target_wise=True,
     snr_type='range', #'std_dev',
-    plot_hist=False, violinplot_direction='vertical'
+    plot_hist=True, #False,
+    violinplot_direction='vertical'
 )
 
 # analysis._generate_data_distribution_horizontal(

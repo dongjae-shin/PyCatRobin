@@ -374,13 +374,17 @@ class DataAnalysis:
             sns.violinplot(
                 df, x='GroupID', y=column,
                 hue='GroupID',
-                split=False, inner='stick',
+                split=False,
+                inner='stick',
                 palette=cmap,
                 ax=axs[0],
                 legend=False,
                 # hue_order=hue_order,
                 zorder=0
             )
+            # set ylimit of axs[0]
+            range_column = df[column].max() - df[column].min()
+            axs[0].set_ylim(df[column].min() - 0.5*range_column , df[column].max() + 0.5*range_column)
 
             # Scatterplot instead of stripplot was used to give different markers to different locations
             # the style argument to differentiate the locations is not supported in stripplot
@@ -404,6 +408,11 @@ class DataAnalysis:
             axs[0].set_xticks(list(groupid_to_num.values()))
             axs[0].set_xticklabels(list(groupid_to_num.keys()))
 
+            #change the font size of the x tick labels
+            labelsize = 15
+            axs[0].tick_params(axis='x', labelsize=labelsize)
+            axs[0].tick_params(axis='y', labelsize=labelsize)
+
             if plot_hist:
                 # Plot the histogram
                 sns.histplot(
@@ -415,6 +424,8 @@ class DataAnalysis:
                 # Make the x tick labels integer
                 axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
                 axs[1].set_ylabel('')
+                axs[1].tick_params(axis='x', labelsize=labelsize)
+                axs[1].tick_params(axis='y', labelsize=labelsize)
 
             fig.suptitle(f'Distribution of {column}')
             plt.tight_layout()
@@ -511,8 +522,8 @@ class DataAnalysis:
             ax=ax, # use the ax parameter to plot the heatmap on the provided axis
         )
         # Rotate xtick labels
-        plt.xticks(ha='left', fontsize=label_size, rotation=-30)
-        plt.yticks(ha='right', fontsize=label_size, rotation=30)
+        plt.xticks(ha='left', fontsize=label_size, rotation=-20)
+        plt.yticks(ha='right', fontsize=label_size, rotation=60)
         plt.tight_layout()
         plt.show()
 
