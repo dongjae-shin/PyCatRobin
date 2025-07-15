@@ -521,8 +521,10 @@ class DataAnalysis:
             vmax=vmax, vmin=vmin,
             ax=ax, # use the ax parameter to plot the heatmap on the provided axis
         )
+        # change the position of the xticklabels
+        ax.xaxis.set_ticks_position("top")
         # Rotate xtick labels
-        plt.xticks(ha='left', fontsize=label_size, rotation=-20)
+        plt.xticks(ha='left', fontsize=label_size, rotation=20)
         plt.yticks(ha='right', fontsize=label_size, rotation=60)
         plt.tight_layout()
         plt.show()

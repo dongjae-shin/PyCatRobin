@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="modified compare_targets_std_dev() so it plots barplot according to snr_type.">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated plots by DataAnalysis">
       <change beforePath="$PROJECT_DIR$/.idea/PyCatRobin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PyCatRobin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/extract_from_gc_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/extract_from_gc_data.py" afterDir="false" />
@@ -45,23 +46,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dongjae-shin/PyCatRobin.git&quot;,
-    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dongjae-shin/PyCatRobin.git",
+    "accountId": "13aebc2b-0e60-47c8-9aa0-f9a1590f00e6"
   },
-  &quot;recentNewPullRequestHead&quot;: {
-    &quot;server&quot;: {
-      &quot;useHttp&quot;: false,
-      &quot;host&quot;: &quot;github.com&quot;,
-      &quot;port&quot;: null,
-      &quot;suffix&quot;: null
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
     },
-    &quot;owner&quot;: &quot;dongjae-shin&quot;,
-    &quot;repository&quot;: &quot;LongTermCat&quot;
+    "owner": "dongjae-shin",
+    "repository": "LongTermCat"
   },
-  &quot;editorReviewEnabled&quot;: false
-}</component>
+  "editorReviewEnabled": false
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -91,7 +92,7 @@
     "ShowUsagesActions.previewPropertyKey": "true",
     "git-widget-placeholder": "snr__range",
     "last_opened_file_path": "/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/PyCatRobin",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -141,7 +142,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-348a24fa61fa-5312c7369657-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.23774.444" />
+        <option value="bundled-python-sdk-dfff61a61320-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.25410.159" />
       </set>
     </attachedChunks>
   </component>
@@ -153,30 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00037" summary="updated data_analysis.py so it can plot violin, strip, and histplot (seaborn) together in _generate_histogram().">
-      <option name="closed" value="true" />
-      <created>1738973192114</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1738973192114</updated>
-    </task>
-    <task id="LOCAL-00038" summary="updated data_analysis.py">
-      <option name="closed" value="true" />
-      <created>1738981567453</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1738981567453</updated>
-    </task>
-    <task id="LOCAL-00039" summary="updated extract_from_gc_data.py">
-      <option name="closed" value="true" />
-      <created>1739550365127</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1739550365127</updated>
     </task>
     <task id="LOCAL-00040" summary="updated extract_from_gc_data.py and extract.py">
       <option name="closed" value="true" />
@@ -546,7 +523,31 @@
       <option name="project" value="LOCAL" />
       <updated>1752452917379</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="modified compare_targets_std_dev() so it plots barplot according to snr_type.">
+      <option name="closed" value="true" />
+      <created>1752474906718</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1752474906718</updated>
+    </task>
+    <task id="LOCAL-00087" summary="removed TODO">
+      <option name="closed" value="true" />
+      <created>1752513462392</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1752513462393</updated>
+    </task>
+    <task id="LOCAL-00088" summary="updated plots by DataAnalysis">
+      <option name="closed" value="true" />
+      <created>1752533977489</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1752533977489</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -603,8 +604,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="1. modified extract.py to cover '*.xls',&#10;2. temporarily modified extract.py to deal with wrong m_catal value from PSU&#10;3. modified _get_location() to cover PSU&#10;4. added plot_tos_data_duplicate() in data_analysis.py" />
-    <MESSAGE value="refactor extract.py to improve m_catal calculation thanks to corrected data from PSU." />
     <MESSAGE value="comment out unused columns in extract_from_gc_data.py" />
     <MESSAGE value="refactor DataAnalysis class to include location dictionary and enhance plot_tos_data_duplicate method for better location data handling" />
     <MESSAGE value="refactor data_analysis.py to enhance compare_targets_std_dev and _generate_data_distribution methods with optional histogram plotting" />
@@ -628,7 +627,9 @@
     <MESSAGE value="updated calculate_statistics_duplicate_group() so it can average target values of the same location for each duplicate group." />
     <MESSAGE value="updated font scaling" />
     <MESSAGE value="modified compare_targets_std_dev() so it plots barplot according to snr_type." />
-    <option name="LAST_COMMIT_MESSAGE" value="modified compare_targets_std_dev() so it plots barplot according to snr_type." />
+    <MESSAGE value="removed TODO" />
+    <MESSAGE value="updated plots by DataAnalysis" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated plots by DataAnalysis" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -642,6 +643,11 @@
           <url>file://$PROJECT_DIR$/tests/plot_tos_curves.py</url>
           <line>34</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/extract_from_gc_data.py</url>
+          <line>133</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

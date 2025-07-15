@@ -74,11 +74,11 @@ dataset_all.apply_duplicate_groupid(
 # Calculate and add target values into the DataFrame
 savgol=False
 methods=[
-            'initial value',
+            # 'initial value',
             'final value',
-            'initial slope',
-            'final slope',
-            'overall slope',
+            # 'initial slope',
+            # 'final slope',
+            # 'overall slope',
             # 'delta'
         ]
 for column in [
@@ -120,6 +120,8 @@ analysis.calculate_statistics_duplicate_group(
     # average_same_location=True,
 )
 
+print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final value_mean'])
+
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, font_scale=1.3)
@@ -129,16 +131,16 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
-# analysis.plot_heatmap(
-#     which_to_plot='snr',
-#     # which_to_plot='std_dev',
-#     # snr_type='std_dev',
-#     snr_type='range',
-#     cmap='Reds',
-#     # cmap='Blues',
-#     # vmax=33.05,
-#     # vmin=0.0,
-# )
+analysis.plot_heatmap(
+    which_to_plot='snr',
+    # which_to_plot='std_dev',
+    # snr_type='std_dev',
+    snr_type='range',
+    cmap='Reds',
+    # cmap='Blues',
+    # vmax=33.05,
+    # vmin=0.0,
+)
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
