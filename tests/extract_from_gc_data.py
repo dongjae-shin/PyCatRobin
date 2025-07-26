@@ -36,9 +36,9 @@ exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
-    # "_UCSB",  # data from UCSB
-    # "_Cargnello", # data from Cargnello
-    # "_SLAC",   # data from SLAC
+    "_UCSB",  # data from UCSB
+    "_Cargnello", # data from Cargnello
+    "_SLAC",   # data from SLAC
     # "_PSU",
 ]
 exclude_keywords_all = [
@@ -119,11 +119,12 @@ analysis.calculate_statistics_duplicate_group(
     dataset_all=dataset_all,
     total='duplicate',
     verbose=False,
-    # average_same_location=False,
-    average_same_location=True, # for inter-lab analysis
+    average_same_location=False,
+    # average_same_location=True, # for inter-lab analysis
 )
 
 # print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final slope_mean'])
+print(analysis.df_stat[['CO Net Production Rate (mol/molRh/s)_auc_std', 'CO Net Production Rate (mol/molRh/s)_auc_mean']])
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
