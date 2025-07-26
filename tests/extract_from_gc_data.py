@@ -21,11 +21,11 @@ path = (home_dir +
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Vortex")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/CatNaviGATE/tests/250430_RR_data_local_manual_fixed_Wig-L-Bug")
-        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
+        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/intra")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_temp")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_Rh_loading")
-        "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
+        # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/alldata_synth")
         # "/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/Accelerate/250502_Round_Robin/250505_finalized_RR_data/premix")
 
 path_all = (home_dir +
@@ -74,19 +74,21 @@ dataset_all.apply_duplicate_groupid(
 # Calculate and add target values into the DataFrame
 savgol=False
 methods=[
-            # 'initial value',
+            'initial value',
             'final value',
-            # 'initial slope',
-            # 'final slope',
-            # 'overall slope',
+            'initial slope',
+            'final slope',
+            'overall slope',
             # 'delta'
         ]
+#TODO: Add area under the curve (AUC) as a method
+
 for column in [
-   # 'CO2 Conversion (%)',
-   # 'CH4 Net Production Rate (mol/molRh/s)',
+   'CO2 Conversion (%)',
+   'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   # 'Selectivity to CO (%)'
+   'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -117,10 +119,10 @@ analysis.calculate_statistics_duplicate_group(
     total='duplicate',
     verbose=False,
     average_same_location=False,
-    # average_same_location=True,
+    # average_same_location=True, # for inter-lab analysis
 )
 
-print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final value_mean'])
+# print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final value_mean'])
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
@@ -132,13 +134,14 @@ print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final value_mean'])
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
 analysis.plot_heatmap(
-    which_to_plot='snr',
+    # which_to_plot='snr',
     # which_to_plot='std_dev',
+    which_to_plot='std_dev_mean_normalized',
     # snr_type='std_dev',
     snr_type='range',
-    cmap='Reds',
-    # cmap='Blues',
-    # vmax=33.05,
+    # cmap='Reds',
+    cmap='Blues',
+    vmax=10.0,
     # vmin=0.0,
 )
 

@@ -142,12 +142,15 @@ class DataAnalysis:
 
             # Calculate statistics of each target for 'total' group
             for target in self.dataset.targets:
+                mean = df_total_defined[target].mean()
                 # std = self.dataset.df_us_unique[target].std() # std. dev. of averages; to be deprecated
                 std = df_total_defined[target].std()
                 range_ = df_total_defined[target].max() - df_total_defined[target].min()
                 if verbose:
+                    print(f'total mean of {target}: {mean:5.2f}')
                     print(f'total std. dev. of {target}: {std:5.2f}')
                     print(f'total range of {target}: {range_:5.2f}')
+                df_integrated.loc[f'{target}_mean'] = mean
                 df_integrated.loc[f'{target}_std'] = std
                 df_integrated.loc[f'{target}_range'] = range_
                 df_integrated.loc['GroupID'] = 'total' # unique
@@ -435,7 +438,7 @@ class DataAnalysis:
             self,
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = None, cmap: str = 'Reds',
-            which_to_plot: str = 'snr', # 'snr' or 'std_dev',
+            which_to_plot: str = 'snr', # 'snr', 'std_dev', or 'std_dev_mean_normalized'
             snr_type: str = 'std_dev' # 'std_dev' or 'range'; used only if `which_to_plot` is 'snr'
     ):
         """
@@ -485,6 +488,11 @@ class DataAnalysis:
                 if which_to_plot == 'std_dev':
                     column = f'{prop}_{method}_std'
                     val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                elif which_to_plot == 'std_dev_mean_normalized':
+                    column = f'{prop}_{method}_std'
+                    column_mean = f'{prop}_{method}_mean'
+                    val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max() / \
+                          abs(self.df_stat[self.df_stat['GroupID'] == 'total'][column_mean].values[0])
                 elif which_to_plot == 'snr':
                     if snr_type == 'std_dev':
                         column = f'{prop}_{method}_std'
@@ -512,6 +520,8 @@ class DataAnalysis:
             cbar_label = 'Signal-to-noise ratio (SNR)'
         elif which_to_plot == 'std_dev':
             cbar_label = 'Max{standard deviation${_i}$}'
+        elif which_to_plot == 'std_dev_mean_normalized':
+            cbar_label = 'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
         sns.heatmap(
             df_heatmap,
             annot=True, fmt='.2f',
