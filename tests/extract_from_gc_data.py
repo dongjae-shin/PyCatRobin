@@ -79,6 +79,7 @@ methods=[
             'initial slope',
             'final slope',
             'overall slope',
+            'auc',
             # 'delta'
         ]
 #TODO: Add area under the curve (AUC) as a method
@@ -118,11 +119,11 @@ analysis.calculate_statistics_duplicate_group(
     dataset_all=dataset_all,
     total='duplicate',
     verbose=False,
-    average_same_location=False,
-    # average_same_location=True, # for inter-lab analysis
+    # average_same_location=False,
+    average_same_location=True, # for inter-lab analysis
 )
 
-# print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final value_mean'])
+# print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final slope_mean'])
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
