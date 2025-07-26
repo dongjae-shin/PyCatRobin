@@ -439,7 +439,7 @@ class DataAnalysis:
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = None, cmap: str = 'Reds',
             which_to_plot: str = 'snr', # 'snr', 'std_dev', or 'std_dev_mean_normalized'
-            snr_type: str = 'std_dev' # 'std_dev' or 'range'; used only if `which_to_plot` is 'snr'
+            snr_type: str = 'std_dev' # 'std_dev', 'range', or 'mu_sigma'; used only if `which_to_plot` is 'snr'
     ):
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
@@ -451,7 +451,7 @@ class DataAnalysis:
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
             which_to_plot (str): The type of data to plot. Either 'snr' or 'std_dev'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the standard deviation.
-            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev' or 'range'. Used only if `which_to_plot` is 'snr'.
+            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev', 'range', or 'mu_sigma'. Used only if `which_to_plot` is 'snr'.
 
         Returns:
             None
@@ -496,12 +496,19 @@ class DataAnalysis:
                 elif which_to_plot == 'snr':
                     if snr_type == 'std_dev':
                         column = f'{prop}_{method}_std'
+                        val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
                     elif snr_type == 'range':
                         column = f'{prop}_{method}_range'
+                        val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        column_mean = f'{prop}_{method}_mean'
+                        column_std = f'{prop}_{method}_std'
+                        val = abs(self.df_stat[self.df_stat['GroupID'] != 'total'][column_mean].mean()) / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column_std].mean()
                     else:
-                        raise ValueError("snr_type must be either 'std_dev' or 'range'.")
-                    val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
-                          self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                        raise ValueError("snr_type must be either 'std_dev', 'range', or mu_sigma.")
                 df_heatmap.loc[method, prop] = val
         self.df_heatmap = df_heatmap
 

@@ -36,9 +36,9 @@ exclude_keywords = [
     "0p0005", # data with too low Rh mass, likely to be inaccurate
     "(1)",    # data mistakenly uploaded twice
     "PercentLoading_Synthesis_MassLoading_Temperature_Date_Location", # example Excel file
-    "_UCSB",  # data from UCSB
-    "_Cargnello", # data from Cargnello
-    "_SLAC",   # data from SLAC
+    # "_UCSB",  # data from UCSB
+    # "_Cargnello", # data from Cargnello
+    # "_SLAC",   # data from SLAC
     # "_PSU",
 ]
 exclude_keywords_all = [
@@ -124,7 +124,7 @@ analysis.calculate_statistics_duplicate_group(
 )
 
 # print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final slope_mean'])
-print(analysis.df_stat[['CO Net Production Rate (mol/molRh/s)_auc_std', 'CO Net Production Rate (mol/molRh/s)_auc_mean']])
+# print(analysis.df_stat[['CO Net Production Rate (mol/molRh/s)_auc_std', 'CO Net Production Rate (mol/molRh/s)_auc_mean']])
 
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
@@ -136,14 +136,15 @@ print(analysis.df_stat[['CO Net Production Rate (mol/molRh/s)_auc_std', 'CO Net 
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
 analysis.plot_heatmap(
-    # which_to_plot='snr',
+    which_to_plot='snr',
     # which_to_plot='std_dev',
-    which_to_plot='std_dev_mean_normalized',
+    # which_to_plot='std_dev_mean_normalized',
     # snr_type='std_dev',
-    snr_type='range',
-    # cmap='Reds',
-    cmap='Blues',
-    vmax=10.0,
+    # snr_type='range',
+    snr_type='mu_sigma',
+    cmap='Reds',
+    # cmap='Blues',
+    vmax=5.3,
     # vmin=0.0,
 )
 
