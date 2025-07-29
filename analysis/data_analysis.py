@@ -453,7 +453,7 @@ class DataAnalysis:
             vmax (float): The maximum value of the colorbar.
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
-            which_to_plot (str): The type of data to plot. Either 'snr' or 'std_dev'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the standard deviation.
+            which_to_plot (str): The type of data to plot. Options are 'snr', 'std_dev', or 'std_dev_mean_normalized'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the maximum of standard deviations over replicate groups; if 'std_dev_mean_normalized', plot the maximum of normalized standard deviations over replicate groups.
             snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev', 'range', or 'mu_sigma'. Used only if `which_to_plot` is 'snr'.
             save_fig (bool): If True, save the figure; otherwise, show the figure.
 
@@ -531,7 +531,7 @@ class DataAnalysis:
         vmax = df_heatmap.max().max() if vmax is None else vmax
         vmin = df_heatmap.min().min() if vmin is None else vmin
         if which_to_plot == 'snr':
-            cbar_label = 'Signal-to-noise ratio (SNR)'
+            cbar_label = 'Signal-to-noise ratio'
         elif which_to_plot == 'std_dev':
             cbar_label = 'Max{standard deviation${_i}$}'
         elif which_to_plot == 'std_dev_mean_normalized':
