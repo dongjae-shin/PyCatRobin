@@ -10,6 +10,7 @@ from matplotlib.lines import Line2D
 from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
 from openpyxl.styles.builtins import styles
+from pandas.core.interchange.dataframe_protocol import DataFrame
 from statsmodels.formula.api import nominal_gee
 
 from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
@@ -439,8 +440,10 @@ class DataAnalysis:
             properties: list[str] = None, methods: list[str] = None,
             vmax: float = None, vmin: float = None, cmap: str = 'Reds',
             which_to_plot: str = 'snr', # 'snr', 'std_dev', or 'std_dev_mean_normalized'
-            snr_type: str = 'std_dev' # 'std_dev', 'range', or 'mu_sigma'; used only if `which_to_plot` is 'snr'
-    ):
+            snr_type: str = 'std_dev', # 'std_dev', 'range', or 'mu_sigma'; used only if `which_to_plot` is 'snr'
+            save_fig: bool = False, # whether to save the figure or not
+            prefix: str = None # prefix for the saved figure name; used only if `save_fig` is True
+            ) -> pd.DataFrame:
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
 
@@ -452,9 +455,10 @@ class DataAnalysis:
             cmap (str): The colormap to use for the heatmap.
             which_to_plot (str): The type of data to plot. Either 'snr' or 'std_dev'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the standard deviation.
             snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev', 'range', or 'mu_sigma'. Used only if `which_to_plot` is 'snr'.
+            save_fig (bool): If True, save the figure; otherwise, show the figure.
 
         Returns:
-            None
+            df_heatmap (pd.DataFrame): The DataFrame containing the heatmap data.
         """
         # If properties and methods are not provided, use the unique properties
         if properties is None:
@@ -480,8 +484,11 @@ class DataAnalysis:
         df_heatmap = pd.DataFrame(index=methods, columns=properties)
 
         # Sort index and column names of df_heatmap so the axes of the heatmap are shown in a consistent order
-        df_heatmap.sort_index(axis=0, inplace=True)
-        df_heatmap.sort_index(axis=1, inplace=True)
+        # only when the methods and properties are None
+        if methods is None:
+            df_heatmap.sort_index(axis=0, inplace=True)
+        if properties is None:
+            df_heatmap.sort_index(axis=1, inplace=True)
 
         for prop in properties:
             for method in methods:
@@ -528,7 +535,7 @@ class DataAnalysis:
         elif which_to_plot == 'std_dev':
             cbar_label = 'Max{standard deviation${_i}$}'
         elif which_to_plot == 'std_dev_mean_normalized':
-            cbar_label = 'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
+            cbar_label = r'Normalized variability' #'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
         sns.heatmap(
             df_heatmap,
             annot=True, fmt='.2f',
@@ -544,10 +551,16 @@ class DataAnalysis:
         plt.xticks(ha='left', fontsize=label_size, rotation=20)
         plt.yticks(ha='right', fontsize=label_size, rotation=60)
         plt.tight_layout()
-        plt.show()
 
         # reset the font size
         plt.rcParams.update({'font.size': 10})
+        if save_fig:
+            plt.savefig(f'heatmap_{which_to_plot}_{prefix}.png', dpi=300, bbox_inches='tight')
+        else:
+            plt.show()
+            pass
+
+        return df_heatmap
 
     def plot_tos_data_duplicate(self,
                                 column: str = 'CO Forward Production Rate (mol/molRh/s)',

@@ -653,7 +653,7 @@ def _calculate_target(
     Args:
         path (str): Path to individual GC Excel file.
         column (str): Column name to calculate the target values for.
-        method (str): Method to calculate the target value. Options are 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', or 'auc'.
+        method (str): Method to calculate the target value. Options are 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', or 'AUC'.
         verbose (bool): If True, print the calculated target values.
         adjacency_slope (float): Slope threshold for initial and final slope calculations.
         duration (float): Duration to calculate the final index.
@@ -690,7 +690,7 @@ def _calculate_target(
                                            col_val[final_index], tos, col_val, savgol, plot=False, show=False)
     elif method == 'overall slope':
         target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
-    elif method == 'auc':
+    elif method == 'AUC':
         # calculate area under the curve (AUC) using trapezoidal rule
         target = np.trapz(col_val[selected_index], tos[selected_index])
     # elif method == 'decaying rate':
