@@ -162,18 +162,17 @@ class DataAnalysis:
 
     def compare_targets_std_dev(
             self, target_wise: bool = False, colormap: str = 'tab10', snr_type: str = 'std_dev',
-            plot_hist: bool = True, violinplot_direction: str = 'vertical'
+            plot_hist: bool = True
     ):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
-            snr_type: The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev' or 'range'.
+            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Options are 'std_dev', 'range', or 'mu_sigma'. If snr_type='mu_sigma', it does not use statistics of the total group.
             violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
             plot_hist: If True, plot the histogram of the target values.
-            violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
 
         Returns:
             None
@@ -209,6 +208,7 @@ class DataAnalysis:
                         value_vars=[
                             column, # e.g., 'CO2 Conversion (%)_std', 'Selectivity to CO (%)_std'
                             column.replace('_std', '_range'), # added for snr_type='range'
+                            column.replace('_std', '_mean') # added for snr_type='mu_sigma'
                             ],
                         var_name='Statistic',
                         value_name='Value'
@@ -228,14 +228,26 @@ class DataAnalysis:
                                     x='GroupID', y='Value', ax=axs[i], palette=colors,
                                     hue='GroupID', legend=False)
                         axs[i].set_ylabel('Standard Deviation')
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        sns.barplot(data=df_melted[(df_melted['Statistic'] == column) & (df_melted['GroupID'] != 'total')],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Standard Deviation')
 
                     # Set the title of the subplot with the signal-to-noise ratio (SNR)
                     if snr_type == 'std_dev':
                         df_selected = df_melted[df_melted['Statistic'] == column]
+                        snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
                     elif snr_type == 'range':
                         df_selected = df_melted[df_melted['Statistic'] == column.replace('_std', '_range')]
-                    snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
-                          df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
+                        snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        df_selected = df_melted[df_melted['Statistic'] == column]
+                        df_selected_mean = df_melted[df_melted['Statistic'] == column.replace('_std', '_mean')]
+                        snr = abs(df_selected_mean.loc[df_selected_mean['GroupID'] != 'total', 'Value'].mean()) / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].mean()
 
                     axs[i].set_title(f'{column.split("_")[1]} (SNR={snr:.2f})', fontsize=12)
 
@@ -250,8 +262,7 @@ class DataAnalysis:
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
                             self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
-                                                             plot_hist=plot_hist,
-                                                             violinplot_direction=violinplot_direction)
+                                                             plot_hist=plot_hist, snr_type=snr_type)
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
@@ -279,7 +290,8 @@ class DataAnalysis:
             plt.show()
 
     def _generate_data_distribution(
-            self, column: str, cmap: str = 'tab10', plot_hist: bool = True, violinplot_direction: str = 'vertical'
+            self, column: str, cmap: str = 'tab10', plot_hist: bool = True,
+            snr_type: str = 'std_dev'
     ):
 
         # shallow copy: connected to the original df. it's like using nickname
@@ -311,129 +323,83 @@ class DataAnalysis:
         # Save the DataFrame for later use
         self.df_violinplot = df
 
+        if snr_type == 'mu_sigma':
+            max_column = df[column].max()
+            min_column = df[column].min()
+            # exclude the row with GroupID 'total' from the DataFrame
+            df = df[df['GroupID'] != 'total'].reset_index(drop=True)
+
+
         # Plot a violinplot
-        if violinplot_direction == 'horizontal':
-            fig, axs = plt.subplots(nrows=2 if plot_hist else 1, ncols=1, sharex=True)
-            if not plot_hist:
-                axs = [axs]
+        # elif violinplot_direction == 'vertical':
+        fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
+        if not plot_hist:
+            axs = [axs]
 
-            # hue_order = df['GroupID'].unique()
+        # hue_order = df['GroupID'].unique()
 
-            sns.violinplot(
-                df, x=column, y='GroupID',
-                hue='GroupID',
-                split=False, inner='stick',
-                palette=cmap,
-                ax=axs[0],
-                legend=False,
-                # hue_order=hue_order,
-                zorder=0
+        sns.violinplot(
+            df, x='GroupID', y=column,
+            hue='GroupID',
+            split=False,
+            inner='stick',
+            palette=cmap,
+            ax=axs[0],
+            legend=False,
+            # hue_order=hue_order,
+            zorder=0
+        )
+
+        axs[0].axhspan(min_column, max_column, color='lightgray', alpha=0.4, zorder=-1)
+
+        # set ylimit of axs[0]
+        range_column = df[column].max() - df[column].min()
+        axs[0].set_ylim(df[column].min() - 0.5*range_column, df[column].max() + 0.5*range_column)
+
+        # Scatterplot instead of stripplot was used to give different markers to different locations
+        # the style argument to differentiate the locations is not supported in stripplot
+        # Step 1: Map each unique GroupID to a numeric position
+        groupid_labels = df['GroupID'].astype(str).unique()
+        groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
+        df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
+        # Step 2: Add jitter
+        df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
+
+        sns.scatterplot(
+            df, x='GroupID_jitter', y=column,
+            hue='location',
+            palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
+            ax=axs[0], legend=True,
+            style='location', edgecolor='w', s=30,
+            # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
+            # hue_order=hue_order,
+            zorder=2
+        )
+        axs[0].set_xticks(list(groupid_to_num.values()))
+        axs[0].set_xticklabels(list(groupid_to_num.keys()))
+
+        #change the font size of the x tick labels
+        labelsize = 15
+        axs[0].tick_params(axis='x', labelsize=labelsize)
+        axs[0].tick_params(axis='y', labelsize=labelsize)
+
+        if plot_hist:
+            # Plot the histogram
+            sns.histplot(
+                df, y=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
+                kde=False, ax=axs[1]
             )
+            # Make the boundary of axs[1] the same as that of axs[0]
+            axs[1].set_ylim(axs[0].get_ylim())
+            # Make the x tick labels integer
+            axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
+            axs[1].set_ylabel('')
+            axs[1].tick_params(axis='x', labelsize=labelsize)
+            axs[1].tick_params(axis='y', labelsize=labelsize)
 
-            # Scatterplot instead of stripplot was used to give different markers to different locations
-            # the style argument to differentiate the locations is not supported in stripplot
-            # Step 1: Map each unique GroupID to a numeric position
-            groupid_labels = df['GroupID'].astype(str).unique()
-            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
-            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
-            # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
-
-            sns.scatterplot(
-                df, x=column, y='GroupID_jitter',
-                hue='location',
-                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
-                ax=axs[0], legend=True,
-                style='location', edgecolor='w', s=30,
-                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
-                # hue_order=hue_order,
-                zorder=2
-            )
-            axs[0].set_yticks(list(groupid_to_num.values()))
-            axs[0].set_yticklabels(list(groupid_to_num.keys()))
-
-            if plot_hist:
-                # Plot the histogram
-                sns.histplot(
-                    df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
-                    kde=False, ax=axs[1]
-                )
-                # Make the boundary of axs[1] the same as that of axs[0]
-                axs[1].set_xlim(axs[0].get_xlim())
-                # Make the y tick labels integer
-                axs[1].set_yticks(np.arange(0, axs[1].get_ylim()[1], 2))
-                axs[0].set_xlabel('')
-
-            fig.suptitle(f'Distribution of {column}')
-            plt.tight_layout()
-            plt.show()
-
-        elif violinplot_direction == 'vertical':
-            fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
-            if not plot_hist:
-                axs = [axs]
-
-            # hue_order = df['GroupID'].unique()
-
-            sns.violinplot(
-                df, x='GroupID', y=column,
-                hue='GroupID',
-                split=False,
-                inner='stick',
-                palette=cmap,
-                ax=axs[0],
-                legend=False,
-                # hue_order=hue_order,
-                zorder=0
-            )
-            # set ylimit of axs[0]
-            range_column = df[column].max() - df[column].min()
-            axs[0].set_ylim(df[column].min() - 0.5*range_column , df[column].max() + 0.5*range_column)
-
-            # Scatterplot instead of stripplot was used to give different markers to different locations
-            # the style argument to differentiate the locations is not supported in stripplot
-            # Step 1: Map each unique GroupID to a numeric position
-            groupid_labels = df['GroupID'].astype(str).unique()
-            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
-            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
-            # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
-
-            sns.scatterplot(
-                df, x='GroupID_jitter', y=column,
-                hue='location',
-                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
-                ax=axs[0], legend=True,
-                style='location', edgecolor='w', s=30,
-                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
-                # hue_order=hue_order,
-                zorder=2
-            )
-            axs[0].set_xticks(list(groupid_to_num.values()))
-            axs[0].set_xticklabels(list(groupid_to_num.keys()))
-
-            #change the font size of the x tick labels
-            labelsize = 15
-            axs[0].tick_params(axis='x', labelsize=labelsize)
-            axs[0].tick_params(axis='y', labelsize=labelsize)
-
-            if plot_hist:
-                # Plot the histogram
-                sns.histplot(
-                    df, y=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
-                    kde=False, ax=axs[1]
-                )
-                # Make the boundary of axs[1] the same as that of axs[0]
-                axs[1].set_ylim(axs[0].get_ylim())
-                # Make the x tick labels integer
-                axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
-                axs[1].set_ylabel('')
-                axs[1].tick_params(axis='x', labelsize=labelsize)
-                axs[1].tick_params(axis='y', labelsize=labelsize)
-
-            fig.suptitle(f'Distribution of {column}')
-            plt.tight_layout()
-            plt.show()
+        fig.suptitle(f'Distribution of {column}')
+        plt.tight_layout()
+        plt.show()
 
     def plot_heatmap(
             self,

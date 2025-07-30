@@ -74,22 +74,21 @@ dataset_all.apply_duplicate_groupid(
 # Calculate and add target values into the DataFrame
 savgol=False
 methods=[
-            'initial value',
+            # 'initial value',
             'final value',
-            'initial slope',
-            'final slope',
-            'overall slope',
-            'auc',
+            # 'initial slope',
+            # 'final slope',
+            # 'overall slope',
+            # 'auc',
             # 'delta'
         ]
-#TODO: Add area under the curve (AUC) as a method
 
 for column in [
-   'CO2 Conversion (%)',
-   'CH4 Net Production Rate (mol/molRh/s)',
+   # 'CO2 Conversion (%)',
+   # 'CH4 Net Production Rate (mol/molRh/s)',
    'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -135,27 +134,27 @@ analysis.calculate_statistics_duplicate_group(
 # analysis.plot_tos_data_duplicate(column='CH4 Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO2 Conversion (%)', x_max_plot=12, y_max_plot=45)
 
-analysis.plot_heatmap(
-    which_to_plot='snr',
-    # which_to_plot='std_dev',
-    # which_to_plot='std_dev_mean_normalized',
-    # snr_type='std_dev',
-    # snr_type='range',
-    snr_type='mu_sigma',
-    cmap='Reds',
-    # cmap='Blues',
-    vmax=5.3,
-    # vmin=0.0,
-)
+# analysis.plot_heatmap(
+#     which_to_plot='snr',
+#     # which_to_plot='std_dev',
+#     # which_to_plot='std_dev_mean_normalized',
+#     # snr_type='std_dev',
+#     # snr_type='range',
+#     snr_type='mu_sigma',
+#     cmap='Reds',
+#     # cmap='Blues',
+#     vmax=5.3,
+#     # vmin=0.0,
+# )
 
 # average_value = analysis.df_snr.mean().mean()
 # print(f'Average value of all the values in the DataFrame: {average_value}')
 
 analysis.compare_targets_std_dev(
     target_wise=True,
-    snr_type='range', #'std_dev',
+    # snr_type='range', #'std_dev',
+    snr_type='mu_sigma',
     plot_hist=True, #False,
-    violinplot_direction='vertical'
 )
 
 # analysis._generate_data_distribution_horizontal(
