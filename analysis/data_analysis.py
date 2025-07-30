@@ -30,6 +30,7 @@ class DataAnalysis:
             raise ValueError("Please provide a dataset.")
 
         self.dataset = dataset
+        self.dataset_all = None
         self.df_stat = None
         self.unique_properties = None
         self.df_snr = None
@@ -129,7 +130,8 @@ class DataAnalysis:
                 elif total == 'duplicate':
                     df_total_defined = self.dataset.df_us
                     print("Using duplicate dataset (dataset.df_us) for total statistics.")
-            elif dataset_all is not None:
+            elif dataset_all:
+                self.dataset_all = dataset_all
                 if total == 'unique': # to be deprecated
                     df_total_defined = dataset_all.df_us_unique
                     print("Using unique dataset (dataset_all.df_us_unique) for total statistics.")
@@ -332,9 +334,7 @@ class DataAnalysis:
             # exclude the row with GroupID 'total' from the DataFrame
             df = df[df['GroupID'] != 'total'].reset_index(drop=True)
 
-
         # Plot a violinplot
-        # elif violinplot_direction == 'vertical':
         fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
         if not plot_hist:
             axs = [axs]
@@ -356,8 +356,8 @@ class DataAnalysis:
         axs[0].axhspan(min_column, max_column, color='lightgray', alpha=0.4, zorder=-1)
 
         # set ylimit of axs[0]
-        range_column = df[column].max() - df[column].min()
-        axs[0].set_ylim(df[column].min() - 0.5*range_column, df[column].max() + 0.5*range_column)
+        range_column = self.dataset_all.df_us[column].max() - self.dataset_all.df_us[column].min()
+        axs[0].set_ylim(self.dataset_all.df_us[column].min() - 0.4*range_column, self.dataset_all.df_us[column].max() + 0.4*range_column)
 
         # Scatterplot instead of stripplot was used to give different markers to different locations
         # the style argument to differentiate the locations is not supported in stripplot
@@ -404,8 +404,12 @@ class DataAnalysis:
         plt.tight_layout()
         if save_fig:
             print('Saving the figure...')
-            plt.savefig(f'violin_{prefix}.png', dpi=300, bbox_inches='tight')
-            print(f'Figure saved as violin_{prefix}.png')
+            filename = f'violin_{column}_{prefix}.png'\
+                    .replace(' ', '_')\
+                    .replace('(mol/molRh/s)', '')\
+                    .replace('(%)', '')
+            plt.savefig(filename, dpi=300, bbox_inches='tight')
+            print(f'Figure saved as {filename}')
             # after saving the figure, close it
             plt.close(fig)
         else:
