@@ -21,7 +21,6 @@ class DataForGP:
         path_removed (list): List of paths to the removed Excel files.
         df_us (pd.DataFrame): DataFrame containing the processed data.
         df_us_unique (pd.DataFrame): DataFrame containing the unique processed data.
-        df_stat (pd.DataFrame): DataFrame containing statistical data of duplicate groups.
         targets (list): List to store target values.
 
     Methods:
@@ -59,7 +58,6 @@ class DataForGP:
         self.path_removed = None
         self.df_us = None
         self.df_us_unique = None
-        self.df_stat = None
         self.targets = []
 
     def find_excel_files(self):
@@ -655,7 +653,7 @@ def _calculate_target(
     Args:
         path (str): Path to individual GC Excel file.
         column (str): Column name to calculate the target values for.
-        method (str): Method to calculate the target value. Options are 'delta', 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope'.
+        method (str): Method to calculate the target value. Options are 'initial value', 'final value', 'initial slope', 'final slope', 'overall slope', or 'AUC'.
         verbose (bool): If True, print the calculated target values.
         adjacency_slope (float): Slope threshold for initial and final slope calculations.
         duration (float): Duration to calculate the final index.
@@ -692,6 +690,9 @@ def _calculate_target(
                                            col_val[final_index], tos, col_val, savgol, plot=False, show=False)
     elif method == 'overall slope':
         target = (col_val[final_index] - col_val[initial_index]) / (tos[final_index] - tos[initial_index])
+    elif method == 'AUC':
+        # calculate area under the curve (AUC) using trapezoidal rule
+        target = np.trapz(col_val[selected_index], tos[selected_index])
     # elif method == 'decaying rate':
     #     print('not implemented yet')
     #     return

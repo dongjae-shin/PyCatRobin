@@ -10,6 +10,7 @@ from matplotlib.lines import Line2D
 from matplotlib.pyplot import legend
 from matplotlib.widgets import Button
 from openpyxl.styles.builtins import styles
+from pandas.core.interchange.dataframe_protocol import DataFrame
 from statsmodels.formula.api import nominal_gee
 
 from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
@@ -37,7 +38,8 @@ class DataAnalysis:
 
     def calculate_statistics_duplicate_group(self, verbose: bool = False,
                                              dataset_all: DataForGP = None,
-                                             total: str = 'unique'):
+                                             total: str = 'unique',
+                                             average_same_location: bool = False):
         """
         Calculate statistics for duplicate groups. The statistics include the mean, standard deviation of each target, and
         the total standard deviation of each target in the selected dataset by 'dataset_all' and 'total'. The calculated
@@ -47,9 +49,10 @@ class DataAnalysis:
         signal-to-noise ratio (SNR), standard deviation, histogram, and violin plot.
 
         Args:
-            dataset_all: If provided, use this dataset to estimate the true variability of each target metric instead of self.dataset.
+            dataset_all: If provided, use this dataset to estimate the true variability/range of each target metric instead of self.dataset.
             verbose (bool): If True, print the calculated statistics.
-            total (str): 'unique' or 'duplicate'. If 'unique', duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability of each target metric.
+            total (str): 'unique' or 'duplicate'. If 'unique', metrics of duplicate data are averaged; if 'duplicate', all the duplicate data are used to estimate true variability/range of each target metric.
+            average_same_location (bool): If True, average the target values of the same location in each duplicate group. Useful for interlab standard deviation calculation.
 
         Returns:
             None
@@ -63,7 +66,7 @@ class DataAnalysis:
         if len(self.dataset.targets) == 0:
             raise ValueError("self.dataset.targets is not constructed yet. Please run assign_target_values() first.")
 
-        # use fist row as a dummy, and remove columns of self.df_stat corresponding to target values
+        # use the first row as a dummy, and remove columns of self.df_stat corresponding to target values
         self.df_stat = self.dataset.df_us.iloc[0, :] #
         self.df_stat = self.df_stat.to_frame().T
         self.df_stat = self.df_stat.drop(self.dataset.targets, axis=1)
@@ -72,6 +75,7 @@ class DataAnalysis:
         for target in self.dataset.targets:
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_mean', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_std', None)
+            self.df_stat.insert(len(self.df_stat.columns), f'{target}_range', None)
             self.df_stat.insert(len(self.df_stat.columns), f'{target}_list', None)
         # add a column for dataframe for each duplicate group
         self.df_stat.insert(len(self.df_stat.columns), 'dataframe', None)
@@ -83,15 +87,31 @@ class DataAnalysis:
                 if verbose:
                     print(f'Group {i}: ')
                 df_integrated = df_group.iloc[0, :].drop(self.dataset.targets) # use the first row in the group
+
+                if average_same_location:
+                    # Group by 'location' and integrate rows with the same location by averaging the values of targets for pure 'interlab' std. dev.
+                    for location, df_subgroup in df_group.groupby('location'):
+                        if len(df_subgroup) > 1:
+                            # Average the values of all columns except 'location'
+                            df_sub_integrated = df_subgroup.iloc[:1, :] # use the first row as a dummy
+                            df_sub_integrated[self.dataset.targets] = df_subgroup[self.dataset.targets].mean()
+                            # remove rows from the df_group
+                            df_group = df_group[df_group['location'] != location]
+                            # add sub_integrated row to the df_group
+                            df_group = pd.concat([df_group, df_sub_integrated], axis=0)
+
                 # calculate statistics of each target for each duplicate group
                 for target in self.dataset.targets:
                     mean = df_group[target].mean()
                     std = df_group[target].std()
+                    range_ = df_group[target].max() - df_group[target].min()
                     if verbose:
                         print(f'mean of {target}: {mean:5.2f}')
                         print(f'std. dev. of {target}: {std:5.2f}')
+                        print(f'range of {target}: {range_:5.2f}')
                     df_integrated.loc[f'{target}_mean'] = mean
                     df_integrated.loc[f'{target}_std'] = std
+                    df_integrated.loc[f'{target}_range'] = range_
                     df_integrated.loc[f'{target}_list'] = df_group[target].to_list()
                 df_integrated.loc['filename'] = df_group['filename'].to_list()
                 df_integrated.loc['experiment_date'] = df_group['experiment_date'].dt.strftime('%Y%m%d').to_list()
@@ -121,13 +141,19 @@ class DataAnalysis:
             # Add a row for the defined total data
             df_integrated[:] = None # dummy
 
-            # Calculate statistics of each target for each duplicate group
+            # Calculate statistics of each target for 'total' group
             for target in self.dataset.targets:
+                mean = df_total_defined[target].mean()
                 # std = self.dataset.df_us_unique[target].std() # std. dev. of averages; to be deprecated
                 std = df_total_defined[target].std()
+                range_ = df_total_defined[target].max() - df_total_defined[target].min()
                 if verbose:
+                    print(f'total mean of {target}: {mean:5.2f}')
                     print(f'total std. dev. of {target}: {std:5.2f}')
+                    print(f'total range of {target}: {range_:5.2f}')
+                df_integrated.loc[f'{target}_mean'] = mean
                 df_integrated.loc[f'{target}_std'] = std
+                df_integrated.loc[f'{target}_range'] = range_
                 df_integrated.loc['GroupID'] = 'total' # unique
                 # df_integrated.loc[f'{target}_list'] = self.dataset.df_us_unique[target].to_list()
                 df_integrated.loc[f'{target}_list'] = df_total_defined[target].to_list()
@@ -135,18 +161,18 @@ class DataAnalysis:
             self.df_stat.loc[self.df_stat.shape[0]] = df_integrated
 
     def compare_targets_std_dev(
-            self, target_wise: bool = False, colormap: str = 'tab10',
-            plot_hist: bool = True, violinplot_direction: str = 'vertical'
+            self, target_wise: bool = False, colormap: str = 'tab10', snr_type: str = 'std_dev',
+            plot_hist: bool = True
     ):
         """
         Compare the standard deviation of the target values for each column.
 
         Args:
+            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Options are 'std_dev', 'range', or 'mu_sigma'. If snr_type='mu_sigma', it does not use statistics of the total group.
             violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
             plot_hist: If True, plot the histogram of the target values.
-            violinplot_direction (str): The direction of the violin plot. Either 'horizontal' or 'vertical'.
 
         Returns:
             None
@@ -164,33 +190,64 @@ class DataAnalysis:
 
             # Plot the data
             for property in self.unique_properties: # Figures over properties
-                columns_property = [col for col in columns if property in col]# Figures over properties
+                columns_property = [col for col in columns if property in col] # Figures over properties
                 # Create subplots
                 nrows = (len(columns_property) + 2) // 3
                 ncols = min(len(columns_property), 3)
                 fig, axs = plt.subplots(nrows, ncols, figsize=(13, 8))
 
                 # set title of the fig
-                fig.suptitle(f'{property}', fontsize=16)
+                fig.suptitle(f'{property} (SNR type: {snr_type})', fontsize=16)
 
                 axs = np.ravel(axs)
                 n_plot = 0
                 for i, column in enumerate(columns_property): # Subplots over methods
                     # Melt the DataFrame to long format for seaborn
-                    df_melted = self.df_stat.melt(id_vars=['GroupID'],
-                                                          value_vars=column,
-                                                          var_name='Target',
-                                                          value_name='Standard Deviation')
+                    df_melted = self.df_stat.melt(
+                        id_vars=['GroupID'],
+                        value_vars=[
+                            column, # e.g., 'CO2 Conversion (%)_std', 'Selectivity to CO (%)_std'
+                            column.replace('_std', '_range'), # added for snr_type='range'
+                            column.replace('_std', '_mean') # added for snr_type='mu_sigma'
+                            ],
+                        var_name='Statistic',
+                        value_name='Value'
+                    )
                     # Generate colors from a predefined colormap
                     cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
                     colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
                     colors[-1] = 'black'
-                    # Plot the data
-                    sns.barplot(data=df_melted, x='GroupID', y='Standard Deviation', ax=axs[i], palette=colors,
-                                hue='GroupID', legend=False)
+                    # Plot the data based on standard deviation
+                    if snr_type == 'range':
+                        sns.barplot(data=df_melted[df_melted['Statistic'] == column.replace('_std', '_range')],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Range')
+                    elif snr_type == 'std_dev':
+                        sns.barplot(data=df_melted[df_melted['Statistic'] == column],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Standard Deviation')
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        sns.barplot(data=df_melted[(df_melted['Statistic'] == column) & (df_melted['GroupID'] != 'total')],
+                                    x='GroupID', y='Value', ax=axs[i], palette=colors,
+                                    hue='GroupID', legend=False)
+                        axs[i].set_ylabel('Standard Deviation')
+
                     # Set the title of the subplot with the signal-to-noise ratio (SNR)
-                    snr = df_melted.loc[df_melted['GroupID'] == 'total', 'Standard Deviation'].values[0] / \
-                          df_melted.loc[df_melted['GroupID'] != 'total', 'Standard Deviation'].max()
+                    if snr_type == 'std_dev':
+                        df_selected = df_melted[df_melted['Statistic'] == column]
+                        snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
+                    elif snr_type == 'range':
+                        df_selected = df_melted[df_melted['Statistic'] == column.replace('_std', '_range')]
+                        snr = df_selected.loc[df_selected['GroupID'] == 'total', 'Value'].values[0] / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].max()
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        df_selected = df_melted[df_melted['Statistic'] == column]
+                        df_selected_mean = df_melted[df_melted['Statistic'] == column.replace('_std', '_mean')]
+                        snr = abs(df_selected_mean.loc[df_selected_mean['GroupID'] != 'total', 'Value'].mean()) / \
+                              df_selected.loc[df_selected['GroupID'] != 'total', 'Value'].mean()
 
                     axs[i].set_title(f'{column.split("_")[1]} (SNR={snr:.2f})', fontsize=12)
 
@@ -205,8 +262,7 @@ class DataAnalysis:
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
                             self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
-                                                             plot_hist=plot_hist,
-                                                             violinplot_direction=violinplot_direction)
+                                                             plot_hist=plot_hist, snr_type=snr_type)
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
@@ -221,20 +277,21 @@ class DataAnalysis:
             # Melt the DataFrame to long format for seaborn
             df_melted = self.df_stat.melt(id_vars=['GroupID'],
                                              value_vars=[col for col in self.df_stat.columns if '_std' in col],
-                                             var_name='Target',
-                                             value_name='Standard Deviation')
-            df_melted['Target'] = df_melted['Target'].str.rstrip('_std')
+                                             var_name='Statistic',
+                                             value_name='Value')
+            df_melted['Statistic'] = df_melted['Statistic'].str.rstrip('_std')
 
             # Plot the data
             plt.figure(figsize=(12, 6))
-            sns.barplot(data=df_melted, x='Target', y='Standard Deviation', hue='GroupID', palette=colormap)
+            sns.barplot(data=df_melted, x='Statistic', y='Value', hue='GroupID', palette=colormap)
             plt.xticks(rotation=45, ha='right')
             plt.title('Standard Deviation of Target Values by GroupID')
             plt.tight_layout()
             plt.show()
 
     def _generate_data_distribution(
-            self, column: str, cmap: str = 'tab10', plot_hist: bool = True, violinplot_direction: str = 'vertical'
+            self, column: str, cmap: str = 'tab10', plot_hist: bool = True,
+            snr_type: str = 'std_dev'
     ):
 
         # shallow copy: connected to the original df. it's like using nickname
@@ -266,124 +323,93 @@ class DataAnalysis:
         # Save the DataFrame for later use
         self.df_violinplot = df
 
+        if snr_type == 'mu_sigma':
+            max_column = df[column].max()
+            min_column = df[column].min()
+            # exclude the row with GroupID 'total' from the DataFrame
+            df = df[df['GroupID'] != 'total'].reset_index(drop=True)
+
+
         # Plot a violinplot
-        if violinplot_direction == 'horizontal':
-            fig, axs = plt.subplots(nrows=2 if plot_hist else 1, ncols=1, sharex=True)
-            if not plot_hist:
-                axs = [axs]
+        # elif violinplot_direction == 'vertical':
+        fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
+        if not plot_hist:
+            axs = [axs]
 
-            # hue_order = df['GroupID'].unique()
+        # hue_order = df['GroupID'].unique()
 
-            sns.violinplot(
-                df, x=column, y='GroupID',
-                hue='GroupID',
-                split=False, inner='stick',
-                palette=cmap,
-                ax=axs[0],
-                legend=False,
-                # hue_order=hue_order,
-                zorder=0
+        sns.violinplot(
+            df, x='GroupID', y=column,
+            hue='GroupID',
+            split=False,
+            inner='stick',
+            palette=cmap,
+            ax=axs[0],
+            legend=False,
+            # hue_order=hue_order,
+            zorder=0
+        )
+
+        axs[0].axhspan(min_column, max_column, color='lightgray', alpha=0.4, zorder=-1)
+
+        # set ylimit of axs[0]
+        range_column = df[column].max() - df[column].min()
+        axs[0].set_ylim(df[column].min() - 0.5*range_column, df[column].max() + 0.5*range_column)
+
+        # Scatterplot instead of stripplot was used to give different markers to different locations
+        # the style argument to differentiate the locations is not supported in stripplot
+        # Step 1: Map each unique GroupID to a numeric position
+        groupid_labels = df['GroupID'].astype(str).unique()
+        groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
+        df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
+        # Step 2: Add jitter
+        df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
+
+        sns.scatterplot(
+            df, x='GroupID_jitter', y=column,
+            hue='location',
+            palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
+            ax=axs[0], legend=True,
+            style='location', edgecolor='w', s=30,
+            # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
+            # hue_order=hue_order,
+            zorder=2
+        )
+        axs[0].set_xticks(list(groupid_to_num.values()))
+        axs[0].set_xticklabels(list(groupid_to_num.keys()))
+
+        #change the font size of the x tick labels
+        labelsize = 15
+        axs[0].tick_params(axis='x', labelsize=labelsize)
+        axs[0].tick_params(axis='y', labelsize=labelsize)
+
+        if plot_hist:
+            # Plot the histogram
+            sns.histplot(
+                df, y=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
+                kde=False, ax=axs[1]
             )
+            # Make the boundary of axs[1] the same as that of axs[0]
+            axs[1].set_ylim(axs[0].get_ylim())
+            # Make the x tick labels integer
+            axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
+            axs[1].set_ylabel('')
+            axs[1].tick_params(axis='x', labelsize=labelsize)
+            axs[1].tick_params(axis='y', labelsize=labelsize)
 
-            # Scatterplot instead of stripplot was used to give different markers to different locations
-            # the style argument to differentiate the locations is not supported in stripplot
-            # Step 1: Map each unique GroupID to a numeric position
-            groupid_labels = df['GroupID'].astype(str).unique()
-            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
-            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
-            # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
+        fig.suptitle(f'Distribution of {column}')
+        plt.tight_layout()
+        plt.show()
 
-            sns.scatterplot(
-                df, x=column, y='GroupID_jitter',
-                hue='location',
-                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
-                ax=axs[0], legend=True,
-                style='location', edgecolor='w', s=30,
-                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
-                # hue_order=hue_order,
-                zorder=2
-            )
-            axs[0].set_yticks(list(groupid_to_num.values()))
-            axs[0].set_yticklabels(list(groupid_to_num.keys()))
-
-            if plot_hist:
-                # Plot the histogram
-                sns.histplot(
-                    df, x=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
-                    kde=False, ax=axs[1]
-                )
-                # Make the boundary of axs[1] the same as that of axs[0]
-                axs[1].set_xlim(axs[0].get_xlim())
-                # Make the y tick labels integer
-                axs[1].set_yticks(np.arange(0, axs[1].get_ylim()[1], 2))
-                axs[0].set_xlabel('')
-
-            fig.suptitle(f'Distribution of {column}')
-            plt.tight_layout()
-            plt.show()
-
-        elif violinplot_direction == 'vertical':
-            fig, axs = plt.subplots(nrows=1, ncols=2 if plot_hist else 1, sharey=True, figsize=(10, 6))
-            if not plot_hist:
-                axs = [axs]
-
-            # hue_order = df['GroupID'].unique()
-
-            sns.violinplot(
-                df, x='GroupID', y=column,
-                hue='GroupID',
-                split=False, inner='stick',
-                palette=cmap,
-                ax=axs[0],
-                legend=False,
-                # hue_order=hue_order,
-                zorder=0
-            )
-
-            # Scatterplot instead of stripplot was used to give different markers to different locations
-            # the style argument to differentiate the locations is not supported in stripplot
-            # Step 1: Map each unique GroupID to a numeric position
-            groupid_labels = df['GroupID'].astype(str).unique()
-            groupid_to_num = {label: i for i, label in enumerate(groupid_labels)}
-            df['GroupID_num'] = df['GroupID'].astype(str).map(groupid_to_num)
-            # Step 2: Add jitter
-            df['GroupID_jitter'] = df['GroupID_num'] + np.random.uniform(-0.05, 0.05, size=len(df))
-
-            sns.scatterplot(
-                df, x='GroupID_jitter', y=column,
-                hue='location',
-                palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray'],
-                ax=axs[0], legend=True,
-                style='location', edgecolor='w', s=30,
-                # markers=['X', 'o', 'P', '^', '*', 'v', 'D', 'P'],
-                # hue_order=hue_order,
-                zorder=2
-            )
-            axs[0].set_xticks(list(groupid_to_num.values()))
-            axs[0].set_xticklabels(list(groupid_to_num.keys()))
-
-            if plot_hist:
-                # Plot the histogram
-                sns.histplot(
-                    df, y=column, hue='GroupID', shrink=0.95, multiple='stack', stat='count', palette=cmap,
-                    kde=False, ax=axs[1]
-                )
-                # Make the boundary of axs[1] the same as that of axs[0]
-                axs[1].set_ylim(axs[0].get_ylim())
-                # Make the x tick labels integer
-                axs[1].set_xticks(np.arange(0, axs[1].get_xlim()[1], 2))
-                axs[1].set_ylabel('')
-
-            fig.suptitle(f'Distribution of {column}')
-            plt.tight_layout()
-            plt.show()
-
-    def plot_heatmap_snr(
+    def plot_heatmap(
             self,
             properties: list[str] = None, methods: list[str] = None,
-            vmax: float = None, vmin: float = 0, cmap: str = 'Reds',
-    ):
+            vmax: float = None, vmin: float = None, cmap: str = 'Reds',
+            which_to_plot: str = 'snr', # 'snr', 'std_dev', or 'std_dev_mean_normalized'
+            snr_type: str = 'std_dev', # 'std_dev', 'range', or 'mu_sigma'; used only if `which_to_plot` is 'snr'
+            save_fig: bool = False, # whether to save the figure or not
+            prefix: str = None # prefix for the saved figure name; used only if `save_fig` is True
+            ) -> pd.DataFrame:
         """
         Plot the heatmap of the signal-to-noise ratio (SNR) of the target values.
 
@@ -393,9 +419,12 @@ class DataAnalysis:
             vmax (float): The maximum value of the colorbar.
             vmin (float): The minimum value of the colorbar.
             cmap (str): The colormap to use for the heatmap.
+            which_to_plot (str): The type of data to plot. Options are 'snr', 'std_dev', or 'std_dev_mean_normalized'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the maximum of standard deviations over replicate groups; if 'std_dev_mean_normalized', plot the maximum of normalized standard deviations over replicate groups.
+            snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev', 'range', or 'mu_sigma'. Used only if `which_to_plot` is 'snr'.
+            save_fig (bool): If True, save the figure; otherwise, show the figure.
 
         Returns:
-            None
+            df_heatmap (pd.DataFrame): The DataFrame containing the heatmap data.
         """
         # If properties and methods are not provided, use the unique properties
         if properties is None:
@@ -416,25 +445,48 @@ class DataAnalysis:
             # make elements of methods unique
             methods = list(set(methods))
 
-        # Make (len(properties) x (len(methods)) DataFrame consists of corresponding SNR values
+        # Make (len(properties) x (len(methods)) DataFrame consists of corresponding 'which_to_plot' values
         # Make the row index corresponds to methods and the column index corresponds to properties
-        df_snr = pd.DataFrame(index=methods, columns=properties)
+        df_heatmap = pd.DataFrame(index=methods, columns=properties)
 
-        # Sort index and column names of df_snr so the axes of the heatmap are shown in a consistent order
-        df_snr.sort_index(axis=0, inplace=True)
-        df_snr.sort_index(axis=1, inplace=True)
+        # Sort index and column names of df_heatmap so the axes of the heatmap are shown in a consistent order
+        # only when the methods and properties are None
+        if methods is None:
+            df_heatmap.sort_index(axis=0, inplace=True)
+        if properties is None:
+            df_heatmap.sort_index(axis=1, inplace=True)
 
         for prop in properties:
             for method in methods:
-                column = f'{prop}_{method}_std'
-                snr = self.df_stat[column].iloc[-1] / self.df_stat[column].iloc[:-1].max()
-                snr = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
-                      self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
-                df_snr.loc[method, prop] = snr
-        self.df_snr = df_snr
+                if which_to_plot == 'std_dev':
+                    column = f'{prop}_{method}_std'
+                    val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                elif which_to_plot == 'std_dev_mean_normalized':
+                    column = f'{prop}_{method}_std'
+                    column_mean = f'{prop}_{method}_mean'
+                    val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max() / \
+                          abs(self.df_stat[self.df_stat['GroupID'] == 'total'][column_mean].values[0])
+                elif which_to_plot == 'snr':
+                    if snr_type == 'std_dev':
+                        column = f'{prop}_{method}_std'
+                        val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                    elif snr_type == 'range':
+                        column = f'{prop}_{method}_range'
+                        val = self.df_stat[self.df_stat['GroupID'] == 'total'][column].values[0] / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
+                    elif snr_type == 'mu_sigma': # does not use statistics of the total group
+                        column_mean = f'{prop}_{method}_mean'
+                        column_std = f'{prop}_{method}_std'
+                        val = abs(self.df_stat[self.df_stat['GroupID'] != 'total'][column_mean].mean()) / \
+                              self.df_stat[self.df_stat['GroupID'] != 'total'][column_std].mean()
+                    else:
+                        raise ValueError("snr_type must be either 'std_dev', 'range', or mu_sigma.")
+                df_heatmap.loc[method, prop] = val
+        self.df_heatmap = df_heatmap
 
         # Ensure the DataFrame is filled with float values
-        df_snr = df_snr.astype(float)
+        df_heatmap = df_heatmap.astype(float)
 
         # Plot the heatmap
         fig, ax = plt.subplots(figsize=(10.3, 10))
@@ -442,24 +494,39 @@ class DataAnalysis:
         label_size = 22
         annot_size = 18
         plt.rcParams.update({'font.size': label_size})
-        vmax = df_snr.max().max() if vmax is None else vmax
+        vmax = df_heatmap.max().max() if vmax is None else vmax
+        vmin = df_heatmap.min().min() if vmin is None else vmin
+        if which_to_plot == 'snr':
+            cbar_label = 'Signal-to-noise ratio'
+        elif which_to_plot == 'std_dev':
+            cbar_label = 'Max{standard deviation${_i}$}'
+        elif which_to_plot == 'std_dev_mean_normalized':
+            cbar_label = r'Normalized variability' #'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
         sns.heatmap(
-            df_snr,
+            df_heatmap,
             annot=True, fmt='.2f',
             annot_kws={'fontsize': annot_size}, # set fontsize for the annotation
             cmap=cmap,
-            cbar_kws={'label': 'Signal-to-Noise Ratio (SNR)'},
+            cbar_kws={'label': cbar_label},
             vmax=vmax, vmin=vmin,
             ax=ax, # use the ax parameter to plot the heatmap on the provided axis
         )
+        # change the position of the xticklabels
+        ax.xaxis.set_ticks_position("top")
         # Rotate xtick labels
-        plt.xticks(ha='left', fontsize=label_size, rotation=-30)
-        plt.yticks(ha='right', fontsize=label_size, rotation=30)
+        plt.xticks(ha='left', fontsize=label_size, rotation=20)
+        plt.yticks(ha='right', fontsize=label_size, rotation=60)
         plt.tight_layout()
-        plt.show()
 
         # reset the font size
         plt.rcParams.update({'font.size': 10})
+        if save_fig:
+            plt.savefig(f'heatmap_{which_to_plot}_{prefix}.png', dpi=300, bbox_inches='tight')
+        else:
+            plt.show()
+            pass
+
+        return df_heatmap
 
     def plot_tos_data_duplicate(self,
                                 column: str = 'CO Forward Production Rate (mol/molRh/s)',
@@ -467,6 +534,7 @@ class DataAnalysis:
                                 location_dict_auto: bool = False,
                                 x_max_plot: float = None,
                                 y_max_plot: float = None,
+                                font_scale: float = 1.0
                                 ):
         group_ids = list(set(self.dataset.df_us['GroupID'][self.dataset.df_us['GroupID'] > 0]))
         # If True, automatically make Dictionary that connects the location to unique integer values
@@ -502,6 +570,7 @@ class DataAnalysis:
                 location_data[locations[i]]['count'] += 1
 
             # Plot data for each location
+
             for location, data in location_data.items():
                 plt.scatter(
                     data['tos'], data['col_val'],
@@ -515,10 +584,14 @@ class DataAnalysis:
                 plt.xlim(0, x_max_plot)
             if y_max_plot:
                 plt.ylim(0, y_max_plot)
-            plt.xlabel('Time on stream (hrs)')
-            plt.ylabel(column)
-            plt.title(f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})')
-            plt.legend()
+            plt.xlabel('Time on stream (hrs)', fontsize=14*font_scale)
+            plt.ylabel(column, fontsize=14*font_scale, wrap=True)
+            plt.title(
+                f'{reaction_temp} C, {w_Rh} wt%, {m_Rh} mg, "{synth_method}" (GroupID={group_id})',
+                fontsize=12*font_scale, wrap=True
+            )
+            plt.legend(fontsize=12*font_scale)
+            plt.tight_layout()
             plt.show()
 
 
