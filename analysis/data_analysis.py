@@ -15,7 +15,6 @@ from statsmodels.formula.api import nominal_gee
 
 from data.extract import DataForGP, _plot_tos_data, _extract_indices_target
 
-
 class DataAnalysis:
 
     # Global dictionary for the location
@@ -162,7 +161,7 @@ class DataAnalysis:
 
     def compare_targets_std_dev(
             self, target_wise: bool = False, colormap: str = 'tab10', snr_type: str = 'std_dev',
-            plot_hist: bool = True
+            plot_hist: bool = True, save_fig: bool = False, prefix: str = 'target_metric',
     ):
         """
         Compare the standard deviation of the target values for each column.
@@ -173,6 +172,8 @@ class DataAnalysis:
             target_wise (bool): If True, compare standard deviations target-wise; otherwise, compare overall.
             colormap (str): The colormap to use for the plot.
             plot_hist: If True, plot the histogram of the target values.
+            save_fig (bool): If True, save the violinplot when clicking corresponding barplot; otherwise, show the figure.
+            prefix (str): The prefix for the saved figure name. Used only if `save_fig` is True.
 
         Returns:
             None
@@ -261,8 +262,10 @@ class DataAnalysis:
                     # Make the axes itself a button
                     def on_click(event, col=column, ax=axs[i]):
                         if event.inaxes == ax:
-                            self._generate_data_distribution(column=col.rstrip("_std"), cmap=colors,
-                                                             plot_hist=plot_hist, snr_type=snr_type)
+                            self._generate_data_distribution(
+                                column=col.rstrip("_std"), cmap=colors, plot_hist=plot_hist, snr_type=snr_type,
+                                save_fig=save_fig, prefix=prefix
+                            )
                     fig.canvas.mpl_connect('button_press_event', on_click)
 
                 # Hide the blank Axes: turn off Axes.axis if Axes order > number of plotted Axes
@@ -291,7 +294,7 @@ class DataAnalysis:
 
     def _generate_data_distribution(
             self, column: str, cmap: str = 'tab10', plot_hist: bool = True,
-            snr_type: str = 'std_dev'
+            snr_type: str = 'std_dev', save_fig: bool = False, prefix: str = 'target_metric'
     ):
 
         # shallow copy: connected to the original df. it's like using nickname
@@ -399,7 +402,14 @@ class DataAnalysis:
 
         fig.suptitle(f'Distribution of {column}')
         plt.tight_layout()
-        plt.show()
+        if save_fig:
+            print('Saving the figure...')
+            plt.savefig(f'violin_{prefix}.png', dpi=300, bbox_inches='tight')
+            print(f'Figure saved as violin_{prefix}.png')
+            # after saving the figure, close it
+            plt.close(fig)
+        else:
+            plt.show()
 
     def plot_heatmap(
             self,
@@ -422,6 +432,7 @@ class DataAnalysis:
             which_to_plot (str): The type of data to plot. Options are 'snr', 'std_dev', or 'std_dev_mean_normalized'. If 'snr', plot the signal-to-noise ratio; if 'std_dev', plot the maximum of standard deviations over replicate groups; if 'std_dev_mean_normalized', plot the maximum of normalized standard deviations over replicate groups.
             snr_type (str): The type of signal-to-noise ratio (SNR) to use for comparison. Either 'std_dev', 'range', or 'mu_sigma'. Used only if `which_to_plot` is 'snr'.
             save_fig (bool): If True, save the figure; otherwise, show the figure.
+            prefix (str): The prefix for the saved figure name. Used only if `save_fig` is True.
 
         Returns:
             df_heatmap (pd.DataFrame): The DataFrame containing the heatmap data.
@@ -524,7 +535,6 @@ class DataAnalysis:
             plt.savefig(f'heatmap_{which_to_plot}_{prefix}.png', dpi=300, bbox_inches='tight')
         else:
             plt.show()
-            pass
 
         return df_heatmap
 
