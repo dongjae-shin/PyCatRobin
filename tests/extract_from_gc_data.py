@@ -74,20 +74,20 @@ dataset_all.apply_duplicate_groupid(
 # Calculate and add target values into the DataFrame
 savgol=False
 methods=[
-    'AUC',
+    # 'AUC',
     'final value',
-    'initial value',
-    'final slope',
-    'initial slope',
-    'overall slope',
+    # 'initial value',
+    # 'final slope',
+    # 'initial slope',
+    # 'overall slope',
         ]
 
 for column in [
-   'CO2 Conversion (%)',
+   # 'CO2 Conversion (%)',
    'CH4 Net Production Rate (mol/molRh/s)',
-   'CO Net Production Rate (mol/molRh/s)',
+   # 'CO Net Production Rate (mol/molRh/s)',
    # 'CO Forward Production Rate (mol/molRh/s)',
-   'Selectivity to CO (%)'
+   # 'Selectivity to CO (%)'
     ]:
     dataset.assign_target_values(
         savgol=savgol, methods=methods,
@@ -124,7 +124,7 @@ analysis.calculate_statistics_duplicate_group(
 # print(analysis.df_stat['CO Net Production Rate (mol/molRh/s)_final slope_mean'])
 # print(analysis.df_stat[['CO Net Production Rate (mol/molRh/s)_auc_std', 'CO Net Production Rate (mol/molRh/s)_auc_mean']])
 
-# analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
+analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=5.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=10.5)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, font_scale=1.3)
 # analysis.plot_tos_data_duplicate(column='CO Net Production Rate (mol/molRh/s)', x_max_plot=12, y_max_plot=23, font_scale=1.3) # for Old dataset
@@ -154,8 +154,8 @@ analysis.compare_targets_std_dev(
     # snr_type='range', #'std_dev',
     snr_type='mu_sigma',
     plot_hist=True, #False,
-    save_fig=True,
-    prefix='',
+    # save_fig=True,
+    # prefix='',
 )
 
 # analysis._generate_data_distribution_horizontal(
