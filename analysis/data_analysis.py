@@ -478,9 +478,10 @@ class DataAnalysis:
                     val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max()
                 elif which_to_plot == 'std_dev_mean_normalized':
                     column = f'{prop}_{method}_std'
-                    column_mean = f'{prop}_{method}_mean'
+                    column_list = f'{prop}_{method}_list'
+                    total_array = np.array(self.df_stat[self.df_stat['GroupID'] == 'total'][column_list].values[0])
                     val = self.df_stat[self.df_stat['GroupID'] != 'total'][column].max() / \
-                          abs(self.df_stat[self.df_stat['GroupID'] == 'total'][column_mean].values[0])
+                          np.absolute(total_array).mean()
                 elif which_to_plot == 'snr':
                     if snr_type == 'std_dev':
                         column = f'{prop}_{method}_std'
