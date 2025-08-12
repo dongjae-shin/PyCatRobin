@@ -121,9 +121,10 @@ df_heatmap_stanford = plot_variability(exclude_keywords_stanford, 'stanford', av
 df_heatmap_slac = plot_variability(exclude_keywords_slac, 'slac', average_same_location=False)
 df_heatmap_psu = plot_variability(exclude_keywords_psu, 'psu', average_same_location=False)
 
-# mean of the four heatmaps
+# average of the four heatmaps
 df_heatmap_avg = (df_heatmap_ucsb + df_heatmap_stanford + df_heatmap_slac + df_heatmap_psu) / 4.0
 
+# Plot the average heatmap
 import matplotlib.pyplot as plt
 import seaborn as sns
 # Plot the heatmap
@@ -134,7 +135,7 @@ vmax = 5.0; vmin = None
 vmax = df_heatmap_avg.max().max() if vmax is None else vmax
 vmin = df_heatmap_avg.min().min() if vmin is None else vmin
 which_to_plot = 'std_dev_mean_normalized'
-cbar_label =  r'$\overline{\text{Normalized Variability}}$' #'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
+cbar_label =  r'$\overline{\text{Normalized variability}}$' #'Max{standard deviation${_i}$} / |Mean$_{entire}$|'
 cmap = 'Blues'
 sns.heatmap(
     df_heatmap_avg,
