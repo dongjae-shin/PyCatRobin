@@ -24,7 +24,8 @@ def plot(
         average_same_location: bool,
         path=path_all, path_all=path_all,
         snr: bool = True,
-        feature_impact: bool = True
+        feature_impact: bool = True,
+        colors: list = None
 ):
     exclude_keywords_all = [
         "0p0005", # data with too low Rh mass, likely to be inaccurate
@@ -66,10 +67,10 @@ def plot(
                 'overall slope',
             ]
     for column in [
-       'CO2 Conversion (%)',
-       'CH4 Net Production Rate (mol/molRh/s)',
+       # 'CO2 Conversion (%)',
+       # 'CH4 Net Production Rate (mol/molRh/s)',
        'CO Net Production Rate (mol/molRh/s)',
-       'Selectivity to CO (%)'
+       # 'Selectivity to CO (%)'
         ]:
         dataset.assign_target_values(
             savgol=savgol, methods=methods,
@@ -99,10 +100,10 @@ def plot(
         analysis.plot_heatmap(
             methods=methods, # to show the rows in a defined order
             properties=[
-            'CH4 Net Production Rate (mol/molRh/s)',
+            # 'CH4 Net Production Rate (mol/molRh/s)',
             'CO Net Production Rate (mol/molRh/s)',
-            'CO2 Conversion (%)',
-            'Selectivity to CO (%)'
+            # 'CO2 Conversion (%)',
+            # 'Selectivity to CO (%)'
             ],
             which_to_plot='snr',
             snr_type='mu_sigma',
@@ -119,14 +120,19 @@ def plot(
             snr_type='mu_sigma',
             plot_hist=True,  # False,
             save_fig=True,
-            prefix=prefix
+            prefix=prefix,
+            colors=colors
         )
 
-plot(exclude_keywords_overall, 'overall', average_same_location=False, path=path_all, snr=True, feature_impact=False)
-plot(exclude_keywords_ucsb, 'ucsb', average_same_location=False, path=path_all, snr=True, feature_impact=False)
+# plot(exclude_keywords_overall, 'overall', average_same_location=False, path=path_all, snr=True, feature_impact=False)
+# plot(exclude_keywords_ucsb, 'ucsb', average_same_location=False, path=path_all, snr=True, feature_impact=False)
 
-plot(exclude_keywords_overall, 'temp', average_same_location=False, path=path_temp, snr=False, feature_impact=True)
-plot(exclude_keywords_overall, 'Rh_loading', average_same_location=False, path=path_Rh_loading, snr=False, feature_impact=True)
-plot(exclude_keywords_overall, 'synth', average_same_location=False, path=path_synth, snr=False, feature_impact=True)
+# Need to internally turn off legend for violin plots
+colors = ['#69BADD', '#ED712E', '#721495'] # customized colors for colorblindness
+plot(exclude_keywords_overall, 'temp', average_same_location=False, path=path_temp, snr=False, feature_impact=True, colors=colors)
+colors = ['#C6BB68', '#2A60DD', '#ED712E']
+plot(exclude_keywords_overall, 'Rh_loading', average_same_location=False, path=path_Rh_loading, snr=False, feature_impact=True, colors=colors)
+colors = ['#BBBBBB', '#2A60DD']
+plot(exclude_keywords_overall, 'synth', average_same_location=False, path=path_synth, snr=False, feature_impact=True, colors=colors)
 
 

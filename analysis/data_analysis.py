@@ -164,6 +164,7 @@ class DataAnalysis:
     def compare_targets_std_dev(
             self, target_wise: bool = False, colormap: str = 'tab10', snr_type: str = 'std_dev',
             plot_hist: bool = True, save_fig: bool = False, prefix: str = 'target_metric',
+            colors: list[str] = None,
     ):
         """
         Compare the standard deviation of the target values for each column.
@@ -176,6 +177,7 @@ class DataAnalysis:
             plot_hist: If True, plot the histogram of the target values.
             save_fig (bool): If True, save the violinplot when clicking corresponding barplot; otherwise, show the figure.
             prefix (str): The prefix for the saved figure name. Used only if `save_fig` is True.
+            colors (list[str]): A list of colors to use for the barplot. It overrides the colormap if provided.
 
         Returns:
             None
@@ -216,10 +218,21 @@ class DataAnalysis:
                         var_name='Statistic',
                         value_name='Value'
                     )
-                    # Generate colors from a predefined colormap
-                    cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
-                    colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
-                    colors[-1] = 'black'
+
+                    if colors is None:
+                        # Generate colors from a predefined colormap
+                        cmap = plt.cm.get_cmap(colormap, len(df_melted['GroupID'].unique()))
+                        colors = [cmap(i) for i in range(len(df_melted['GroupID'].unique()))]
+                        colors[-1] = 'black'
+                    else:
+                        # If colors are provided, use them instead of the colormap
+                        if len(colors) < len(df_melted['GroupID'].unique()) - 1:
+                            raise ValueError(
+                                f"The number of colors provided is less than the number of unique GroupIDs ({
+                                len(df_melted['GroupID'].unique()) - 1
+                                })."
+                            )
+
                     # Plot the data based on standard deviation
                     if snr_type == 'range':
                         sns.barplot(data=df_melted[df_melted['Statistic'] == column.replace('_std', '_range')],
