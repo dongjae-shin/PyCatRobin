@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated mean normalized std dev">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="added colors argument to compare_targets_std_dev and updated plotting functions">
+      <change beforePath="$PROJECT_DIR$/.idea/PyCatRobin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PyCatRobin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/data_analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/RR_Figure5.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/RR_Figure5.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/snippet_to_calculate_targets.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/tests/snippet_to_calculate_targets.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +47,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/dongjae-shin/PyCatRobin.git&quot;,
-    &quot;accountId&quot;: &quot;b7b883db-0900-4ee5-9035-1c12d8894bc8&quot;
+    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
   },
   &quot;recentNewPullRequestHead&quot;: {
     &quot;server&quot;: {
@@ -143,7 +142,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-348a24fa61fa-5312c7369657-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.23774.444" />
+        <option value="bundled-python-sdk-dfff61a61320-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.25410.159" />
       </set>
     </attachedChunks>
   </component>
@@ -155,14 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00045" summary="updated gaussian_process.py">
-      <option name="closed" value="true" />
-      <created>1740980778508</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1740980778508</updated>
     </task>
     <task id="LOCAL-00046" summary="updated gaussian_process.py">
       <option name="closed" value="true" />
@@ -548,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754983212055</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="added colors argument to compare_targets_std_dev and updated plotting functions">
+      <option name="closed" value="true" />
+      <created>1755494402018</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1755494402019</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -605,7 +604,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add TODO comment in acquisition.py to address potential issue with uniform uncertainties" />
     <MESSAGE value="update extract_from_gc_data.py" />
     <MESSAGE value="update data_analysis.py to calculate SNRs for each location" />
     <MESSAGE value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
@@ -630,7 +628,8 @@
     <MESSAGE value="added some plotting details" />
     <MESSAGE value="updated minors" />
     <MESSAGE value="updated mean normalized std dev" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated mean normalized std dev" />
+    <MESSAGE value="added colors argument to compare_targets_std_dev and updated plotting functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="added colors argument to compare_targets_std_dev and updated plotting functions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
