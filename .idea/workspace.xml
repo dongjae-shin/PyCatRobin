@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="added colors argument to compare_targets_std_dev and updated plotting functions">
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="added separate files for tasks">
       <change beforePath="$PROJECT_DIR$/.idea/PyCatRobin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PyCatRobin.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,23 +45,23 @@
     }
   ]
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dongjae-shin/PyCatRobin.git&quot;,
-    &quot;accountId&quot;: &quot;13aebc2b-0e60-47c8-9aa0-f9a1590f00e6&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dongjae-shin/PyCatRobin.git",
+    "accountId": "b7b883db-0900-4ee5-9035-1c12d8894bc8"
   },
-  &quot;recentNewPullRequestHead&quot;: {
-    &quot;server&quot;: {
-      &quot;useHttp&quot;: false,
-      &quot;host&quot;: &quot;github.com&quot;,
-      &quot;port&quot;: null,
-      &quot;suffix&quot;: null
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
     },
-    &quot;owner&quot;: &quot;dongjae-shin&quot;,
-    &quot;repository&quot;: &quot;LongTermCat&quot;
+    "owner": "dongjae-shin",
+    "repository": "LongTermCat"
   },
-  &quot;editorReviewEnabled&quot;: false
-}</component>
+  "editorReviewEnabled": false
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -142,7 +143,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-dfff61a61320-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.25410.159" />
+        <option value="bundled-python-sdk-348a24fa61fa-5312c7369657-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.23774.444" />
       </set>
     </attachedChunks>
   </component>
@@ -154,22 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00046" summary="updated gaussian_process.py">
-      <option name="closed" value="true" />
-      <created>1740981085527</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1740981085527</updated>
-    </task>
-    <task id="LOCAL-00047" summary="updated acquisition.py">
-      <option name="closed" value="true" />
-      <created>1741051638087</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1741051638087</updated>
     </task>
     <task id="LOCAL-00048" summary="updated acquisition.py">
       <option name="closed" value="true" />
@@ -547,7 +532,23 @@
       <option name="project" value="LOCAL" />
       <updated>1755494402019</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="delete active learning part which have been separated as CatDegUS">
+      <option name="closed" value="true" />
+      <created>1759343872029</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1759343872029</updated>
+    </task>
+    <task id="LOCAL-00096" summary="added separate files for tasks">
+      <option name="closed" value="true" />
+      <created>1759350630572</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1759350630572</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -604,8 +605,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update extract_from_gc_data.py" />
-    <MESSAGE value="update data_analysis.py to calculate SNRs for each location" />
     <MESSAGE value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
     <MESSAGE value="1.updated data_analysis.py to enable choosing either vertical or horizontal version of violinplot through compare_targets_std_dev(). &#10;2.simplified the code in _generate_data_distribution_horizontal as in vertical version." />
     <MESSAGE value="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage" />
@@ -629,7 +628,9 @@
     <MESSAGE value="updated minors" />
     <MESSAGE value="updated mean normalized std dev" />
     <MESSAGE value="added colors argument to compare_targets_std_dev and updated plotting functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="added colors argument to compare_targets_std_dev and updated plotting functions" />
+    <MESSAGE value="delete active learning part which have been separated as CatDegUS" />
+    <MESSAGE value="added separate files for tasks" />
+    <option name="LAST_COMMIT_MESSAGE" value="added separate files for tasks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
