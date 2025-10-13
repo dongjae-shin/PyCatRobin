@@ -9,3 +9,6 @@
 <div align="center">
 <img src="./imgs/PyCatRobin_img_251012.png" alt="img" width="500">
 </div>
+
+## Acknowledgement
+* Original codes for t-test and fANOVA analyses were written by Dr. Selin Bac (UCSB) and Michael Albrechtsen (DTU), respectively.

@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="added separate files for tasks">
-      <change beforePath="$PROJECT_DIR$/.idea/PyCatRobin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PyCatRobin.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated README.md">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,6 +98,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/imgs" />
       <recent name="$PROJECT_DIR$/data" />
       <recent name="$PROJECT_DIR$/us_samp" />
       <recent name="$PROJECT_DIR$/uncertainty_sampling" />
@@ -155,14 +153,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00048" summary="updated acquisition.py">
-      <option name="closed" value="true" />
-      <created>1741072298677</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1741072298677</updated>
     </task>
     <task id="LOCAL-00049" summary="updated acquisition.py">
       <option name="closed" value="true" />
@@ -548,7 +538,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759350630572</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <task id="LOCAL-00097" summary="updated README.md">
+      <option name="closed" value="true" />
+      <created>1760342652145</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1760342652145</updated>
+    </task>
+    <option name="localTasksCounter" value="98" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -605,7 +603,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update data_analysis.py to implement vertical version of violinplot and histogram with simpler code structure based on scatterplot instead of stripplot." />
     <MESSAGE value="1.updated data_analysis.py to enable choosing either vertical or horizontal version of violinplot through compare_targets_std_dev(). &#10;2.simplified the code in _generate_data_distribution_horizontal as in vertical version." />
     <MESSAGE value="add TODO comment in extract_from_gc_data.py to modify compare_targets_std_dev() for dataset_all usage" />
     <MESSAGE value="update data_analysis.py" />
@@ -630,7 +627,8 @@
     <MESSAGE value="added colors argument to compare_targets_std_dev and updated plotting functions" />
     <MESSAGE value="delete active learning part which have been separated as CatDegUS" />
     <MESSAGE value="added separate files for tasks" />
-    <option name="LAST_COMMIT_MESSAGE" value="added separate files for tasks" />
+    <MESSAGE value="updated README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated README.md" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
