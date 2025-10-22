@@ -13,7 +13,7 @@
 ## Getting started
 ### 1. Make a virtual environment (e.g., when using `conda`):
 ``` bash
-conda create -n pycatrobin python=3.13
+conda create -n pycatrobin python=3.12
 conda activate pycatrobin
 ```
 ### 2. Installation
