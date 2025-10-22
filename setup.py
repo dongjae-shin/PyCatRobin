@@ -1,3 +1,4 @@
+# setup.py
 from pathlib import Path
 from setuptools import setup, find_packages
 
@@ -13,23 +14,21 @@ def read_requirements(path="requirements.txt"):
     return reqs
 
 setup(
-    name='pycatrobin',
-    version='0.1.0',
-    author='Dongjae Shin',
-    packages=read_requirements(), #find_packages(),
-    # install_requires=[
-    #     # 'pandas==2.2.3',
-    #     # 'mplcursors==0.6',
-    #     # 'matplotlib==3.9.2',
-    #     # 'openpyxl==3.1.5',
-    #     # 'seaborn==0.13.2',
-    #     # 'statsmodels==0.14.4',
-    #     # 'ipython==8.25.0',
-    #     'docx==0.2.4',
-    #     'mplcursors==0.6',
-    #     'openpyxl==3.1.5',
-    #     'python-docx==1.1.2',
-    #     'seaborn==0.13.2',
-    #     'statsmodels==0.14.4'
-    # ]
+    name="your_package_name",
+    version="0.1.0",
+    description="Short description of your project",
+    long_description=Path("README.md").read_text() if Path("README.md").exists() else "",
+    long_description_content_type="text/markdown",
+    author="Your Name",
+    author_email="you@example.com",
+    url="https://github.com/your/repo",
+    license="MIT",
+    packages=find_packages(exclude=("tests", "docs")),
+    python_requires=">=3.9",
+    install_requires=read_requirements(),
+    include_package_data=True,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+    ],
 )
