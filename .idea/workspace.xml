@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b3e0ead7-cb0c-4193-9b73-8a63cc6b396f" name="Changes" comment="updated README.md">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +46,7 @@
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/dongjae-shin/PyCatRobin.git",
-    "accountId": "b7b883db-0900-4ee5-9035-1c12d8894bc8"
+    "accountId": "13aebc2b-0e60-47c8-9aa0-f9a1590f00e6"
   },
   "recentNewPullRequestHead": {
     "server": {
@@ -70,29 +71,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Notification.DisplayName-DoNotAsk-GitHub Copilot&quot;: &quot;GitHub Copilot&quot;,
-    &quot;Notification.DoNotAsk-GitHub Copilot&quot;: &quot;true&quot;,
-    &quot;Python.RR_Figure4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.RR_Figure5.executor&quot;: &quot;Run&quot;,
-    &quot;Python.data_analysis.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.extract.executor&quot;: &quot;Run&quot;,
-    &quot;Python.extract_from_gc_data.executor&quot;: &quot;Run&quot;,
-    &quot;Python.extract_from_gc_data_2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.gp_code.executor&quot;: &quot;Run&quot;,
-    &quot;Python.grid_construction.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hover.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.us_code.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/dongjae/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/PyCatRobin&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;debugger.dataViews.python.type.renderers&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Notification.DisplayName-DoNotAsk-GitHub Copilot": "GitHub Copilot",
+    "Notification.DoNotAsk-GitHub Copilot": "true",
+    "Python.RR_Figure4.executor": "Run",
+    "Python.RR_Figure5.executor": "Run",
+    "Python.data_analysis.executor": "Debug",
+    "Python.extract.executor": "Run",
+    "Python.extract_from_gc_data.executor": "Run",
+    "Python.extract_from_gc_data_2.executor": "Run",
+    "Python.gp_code.executor": "Run",
+    "Python.grid_construction.executor": "Run",
+    "Python.hover.executor": "Run",
+    "Python.test.executor": "Run",
+    "Python.us_code.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "ShowUsagesActions.previewPropertyKey": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/djayshin/Dropbox/0.Dongjae/04.SUNCAT@SLAC,Standford(2402~)/231128_research/240602_ML_codes/PyCatRobin",
+    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -141,7 +142,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-348a24fa61fa-5312c7369657-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.23774.444" />
+        <option value="bundled-python-sdk-dfff61a61320-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.25410.159" />
       </set>
     </attachedChunks>
   </component>
@@ -153,22 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736271698082</updated>
-    </task>
-    <task id="LOCAL-00049" summary="updated acquisition.py">
-      <option name="closed" value="true" />
-      <created>1741072615964</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1741072615964</updated>
-    </task>
-    <task id="LOCAL-00050" summary="updated acquisition.py and grid_construction.py">
-      <option name="closed" value="true" />
-      <created>1741074701771</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1741074701771</updated>
     </task>
     <task id="LOCAL-00051" summary="enhanced data_analysis.py to include color differentiation in stripplot markers">
       <option name="closed" value="true" />
@@ -546,7 +531,23 @@
       <option name="project" value="LOCAL" />
       <updated>1760342652145</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="updated README.md">
+      <option name="closed" value="true" />
+      <created>1760342902777</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1760342902777</updated>
+    </task>
+    <task id="LOCAL-00099" summary="updated README.md">
+      <option name="closed" value="true" />
+      <created>1760343193226</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1760343193226</updated>
+    </task>
+    <option name="localTasksCounter" value="100" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
