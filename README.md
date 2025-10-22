@@ -10,6 +10,9 @@
 
 **Py**thon module to analyze time-on-stream **Cat**alyst testing results from Round **Robin** test
 
+## Requirements
+* All specified in `setup.py`
+
 ## Getting started
 ### 1. Make a virtual environment (e.g., when using `conda`):
 ``` bash
@@ -34,6 +37,5 @@ conda activate pycatrobin
   ``` bash
   python ./example.py
   ```
-  
 ## Acknowledgement
 * Original codes for t-test and fANOVA analyses were written by Dr. Selin Bac (UCSB) and Michael Albrechtsen (DTU), respectively.
