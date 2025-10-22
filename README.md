@@ -17,9 +17,22 @@ conda create -n pycatrobin python=3.12
 conda activate pycatrobin
 ```
 ### 2. Installation
-* **Directly install using pip**
+* choice1) **Directly install using pip**
   ``` bash
   pip install git+https://github.com/dongjae-shin/PyCatRobin.git
+  ```
+* choice2) Clone repository & install using pip
+  ``` bash
+  git clone https://github.com/dongjae-shin/PyCatRobin.git
+  cd PyCatRobin
+  pip install .
+  ```
+  
+### 3. Run the example code (under development)
+* Example python codes to use PyCatRobin are in [`tutorial/`](https://github.com/dongjae-shin/PyCatRobin/tree/main/tutorial) directory.
+* In the `tutorial/`, run as follows:
+  ``` bash
+  python ./example.py
   ```
   
 ## Acknowledgement
