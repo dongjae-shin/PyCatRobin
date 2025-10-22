@@ -16,7 +16,7 @@ setup(
     name='pycatrobin',
     version='0.1.0',
     author='Dongjae Shin',
-    packages=find_packages(),
+    packages=read_requirements(), #find_packages(),
     # install_requires=[
     #     # 'pandas==2.2.3',
     #     # 'mplcursors==0.6',
