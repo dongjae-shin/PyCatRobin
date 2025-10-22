@@ -3,7 +3,7 @@ message: "If you use this software, please cite it as below."
 authors:
   - family-names: Shin
     given-names: Dongjae
-    orcid: https://orcid.org/1234-5678-9101-1121
+    orcid: https://orcid.org/0000-0002-0492-0301
 title: "PyCatRobin: Python module to analyze time-on-stream Catalyst testing results from Round Robin test"
 version: 0.1.0
 identifiers:
