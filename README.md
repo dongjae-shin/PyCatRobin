@@ -40,7 +40,6 @@ conda activate pycatrobin
 
 ## Related publication
 * Application to catalyst testing data analysis (TBD)
-* Integration into a LLM-based multi-agent system ([`link`](https://sc25.conference-program.com/presentation/?id=ws_fgai105&sess=sess209))
 
 ## Acknowledgement
 * Original codes for t-test and fANOVA analyses were written by Dr. Selin Bac (UCSB) and Michael Albrechtsen (DTU), respectively.
