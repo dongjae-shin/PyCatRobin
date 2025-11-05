@@ -229,6 +229,6 @@ def process_folder(folder_path: Path):
     plt.show()
 
 # Run the pipeline on all folders in current directory
-for sub in Path('.').iterdir():
+for sub in Path('../dataset/finalized_RR_data').iterdir():
     if sub.is_dir() and not sub.name.startswith('.'):
         process_folder(sub)
