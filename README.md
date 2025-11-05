@@ -32,7 +32,7 @@ conda activate pycatrobin
   ```
   
 ### 3. Run example codes (under development)
-* Example python codes to use PyCatRobin are in [`examples/`](examples/) directory.
+* Example python codes to use `pycatrobin` are in [`examples/`](examples/) directory.
 * In the `examples/`, run as follows:
   ``` bash
   python ./extract_from_gc_data_snr.py
