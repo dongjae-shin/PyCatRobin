@@ -37,6 +37,8 @@ conda activate pycatrobin
   ``` bash
   python ./example.py
   ```
+## Examples
+* See the instructions in the [`examples/`](examples/) folder.
 
 ## Related publication
 * Application to catalyst testing data analysis (TBD)
