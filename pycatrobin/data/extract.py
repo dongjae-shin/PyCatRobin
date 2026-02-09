@@ -696,6 +696,18 @@ def _calculate_target(
     elif method == 'AUC':
         # calculate area under the curve (AUC) using trapezoidal rule
         target = np.trapz(col_val[selected_index], tos[selected_index])
+    elif method == 'de-const initial':
+        target = _calculate_deactivation_constant(
+            tos, col_val, initial_index, final_index, adjacency_slope, where='initial'
+        )
+    elif method == 'de-const final':
+        target = _calculate_deactivation_constant(
+            tos, col_val, initial_index, final_index, adjacency_slope, where='final'
+        )
+    elif method == 'de-const overall':
+        target = _calculate_deactivation_constant(
+            tos, col_val, initial_index, final_index, adjacency_slope, where='overall'
+        )
     # elif method == 'decaying rate':
     #     print('not implemented yet')
     #     return
@@ -775,10 +787,7 @@ def _extract_indices_target(
     # Find the final index based on the duration from the initial index
     final_index = np.argwhere(tos >= tos[initial_index] + duration).reshape(-1)[0]
 
-    # Find the selected indices within the initial and final index range
-    selected_index = np.arange(initial_index, final_index + 1)
-
-    # Modify indices according to the given `method` argument for 'plot_slope'
+    # Modify indices according to the given `method` argument for slope calculations
     if method == 'initial slope':
         # use the same initial_index
         try:
@@ -793,6 +802,9 @@ def _extract_indices_target(
             initial_index = np.argwhere(tos <= tos[final_index] - adjacency_slope).reshape(-1)[-1]
         except Exception as e:
             print(e, f'has occurred while calculating `initial_index` for {method}.')
+
+    # Find the selected indices within the initial and final index range
+    selected_index = np.arange(initial_index, final_index + 1)
 
     return tos, temp, col_val, initial_index, final_index, selected_index
 
@@ -908,6 +920,88 @@ def _plot_linear_line_fitting(
     if show:
         plt.show()
     return coeffs[0]
+
+def _calculate_deactivation_constant(tos, col_val, initial_index, final_index, adjacency_slope, where='overall'):
+    """
+    Calculate deactivation constant by fitting to exponential decay function.
+    1st order deactivation model for rate, not concentration as in textbooks.
+    ln(r/ro) -> np.log(col_val / col_val[initial_index])
+    initial and final slope calculations are based on the data points close to initial and final index, respectively,
+    with a given adjacency_slope in tos. Overall slope calculation is based on the data points between initial and
+    final index.
+
+    Args:
+        tos (pd.Series): Time on stream series.
+        col_val (pd.Series): Column values series.
+        initial_index (int): Initial index for fitting.
+        final_index (int): Final index for fitting.
+        adjacency_slope (float): Slope threshold for initial and final slope calculations.
+        where (str): Method to calculate the deactivation constant. Options are 'initial', 'final', or 'overall'.
+
+    Returns:
+        float: Deactivation constant.
+    """
+
+    # Note: The same r0 (the value at unmodified initial_index) should be used for the following three methods
+
+    if where == 'initial':
+        # choosing modified final_index
+        try:
+            # choosing final index which is close, in tos, to initial index
+            final_index_mod = np.argwhere(tos >= tos[initial_index] + adjacency_slope).reshape(-1)[0]
+        except Exception as e:
+            print(e, f'has occurred while calculating `final_index` for {where} deactivation constant.')
+
+        # Find the selected indices within the initial and final index range
+        selected_index = np.arange(initial_index, final_index_mod + 1)
+
+        # Mask to filter out non-finite values for logarithm calculation
+        tos = tos[selected_index]
+        ln = np.where(
+            (col_val[selected_index] / col_val[initial_index]) > 0,
+            np.log(col_val[selected_index] / col_val[initial_index]),
+            np.nan
+        )
+        mask = np.isfinite(tos) & np.isfinite(ln)
+
+        slope, _ = np.polyfit(tos[mask], ln[mask],1)
+    elif where == 'final':
+        # choosing modified initial_index
+        try:
+            # choosing initial index which is close, in tos, to final index
+            initial_index_mod = np.argwhere(tos <= tos[final_index] - adjacency_slope).reshape(-1)[-1]
+        except Exception as e:
+            print(e, f'has occurred while calculating `initial_index` for {where} deactivation constant.')
+
+        # Find the selected indices within the initial and final index range
+        selected_index = np.arange(initial_index_mod, final_index + 1)
+
+        # Mask to filter out non-finite values for logarithm calculation
+        tos = tos[selected_index]
+        ln = np.where(
+            (col_val[selected_index] / col_val[initial_index]) > 0,
+            np.log(col_val[selected_index] / col_val[initial_index]),
+            np.nan
+        )
+        mask = np.isfinite(tos) & np.isfinite(ln)
+
+        slope, _ = np.polyfit(tos[mask], ln[mask],1)
+    elif where == 'overall':
+        # Find the selected indices within the initial and final index range
+        selected_index = np.arange(initial_index, final_index + 1)
+
+        # Mask to filter out non-finite values for logarithm calculation
+        tos = tos[selected_index]
+        ln = np.where(
+            (col_val[selected_index] / col_val[initial_index]) > 0,
+            np.log(col_val[selected_index] / col_val[initial_index]),
+            np.nan
+            )
+        mask = np.isfinite(tos) & np.isfinite(ln)
+
+        slope, _ = np.polyfit(tos[mask], ln[mask],1)
+
+    return np.nan if col_val[initial_index]==0 else -slope
 
 def _get_location(filename: str) -> str:
     if 'LaboratoryA' in filename:
