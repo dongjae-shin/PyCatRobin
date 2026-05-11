@@ -612,6 +612,16 @@ class DataAnalysis:
                     color=cmap(location_dict[location]),
                     label=f'{location} ({data["count"]})'
                 )
+                # Add line connecting the scatter points
+                chunk_size = len(data['tos']) // data['count']
+                for i in range(0, len(data['tos']), chunk_size):
+                    plt.plot(
+                        data['tos'][i:i+chunk_size],
+                        data['col_val'][i:i+chunk_size],
+                        color=cmap(location_dict[location]),
+                        linewidth=0.8,
+                        alpha=0.5
+                    )
             if x_max_plot:
                 plt.xlim(0, x_max_plot)
             if y_max_plot:
