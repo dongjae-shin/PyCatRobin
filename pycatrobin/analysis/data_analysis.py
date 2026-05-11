@@ -17,9 +17,6 @@ from ..data.extract import DataForML, _plot_tos_data, _extract_indices_target
 
 class DataAnalysis:
 
-    # Global dictionary for the location
-    location_dict = {'Laboratory A': 0, 'Laboratory B': 1, 'Laboratory C': 2, 'Laboratory D': 3}
-
     def __init__(self, dataset: DataForML = None):
         """
         Initialize the DataAnalysis class.
@@ -35,6 +32,13 @@ class DataAnalysis:
         self.unique_properties = None
         self.df_snr = None
         self.df_violinplot = None
+
+        # Set location_dict based on dataset's location_mapping
+        if dataset.location_mapping:
+            self.location_dict = {v: i for i, v in enumerate(dataset.location_mapping.values())}
+        else:
+            # Fallback default
+            self.location_dict = {'Laboratory A': 0, 'Laboratory B': 1, 'Laboratory C': 2, 'Laboratory D': 3}
 
     def calculate_statistics_duplicate_group(self, verbose: bool = False,
                                              dataset_all: DataForML = None,

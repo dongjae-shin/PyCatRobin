@@ -59,6 +59,7 @@ class DataForML:
         self.df_us = None
         self.df_us_unique = None
         self.targets = []
+        self.location_mapping = None
 
     def find_excel_files(self):
         extension = ['*.xlsx', '*.xls']
@@ -91,7 +92,27 @@ class DataForML:
             for path in self.path_removed:
                 print(path)
 
-    def construct_dataframe(self, extensive:bool=False):
+    def construct_dataframe(self, extensive:bool=False, location_mapping: dict[str, str] | None=None):
+        """
+        Construct a DataFrame from the filtered Excel files.
+
+        Args:
+            extensive (bool): Whether to include additional experimental variables such as
+                filename, experiment_date, etc. Defaults to False.
+            location_mapping (dict[str, str] | None): Candidate locations mapping to assign data with.
+                Defaults to {'LaboratoryA': 'Laboratory A', 'LaboratoryB': 'Laboratory B',
+                'LaboratoryC': 'Laboratory C', 'LaboratoryD': 'Laboratory D'}.
+
+        Returns:
+            None
+        """
+        if location_mapping is None:
+            location_mapping = {'LaboratoryA': 'Laboratory A', 'LaboratoryB': 'Laboratory B',
+                                'LaboratoryC': 'Laboratory C', 'LaboratoryD': 'Laboratory D'}
+
+        # Store location_mapping as instance variable
+        self.location_mapping = location_mapping
+
         if extensive:
             self.df_us = pd.DataFrame(
                 {'reaction_temp': [],
@@ -128,7 +149,9 @@ class DataForML:
         self.df_us['experiment_date'] = pd.to_datetime(self.df_us['experiment_date'], format='%Y%m%d')
 
         # add 'location' column
-        self.df_us['location'] = self.df_us['filename'].apply(_get_location)
+        self.df_us['location'] = self.df_us['filename'].apply(
+            lambda fn: _get_location(fn, locations=location_mapping)
+        )
 
     def convert_measured_to_nominal(self,
                                     allowed_values: np.array = None,
@@ -1003,14 +1026,10 @@ def _calculate_deactivation_constant(tos, col_val, initial_index, final_index, a
 
     return np.nan if col_val[initial_index]==0 else -slope
 
-def _get_location(filename: str) -> str:
-    if 'LaboratoryA' in filename:
-        return 'Laboratory A'
-    elif 'LaboratoryB' in filename:
-        return 'Laboratory B'
-    elif 'LaboratoryC' in filename:
-        return 'Laboratory C'
-    elif 'LaboratoryD' in filename:
-        return 'Laboratory D'
-    else:
-        return 'Unknown: add new location.'
+def _get_location(filename: str, locations: dict[str, str] | None = None) -> str:
+    if locations:
+        for key, value in locations.items():
+            if key in filename:
+                return value
+    return 'Unknown: add new location.'
+
