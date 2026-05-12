@@ -731,9 +731,9 @@ def _calculate_target(
         target = _calculate_deactivation_constant(
             tos, col_val, initial_index, final_index, adjacency_slope, where='overall'
         )
-    # elif method == 'decaying rate':
-    #     print('not implemented yet')
-    #     return
+    elif method == 'normalized final value':
+        # calculate normalized final value: value(t_final) / value(t_initial); inter/extrapolation may be needed.
+        target = _calculate_normalized_final_value(tos, col_val, t_initial=0, t_final=35)
 
     if verbose:
         print(f"{column}->{method}: {target:.4f}")
@@ -1025,6 +1025,84 @@ def _calculate_deactivation_constant(tos, col_val, initial_index, final_index, a
         slope, _ = np.polyfit(tos[mask], ln[mask],1)
 
     return np.nan if col_val[initial_index]==0 else -slope
+
+def _calculate_normalized_final_value(tos, col_val, t_initial=0, t_final=35, ax=None):
+    """
+    Calculate normalized final value with inter/extrapolation.
+    value(t_final) / value(t_initial)
+
+    Args:
+        tos (pd.Series): Time on stream series.
+        col_val (pd.Series): Column values series.
+        t_initial (float): Initial time on stream for normalization.
+        t_final (float): Final time on stream for evaluation.
+        ax (plt.Axes, optional): Matplotlib Axes object for verification plotting. Defaults to None.
+
+    Returns:
+        float: Normalized final value.
+    """
+
+    def linear_func(x, x1, x2, y1, y2):
+        a = (y2 - y1) / (x2 - x1)
+        b = y2 - a * x2
+        return a * x + b, a
+
+    # Calculate the value (t=t_initial) (inter/extrapolation)
+    initial_val, _ = linear_func(
+        t_initial,
+        tos.iloc[0],
+        tos.iloc[1],
+        col_val.iloc[0],
+        col_val.iloc[1])
+
+    # Calculate the value (t=t_final) (inter/extrapolation)
+    # Select two indexes, of which tos values are around 't_final', for interpolation/extrapolation
+    if tos.iloc[-1] > t_final:
+        final_index_i = tos[tos <= t_final].index[-1]
+        final_index_f = tos[tos >= t_final].index[0]
+    else:
+        print(f"The final time on stream is less than {t_final}. Extrapolation will be performed.")
+        final_index_f = len(tos) - 1
+        final_index_i = final_index_f - 1
+
+    final_val, _ = linear_func(
+        t_final,
+        tos.iloc[final_index_i],
+        tos.iloc[final_index_f],
+        col_val.iloc[final_index_i],
+        col_val.iloc[final_index_f])
+
+    # Optional plot for verification
+    if ax:
+        x_plot_i = np.linspace(t_initial, (t_final - t_initial) / 2, 100)
+        y_plot_i, _ = linear_func(
+            x_plot_i,
+            tos.iloc[0],
+            tos.iloc[1],
+            col_val.iloc[0],
+            col_val.iloc[1]
+        )
+        x_plot_f = np.linspace((t_final - t_initial) / 2, t_final, 100)
+        y_plot_f, _ = linear_func(
+            x_plot_f,
+            tos.iloc[final_index_i],
+            tos.iloc[final_index_f],
+            col_val.iloc[final_index_i],
+            col_val.iloc[final_index_f]
+        )
+
+
+        ax.plot(tos, col_val, marker='o', linestyle='-') # original data
+        ax.plot(x_plot_i, y_plot_i, label='Linear Fit (Initial Slope)', linestyle='--')
+        ax.plot(x_plot_f, y_plot_f, label='Linear Fit (Final Slope)', linestyle='--')
+        ax.scatter(
+            [t_initial, t_final],
+            [initial_val, final_val],
+            color='red', label='Inter/Extrapolated Values'
+        )
+        ax.legend()
+
+    return final_val / initial_val
 
 def _get_location(filename: str, locations: dict[str, str] | None = None) -> str:
     if locations:

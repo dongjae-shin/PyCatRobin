@@ -602,7 +602,6 @@ class DataAnalysis:
                 location_data[locations[i]]['count'] += 1
 
             # Plot data for each location
-
             for location, data in location_data.items():
                 plt.scatter(
                     data['tos'], data['col_val'],
